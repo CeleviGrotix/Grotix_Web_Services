@@ -1,0 +1,6 @@
+@Grotix_HostAddress = http://localhost:5148
+
+GET {{Grotix_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

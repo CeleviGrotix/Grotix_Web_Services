@@ -1,0 +1,1 @@
+﻿namespace GrotixBackend.Shared.Resources;
