@@ -1,9 +1,11 @@
-﻿namespace GrotixBackend.Profiles.Interfaces.REST.Resources;
+﻿// Profiles/Interfaces/REST/Resources/UserResource.cs
+namespace GrotixBackend.Profiles.Interfaces.REST.Resources;
 
 public record UserResource(
     int Id,
-    string Name,
+    string? Name,
     string Email,
-    string TaxId,
-    string ProfilePicture
+    string? TaxId,
+    string? Phone,
+    int RoleId
 );

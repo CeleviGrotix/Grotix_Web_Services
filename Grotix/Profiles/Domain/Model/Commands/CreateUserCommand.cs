@@ -1,9 +1,11 @@
-﻿namespace GrotixBackend.Profiles.Domain.Model.Commands;
+﻿// Profiles/Domain/Model/Commands/CreateUserCommand.cs
+namespace GrotixBackend.Profiles.Domain.Model.Commands;
 
 public record CreateUserCommand(
     int IdentityId,
-    string Name,
     string Email,
-    string TaxId,
-    string Phone
+    int RoleId = 3,
+    string? Name = null,
+    string? TaxId = null,
+    string? Phone = null
 );

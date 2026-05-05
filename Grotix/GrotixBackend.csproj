@@ -32,6 +32,7 @@
     <Compile Include="Profiles\Domain\Model\Aggregates\User.cs" />
     <Compile Include="Profiles\Domain\Model\Commands\CreateUserCommand.cs" />
     <Compile Include="Profiles\Domain\Model\Queries\GetUserByIdQuery.cs" />
+    <Compile Include="Profiles\Domain\Model\ValueObjects\UserRole.cs" />
     <Compile Include="Profiles\Domain\Repositories\IUserRepository.cs" />
     <Compile Include="Profiles\Infraestructure\Repositories\UserRepository.cs" />
     <Compile Include="Profiles\Interfaces\REST\Controllers\UsersController.cs" />
