@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Only include IAM and user profile code and Program.cs explicitly.
+         Remove implicit wildcard compile to keep project focused on IAM/user modules. -->
+    <Compile Remove="**\*.cs" />
+    <Compile Include="Profiles\Application\ACL\ExternalProfileService.cs" />
+    <Compile Include="Profiles\Application\Internal\CommandServices\IUserCommandService.cs" />
+    <Compile Include="Profiles\Application\Internal\CommandServices\UserCommandService.cs" />
+    <Compile Include="Profiles\Application\Internal\CommandServices\UserQueryService.cs" />
+    <Compile Include="Profiles\Application\Internal\QueryServices\IUserQueryService.cs" />
+    <Compile Include="Profiles\Domain\Model\Aggregates\User.cs" />
+    <Compile Include="Profiles\Domain\Model\Commands\CreateUserCommand.cs" />
+    <Compile Include="Profiles\Domain\Model\Queries\GetUserByIdQuery.cs" />
+    <Compile Include="Profiles\Domain\Repositories\IUserRepository.cs" />
+    <Compile Include="Profiles\Infraestructure\Repositories\UserRepository.cs" />
+    <Compile Include="Profiles\Interfaces\REST\Controllers\UsersController.cs" />
+    <Compile Include="Profiles\Interfaces\REST\Resources\UserResource.cs" />
+    <Compile Include="Profiles\Interfaces\REST\Transform\UserResourceFromEntityAssembler.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="IAM\**\*.cs" />
+    <Compile Include="Profiles\users\**\*.cs" />
+    <Compile Include="Shared\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EF Core InMemory for lightweight local development of IAM and users modules -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="default\Application\ACL\" />
+    <Folder Include="default\Application\Internal\CommandServices\" />
+    <Folder Include="default\Application\Internal\QueryServices\" />
+    <Folder Include="default\Domain\Model\Aggregates\" />
+    <Folder Include="default\Domain\Model\Commands\" />
+    <Folder Include="default\Domain\Model\Queries\" />
+    <Folder Include="default\Domain\Repositories\" />
+    <Folder Include="default\Domain\Services\" />
+    <Folder Include="default\Infraestructure\Repositories\" />
+    <Folder Include="default\Interfaces\ACL\" />
+    <Folder Include="default\Interfaces\REST\Controllers\" />
+    <Folder Include="default\Interfaces\REST\Resources\" />
+    <Folder Include="default\Interfaces\REST\Transform\" />
+    <Folder Include="Profiles\Interfaces\ACL\" />
+  </ItemGroup>
+
+</Project>
