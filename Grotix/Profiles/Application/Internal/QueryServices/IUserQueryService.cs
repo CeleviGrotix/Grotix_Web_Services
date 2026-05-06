@@ -6,4 +6,5 @@ namespace GrotixBackend.Profiles.Application.Internal.QueryServices;
 public interface IUserQueryService
 {
     Task<User?> Handle(GetUserByIdQuery query);
+    Task<User?> Handle(GetUserByIdentityQuery query);
 }

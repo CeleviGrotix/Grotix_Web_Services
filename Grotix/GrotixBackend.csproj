@@ -24,23 +24,10 @@
     <!-- Only include IAM and user profile code and Program.cs explicitly.
          Remove implicit wildcard compile to keep project focused on IAM/user modules. -->
     <Compile Remove="**\*.cs" />
-    <Compile Include="Profiles\Application\ACL\ExternalProfileService.cs" />
-    <Compile Include="Profiles\Application\Internal\CommandServices\IUserCommandService.cs" />
-    <Compile Include="Profiles\Application\Internal\CommandServices\UserCommandService.cs" />
-    <Compile Include="Profiles\Application\Internal\CommandServices\UserQueryService.cs" />
-    <Compile Include="Profiles\Application\Internal\QueryServices\IUserQueryService.cs" />
-    <Compile Include="Profiles\Domain\Model\Aggregates\User.cs" />
-    <Compile Include="Profiles\Domain\Model\Commands\CreateUserCommand.cs" />
-    <Compile Include="Profiles\Domain\Model\Queries\GetUserByIdQuery.cs" />
-    <Compile Include="Profiles\Domain\Model\ValueObjects\UserRole.cs" />
-    <Compile Include="Profiles\Domain\Repositories\IUserRepository.cs" />
-    <Compile Include="Profiles\Infraestructure\Repositories\UserRepository.cs" />
-    <Compile Include="Profiles\Interfaces\REST\Controllers\UsersController.cs" />
-    <Compile Include="Profiles\Interfaces\REST\Resources\UserResource.cs" />
-    <Compile Include="Profiles\Interfaces\REST\Transform\UserResourceFromEntityAssembler.cs" />
+    <Compile Include="CultivationArea\**\*.cs" />
+    <Compile Include="Profiles\**\*.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="IAM\**\*.cs" />
-    <Compile Include="Profiles\users\**\*.cs" />
     <Compile Include="Shared\**\*.cs" />
   </ItemGroup>
 

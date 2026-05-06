@@ -37,7 +37,7 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories
         /// Una tarea que representa la operación asíncrona.
         /// El resultado de la tarea es la entidad encontrada, o <c>null</c> si no existe.
         /// </returns>
-        public virtual async Task<TEntity> GetByIdAsync(int id)
+        public virtual async Task<TEntity?> GetByIdAsync(int id)
         {
             return await Context.Set<TEntity>().FindAsync(id);
         }

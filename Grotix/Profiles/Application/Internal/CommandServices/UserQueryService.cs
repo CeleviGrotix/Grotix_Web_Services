@@ -11,4 +11,9 @@ public class UserQueryService(IUserRepository userRepository) : IUserQueryServic
     {
         return await userRepository.GetByIdAsync(query.UserId);
     }
+
+    public async Task<User?> Handle(GetUserByIdentityQuery query)
+    {
+        return await userRepository.GetByIdentityIdAsync(query.IdentityId);
+    }
 }

@@ -21,7 +21,7 @@ namespace GrotixBackend.IAM.Infrastructure.Repositories
             await _context.Identities.AddAsync(identity);
         }
 
-        public async Task<Identity> GetByIdAsync(int id)
+        public async Task<Identity?> GetByIdAsync(int id)
         {
             return await _context.Identities
                 .FirstOrDefaultAsync(i => i.Id == id);

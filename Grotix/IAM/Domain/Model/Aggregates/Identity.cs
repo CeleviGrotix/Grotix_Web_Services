@@ -1,41 +1,26 @@
 ﻿namespace GrotixBackend.IAM.Domain.Model.Aggregates;
 
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
+using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using System.Text.RegularExpressions;
 
+/// <summary>
+/// Entidad de credenciales del informe Profile (ubicación técnica IAM hasta fusionar carpetas).
+/// </summary>
 public class Identity
 {
     public int Id { get; private set; }
-    public string UserName { get; private set; }
-    public PasswordHash HashedPassword { get; private set; }
+    public string UserName { get; private set; } = null!;
+    public PasswordHash HashedPassword { get; private set; } = null!;
 
     protected Identity() { }
 
-    public Identity(string email, string plainPassword)
+    /// <summary>Crea identidad con correo validado y hash ya calculado por el servicio de aplicación.</summary>
+    public Identity(string email, PasswordHash passwordHash)
     {
-        ValidateEmail(email);
-        Identity.VerifyPasswordStrength(plainPassword);
-        UserName = email;
-        HashedPassword = new PasswordHash(plainPassword);
-    }
-
-    public bool VerifyPassword(string plainText) =>
-        HashedPassword != null && HashedPassword.Matches(plainText);
-
-    private static void ValidateEmail(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("El correo no puede estar vacío.");
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            if (addr.Address != email || !email.Contains('.') || email.Split('@')[1].Length < 3)
-                throw new Exception();
-        }
-        catch
-        {
-            throw new ArgumentException($"El correo '{email}' no tiene un formato válido.");
-        }
+        var vo = UserEmail.Create(email);
+        UserName = vo.Value;
+        HashedPassword = passwordHash ?? throw new ArgumentNullException(nameof(passwordHash));
     }
 
     public static void VerifyPasswordStrength(string password)

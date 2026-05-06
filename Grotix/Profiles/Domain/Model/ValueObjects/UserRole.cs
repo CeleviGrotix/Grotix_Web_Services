@@ -1,6 +1,7 @@
 ﻿namespace GrotixBackend.Profiles.Domain.Model.ValueObjects;
 
-public enum RoleType { User = 1, Staff = 2, Admin = 3 }
+/// <summary>Coincide con los IDs sembrados en la tabla <c>role</c> (Admin=1, Staff=2, User=3).</summary>
+public enum RoleType { Admin = 1, Staff = 2, User = 3 }
 
 public class UserRole : IEquatable<UserRole>
 {

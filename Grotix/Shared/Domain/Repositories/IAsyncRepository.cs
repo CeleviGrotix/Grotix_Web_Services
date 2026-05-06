@@ -19,7 +19,7 @@ namespace GrotixBackend.Shared.Domain.Repositories
         /// Una tarea que representa la operación asíncrona.
         /// El resultado de la tarea es la entidad encontrada, o <c>null</c> si no existe.
         /// </returns>
-        Task<TEntity> GetByIdAsync(int id);
+        Task<TEntity?> GetByIdAsync(int id);
 
         /// <summary>
         /// Obtiene una colección de todas las entidades de forma asíncrona.

@@ -7,4 +7,6 @@ namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 public interface IUserCommandService
 {
     Task<User> Handle(CreateUserCommand command);
+    Task<User> Handle(UpdateUserProfileCommand command);
+    Task<User> Handle(AssignUserRoleCommand command);
 }
