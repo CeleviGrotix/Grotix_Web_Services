@@ -20,7 +20,7 @@ public class StaffCommandService(
         if (await staffRepository.GetByUserIdAsync(command.UserId) != null)
             throw new InvalidOperationException("Este usuario ya tiene una ficha de staff.");
 
-        var staff = new Staff(command.UserId, command.TechnicalRole);
+        var staff = new Staff(command.UserId, command.TechnicalRole, command.LastSystemAccess);
         await staffRepository.AddAsync(staff);
 
         user.AssignRole((int)RoleType.Staff);
@@ -36,6 +36,8 @@ public class StaffCommandService(
 
         if (command.TechnicalRole.HasValue)
             staff.UpdateTechnicalRole(command.TechnicalRole.Value);
+        if (command.LastSystemAccess.HasValue)
+            staff.UpdateLastSystemAccess(command.LastSystemAccess.Value);
         if (command.IsActive.HasValue)
             staff.SetActive(command.IsActive.Value);
 

@@ -31,7 +31,7 @@ public class StaffController(
         return Ok(ToResource(staff));
     }
 
-    public record CreateStaffRequest(int UserId, TechnicalRole TechnicalRole);
+    public record CreateStaffRequest(int UserId, TechnicalRole TechnicalRole, DateTime? LastSystemAccess);
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateStaffRequest request)
@@ -39,7 +39,7 @@ public class StaffController(
         try
         {
             var staff = await staffCommandService.Handle(
-                new CreateStaffCommand(request.UserId, request.TechnicalRole));
+                new CreateStaffCommand(request.UserId, request.TechnicalRole, request.LastSystemAccess));
             return CreatedAtAction(nameof(GetById), new { staffId = staff.Id }, ToResource(staff));
         }
         catch (InvalidOperationException ex)
@@ -48,7 +48,7 @@ public class StaffController(
         }
     }
 
-    public record UpdateStaffRequest(TechnicalRole? TechnicalRole, bool? IsActive);
+    public record UpdateStaffRequest(TechnicalRole? TechnicalRole, DateTime? LastSystemAccess, bool? IsActive);
 
     [HttpPatch("{staffId:int}")]
     public async Task<IActionResult> Patch(int staffId, [FromBody] UpdateStaffRequest request)
@@ -56,7 +56,7 @@ public class StaffController(
         try
         {
             var staff = await staffCommandService.Handle(
-                new UpdateStaffCommand(staffId, request.TechnicalRole, request.IsActive));
+                new UpdateStaffCommand(staffId, request.TechnicalRole, request.LastSystemAccess, request.IsActive));
             return Ok(ToResource(staff));
         }
         catch (KeyNotFoundException)
@@ -66,5 +66,5 @@ public class StaffController(
     }
 
     private static StaffResource ToResource(Staff s) =>
-        new(s.Id, s.UserId, s.TechnicalRole.ToString(), s.IsActive);
+        new(s.Id, s.UserId, s.TechnicalRole.ToString(), s.LastSystemAccess, s.IsActive);
 }

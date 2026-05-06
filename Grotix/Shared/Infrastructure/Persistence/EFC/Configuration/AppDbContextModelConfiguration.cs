@@ -101,6 +101,9 @@ public static class AppDbContextModelConfiguration
             e.Property(s => s.TechnicalRole)
                 .HasColumnName("TechnicalRole")
                 .HasConversion<string>();
+            e.Property(s => s.LastSystemAccess)
+                .HasColumnName("LastSystemAccess")
+                .HasColumnType("datetime(6)");
 
             e.HasOne<User>().WithMany().HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
