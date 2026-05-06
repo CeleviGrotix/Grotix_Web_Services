@@ -15,6 +15,9 @@ public class UserCommandService(
 {
     public async Task<User> Handle(CreateUserCommand command)
     {
+        if (!await roleRepository.ExistsAsync(command.RoleId))
+            throw new ArgumentException($"El rol {command.RoleId} no existe.");
+
         var email = UserEmail.Create(command.Email);
         var user = new User(
             command.IdentityId,
