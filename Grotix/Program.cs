@@ -25,6 +25,7 @@ using GrotixBackend.Shared.Infrastructure.Health;
 using GrotixBackend.Shared.Infrastructure.OpenApi;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -174,7 +175,15 @@ try
         if (existingAdminIdentity != null)
         {
             var adminProfile = await userRepository.GetByIdentityIdAsync(existingAdminIdentity.Id);
-            if (adminProfile != null)
+            if (adminProfile == null)
+            {
+                await aclService.CreateUserAndReturnId(
+                    existingAdminIdentity.Id,
+                    existingAdminIdentity.UserName,
+                    roleId: adminRoleId);
+                Console.WriteLine($"--> Perfil {adminEmail} creado (la identidad ya existía sin fila en user).");
+            }
+            else
             {
                 var canonicalAdminEmail = UserEmail.Create(adminEmail);
                 if (adminProfile.Email.Equals(canonicalAdminEmail) && adminProfile.RoleId != adminRoleId)
