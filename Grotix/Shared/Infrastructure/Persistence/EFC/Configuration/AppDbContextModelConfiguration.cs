@@ -9,7 +9,8 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 /// <summary>Configuración única del modelo EF (compartida por <see cref="AppDbContext"/> y migraciones).</summary>
 public static class AppDbContextModelConfiguration
 {
-    public static void ConfigureGrotixSchema(this ModelBuilder modelBuilder)
+    /// <summary>Modelo hasta la migración inicial (sin <c>contract</c>).</summary>
+    public static void ConfigureGrotixCoreSchema(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Identity>(e =>
         {
@@ -149,5 +150,45 @@ public static class AppDbContextModelConfiguration
             e.HasOne<Crop>().WithMany().HasForeignKey(z => z.CropId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+    }
+
+    public static void ConfigureContractSchema(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Contract>(e =>
+        {
+            e.ToTable("contract");
+            e.HasKey(c => c.Id);
+            e.Property(c => c.Id).HasColumnName("ContractID").ValueGeneratedOnAdd();
+            e.Property(c => c.AssociationId).HasColumnName("AssociationID");
+            e.Property(c => c.StartDate).HasColumnType("datetime(6)");
+            e.Property(c => c.EndDate).HasColumnType("datetime(6)");
+            e.Property(c => c.Status)
+                .HasColumnName("Status")
+                .HasConversion<string>()
+                .HasMaxLength(32)
+                .IsRequired();
+            e.Property(c => c.MaxZones).HasColumnName("MaxZones");
+            e.Property(c => c.MaxMicrocontrollers).HasColumnName("MaxMicrocontrollers");
+            e.Property(c => c.TotalAmount).HasColumnName("TotalAmount");
+            e.Property(c => c.Currency)
+                .HasConversion<string>()
+                .HasMaxLength(16)
+                .IsRequired();
+            e.Property(c => c.PaymentFrequency)
+                .HasColumnName("PaymentFrequency")
+                .HasConversion<string>()
+                .HasMaxLength(32)
+                .IsRequired();
+            e.Property(c => c.IsSuspended).HasColumnName("IsSuspended");
+
+            e.HasOne<Association>().WithMany().HasForeignKey(c => c.AssociationId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    public static void ConfigureGrotixSchema(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.ConfigureGrotixCoreSchema();
+        modelBuilder.ConfigureContractSchema();
     }
 }

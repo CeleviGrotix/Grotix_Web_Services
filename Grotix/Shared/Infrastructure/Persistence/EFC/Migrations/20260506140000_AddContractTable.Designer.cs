@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations;
 
 [DbContext(typeof(AppDbContext))]
-[Migration("20260505120000_InitialCreate")]
-public partial class InitialCreate
+[Migration("20260506140000_AddContractTable")]
+public partial class AddContractTable
 {
     protected override void BuildTargetModel(ModelBuilder modelBuilder) =>
-        AppDbContextModelSnapshotFactory.ApplyInitialBaseline(modelBuilder);
+        AppDbContextModelSnapshotFactory.Apply(modelBuilder);
 }

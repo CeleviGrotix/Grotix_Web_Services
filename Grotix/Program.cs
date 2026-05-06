@@ -32,6 +32,7 @@ using Microsoft.IdentityModel.Tokens;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,6 +102,9 @@ builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 builder.Services.AddScoped<IStaffQueryService, StaffQueryService>();
 builder.Services.AddScoped<IStaffCommandService, StaffCommandService>();
+builder.Services.AddScoped<IContractRepository, ContractRepository>();
+builder.Services.AddScoped<IContractQueryService, ContractQueryService>();
+builder.Services.AddScoped<IContractCommandService, ContractCommandService>();
 
 // Cultivation Area
 builder.Services.AddScoped<IFarmRepository, FarmRepository>();
@@ -116,7 +120,8 @@ builder.Services.AddScoped<ICropQueryService, CropQueryService>();
 // ACL
 builder.Services.AddScoped<IExternalProfileService, ExternalProfileService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(o =>
+    o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHealthChecks()
