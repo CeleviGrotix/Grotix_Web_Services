@@ -16,4 +16,13 @@ public class UserQueryService(IUserRepository userRepository) : IUserQueryServic
     {
         return await userRepository.GetByIdentityIdAsync(query.IdentityId);
     }
+
+    public Task<IReadOnlyList<User>> Handle(GetAllFarmersQuery query) =>
+        userRepository.ListFarmersOrderedByIdAsync();
+
+    public Task<IReadOnlyList<User>> Handle(GetFarmersByAssociationQuery query) =>
+        userRepository.ListFarmersByAssociationIdAsync(query.AssociationId);
+
+    public Task<User?> Handle(GetFarmerByIdQuery query) =>
+        userRepository.GetFarmerByIdAsync(query.UserId);
 }

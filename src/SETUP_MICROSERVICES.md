@@ -54,6 +54,12 @@ En el login, además de `role`, el JWT incluye un claim `permission` por cada c�
 - Profiles: `/api/v1/profiles/*` -> forwarded to `Profiles.Api` as `/api/v1/*`
 - Cultivation: `/api/v1/cultivation/*` -> forwarded to `CultivationArea.Api` as `/api/v1/*`
 
+### Users (directorio de agricultores)
+
+- `GET /api/v1/users` — solo usuarios con rol agricultor (`user_admin`, `user_basic`, `user_advanced`); no lista cuentas `admin`/`staff`.
+- `GET /api/v1/users/{id}` — mismo subconjunto por id (autorización: `admin`/`staff` global; `user_admin` solo misma asociación).
+- `GET /api/v1/profile/me` — perfil del usuario autenticado (incluye cualquier rol).
+
 ### Legacy compatibility routes
 
 - Profiles: `/api/v1/auth/*`, `/api/v1/users/*`, `/api/v1/contracts/*`, `/api/v1/staff/*`, `/api/v1/roles/*`, `/api/v1/associations/*`

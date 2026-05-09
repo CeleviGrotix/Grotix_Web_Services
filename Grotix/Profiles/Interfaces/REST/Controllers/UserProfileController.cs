@@ -19,14 +19,6 @@ public class UserProfileController(
     IUserCommandService userCommandService,
     IUserQueryService userQueryService) : ControllerBase
 {
-    [HttpGet("{userId:int}")]
-    public async Task<IActionResult> GetUserById(int userId)
-    {
-        var user = await userQueryService.Handle(new GetUserByIdQuery(userId));
-        if (user == null) return NotFound();
-        return Ok(UserResourceFromEntityAssembler.ToResourceFromEntity(user));
-    }
-
     [HttpGet("me")]
     [Authorize]
     public async Task<IActionResult> GetMe()

@@ -1,3 +1,4 @@
+using GrotixBackend.Profiles.Domain.Model;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Repositories;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -14,5 +15,33 @@ public class CoreDbUserRepository(AppDbContext context)
     {
         return await Context.Set<User>()
             .FirstOrDefaultAsync(u => u.IdentityId == identityId);
+    }
+
+    public async Task<IReadOnlyList<User>> ListFarmersOrderedByIdAsync(CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<User>()
+            .AsNoTracking()
+            .Where(u => FarmerRoles.Ids.Contains(u.RoleId))
+            .OrderBy(u => u.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<User>> ListFarmersByAssociationIdAsync(int associationId, CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<User>()
+            .AsNoTracking()
+            .Where(u => u.AssociationId == associationId && FarmerRoles.Ids.Contains(u.RoleId))
+            .OrderBy(u => u.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<User?> GetFarmerByIdAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var user = await Context.Set<User>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user == null || !FarmerRoles.IsFarmerRole(user.RoleId))
+            return null;
+        return user;
     }
 }

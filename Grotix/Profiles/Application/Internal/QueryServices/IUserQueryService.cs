@@ -7,4 +7,9 @@ public interface IUserQueryService
 {
     Task<User?> Handle(GetUserByIdQuery query);
     Task<User?> Handle(GetUserByIdentityQuery query);
+    Task<IReadOnlyList<User>> Handle(GetAllFarmersQuery query);
+
+    Task<IReadOnlyList<User>> Handle(GetFarmersByAssociationQuery query);
+
+    Task<User?> Handle(GetFarmerByIdQuery query);
 }
