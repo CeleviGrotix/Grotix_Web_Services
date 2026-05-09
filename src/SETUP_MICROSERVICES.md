@@ -15,7 +15,7 @@
 dotnet ef database update --project src/Profiles.Api/Profiles.Api.csproj
 ```
 
-Incluye la migración `UpdateRolesAndPermissions` (roles `admin`, `staff`, `user_admin`, `user_basic`, `user_advanced` y permisos en `permission` / `role_permission`).
+Incluye migraciones como `UpdateRolesAndPermissions` y `AddAssociationInvite` (tabla `association_invite`).
 
 3. Start `Profiles.Api`:
 
@@ -42,7 +42,7 @@ dotnet run --project src/Gateway.Api/Gateway.Api.csproj --urls http://localhost:
 | `admin` | Administrador del sistema (rol 1) |
 | `staff` | Operador técnico (rol 2) |
 | `user_admin` | Gestor de organización (rol 3) |
-| `user_basic` | Agricultor básico (rol 4) — registro por defecto |
+| `user_basic` | Agricultor básico (rol 4) — asignado vía **invitación** |
 | `user_advanced` | Agricultor avanzado (rol 5) |
 
 En el login, además de `role`, el JWT incluye un claim `permission` por cada código (p. ej. `TELEMETRY_VIEW`). Definidos en `KnownPermissionCodes` y en la migración `UpdateRolesAndPermissions`.
@@ -53,6 +53,18 @@ En el login, además de `role`, el JWT incluye un claim `permission` por cada c�
 
 - Profiles: `/api/v1/profiles/*` -> forwarded to `Profiles.Api` as `/api/v1/*`
 - Cultivation: `/api/v1/cultivation/*` -> forwarded to `CultivationArea.Api` as `/api/v1/*`
+
+### Contratos (`POST`/`GET /api/v1/contracts`)
+
+- **`POST`** (solo `admin` / `staff`): crea el contrato **y** el usuario **`user_admin`** para la `AssociationId` indicada. Requiere `orgAdminEmail`, `orgAdminPassword` y opcional `orgAdminName`. Si la asociación **ya tiene** un `user_admin`, devuelve error (un administrador por organización en este flujo).
+- **`GET`** lista todos los contratos (`admin`/`staff`) o solo los de la propia asociación (`user_admin`).
+
+### Invitaciones y registro (`association_invite`)
+
+1. **`POST /api/v1/associations/{associationId}/invites`** (JWT): crea una invitación. Cuerpo `{ "roleId": 4 | 5, "expiresAt": null }`. Permitido: `admin`, `staff`, o `user_admin` de esa misma asociación. La respuesta incluye **`token`** en claro **una sola vez** (guárdalo).
+2. **`POST /api/v1/auth/register`**: `{ "email", "password", "inviteToken" }`. El usuario queda con el rol y la organización definidos en la invitación (`user_basic` o `user_advanced`). Si el token está usado o caducado, falla.
+
+El hash SHA-256 del token es lo que se guarda en BD (`TokenHash`).
 
 ### Users (directorio de agricultores)
 
@@ -81,4 +93,4 @@ Directo en APIs: `5101` / `5102` también exponen `/live`, `/ready/core`, `/read
 - Arranque con Docker (raíz del repo): `docker compose -f docker-compose.rabbitmq.yml up -d`
 - Configuración: sección `RabbitMq` en `appsettings` de `Profiles.Api` y `CultivationArea.Api`. Con `Enabled: false` no se conecta ni publica ni consume.
 - Si RabbitMQ no está en marcha o falla usuario/clave, las APIs **siguen arrancando**; verás un warning en log y no se publicará/consumirá hasta que el broker responda (conexión lazy).
-- Flujo de prueba: registrar usuario vía `POST /api/v1/auth/register` (Profiles o gateway). Tras el registro, `Profiles.Api` publica el evento `user.registered` al exchange `grotix.events`. `CultivationArea.Api` consume la cola `cultivation.user.registered` y escribe el payload en log.
+- Flujo de prueba: crear invitación (`POST .../associations/{id}/invites`), luego registrar con `inviteToken` vía `POST /api/v1/auth/register`. Tras el registro, `Profiles.Api` publica `user.registered` al exchange `grotix.events`. `CultivationArea.Api` consume la cola `cultivation.user.registered` y escribe el payload en log.

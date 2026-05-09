@@ -189,9 +189,35 @@ public static class AppDbContextModelConfiguration
         });
     }
 
+    public static void ConfigureAssociationInviteSchema(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AssociationInvite>(e =>
+        {
+            e.ToTable("association_invite");
+            e.HasKey(i => i.Id);
+            e.Property(i => i.Id).HasColumnName("InviteID").ValueGeneratedOnAdd();
+            e.Property(i => i.AssociationId).HasColumnName("AssociationID");
+            e.Property(i => i.TokenHash).HasMaxLength(64).IsRequired();
+            e.HasIndex(i => i.TokenHash).IsUnique();
+            e.Property(i => i.RoleId).HasColumnName("RoleID");
+            e.Property(i => i.ExpiresAt).HasColumnName("ExpiresAt").HasColumnType("datetime(6)");
+            e.Property(i => i.UsedAt).HasColumnName("UsedAt").HasColumnType("datetime(6)");
+            e.Property(i => i.CreatedAt).HasColumnName("CreatedAt").HasColumnType("datetime(6)");
+            e.Property(i => i.CreatedByUserId).HasColumnName("CreatedByUserID");
+
+            e.HasOne<Association>().WithMany().HasForeignKey(i => i.AssociationId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne<Role>().WithMany().HasForeignKey(i => i.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<User>().WithMany().HasForeignKey(i => i.CreatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+    }
+
     public static void ConfigureGrotixSchema(this ModelBuilder modelBuilder)
     {
         modelBuilder.ConfigureGrotixCoreSchema();
         modelBuilder.ConfigureContractSchema();
+        modelBuilder.ConfigureAssociationInviteSchema();
     }
 }

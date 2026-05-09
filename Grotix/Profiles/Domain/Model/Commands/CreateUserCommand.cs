@@ -7,5 +7,6 @@ public record CreateUserCommand(
     int RoleId = 4,
     string? Name = null,
     string? TaxId = null,
-    string? Phone = null
+    string? Phone = null,
+    int? AssociationId = null
 );

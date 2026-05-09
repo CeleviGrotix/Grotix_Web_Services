@@ -1,8 +1,9 @@
 using GrotixBackend.Profiles.Domain.Model.Enums;
 
-namespace GrotixBackend.Profiles.Domain.Model.Commands;
+namespace GrotixBackend.Profiles.Interfaces.REST.Requests;
 
-public record CreateContractCommand(
+/// <summary>Cuerpo de <c>POST /api/v1/contracts</c>. Requiere rol <c>admin</c> o <c>staff</c>.</summary>
+public sealed record CreateContractRequest(
     int AssociationId,
     DateTime StartDate,
     DateTime EndDate,
@@ -13,8 +14,7 @@ public record CreateContractCommand(
     ContractCurrency Currency,
     ContractPaymentFrequency PaymentFrequency,
     bool IsSuspended,
-    /// <summary>Correo del primer administrador de la organización (rol <c>user_admin</c>).</summary>
+    /// <summary>Correo del administrador de organización (<c>user_admin</c>) creado con el contrato.</summary>
     string OrgAdminEmail,
     string OrgAdminPassword,
-    /// <summary>Nombre visible opcional del administrador.</summary>
     string? OrgAdminName);

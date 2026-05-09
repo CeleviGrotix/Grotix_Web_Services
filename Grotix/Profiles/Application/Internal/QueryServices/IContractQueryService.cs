@@ -7,4 +7,6 @@ public interface IContractQueryService
 {
     Task<Contract?> Handle(GetContractByIdQuery query);
     Task<IReadOnlyList<Contract>> ListAllAsync();
+
+    Task<IReadOnlyList<Contract>> ListByAssociationAsync(int associationId);
 }

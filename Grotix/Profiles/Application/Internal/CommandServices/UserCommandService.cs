@@ -25,7 +25,8 @@ public class UserCommandService(
             command.RoleId,
             command.Name,
             command.TaxId,
-            command.Phone
+            command.Phone,
+            command.AssociationId
         );
 
         await userRepository.AddAsync(user);

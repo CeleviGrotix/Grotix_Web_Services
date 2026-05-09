@@ -70,9 +70,13 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IExternalProfileService, ExternalProfileService>();
 
 builder.Services.AddScoped<IUserRepository, CoreDbUserRepository>();
+builder.Services.AddScoped<IAssociationRepository, CoreDbAssociationRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+
+builder.Services.AddScoped<IAssociationInviteRepository, AssociationInviteRepository>();
+builder.Services.AddScoped<IAssociationInviteCommandService, AssociationInviteCommandService>();
 
 builder.Services.AddScoped<IFarmRepository, FarmRepository>();
 builder.Services.AddScoped<IZoneRepository, ZoneRepository>();

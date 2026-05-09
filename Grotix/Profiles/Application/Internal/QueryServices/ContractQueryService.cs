@@ -14,4 +14,7 @@ public class ContractQueryService(IContractRepository contractRepository) : ICon
         var list = await contractRepository.ListAsync();
         return list.ToList();
     }
+
+    public Task<IReadOnlyList<Contract>> ListByAssociationAsync(int associationId) =>
+        contractRepository.ListByAssociationIdAsync(associationId);
 }

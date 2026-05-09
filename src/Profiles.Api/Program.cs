@@ -80,6 +80,8 @@ builder.Services.AddScoped<IStaffCommandService, StaffCommandService>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IContractQueryService, ContractQueryService>();
 builder.Services.AddScoped<IContractCommandService, ContractCommandService>();
+builder.Services.AddScoped<IAssociationInviteRepository, AssociationInviteRepository>();
+builder.Services.AddScoped<IAssociationInviteCommandService, AssociationInviteCommandService>();
 builder.Services.AddScoped<IExternalProfileService, ExternalProfileService>();
 
 builder.Services.AddGrotixRabbitMqPublisher(builder.Configuration);

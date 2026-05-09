@@ -1,5 +1,6 @@
 using GrotixBackend.Profiles.Domain.Model;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
+using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories;
@@ -43,5 +44,14 @@ public class CoreDbUserRepository(AppDbContext context)
         if (user == null || !FarmerRoles.IsFarmerRole(user.RoleId))
             return null;
         return user;
+    }
+
+    public async Task<bool> HasUserAdminForAssociationAsync(int associationId, CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<User>()
+            .AsNoTracking()
+            .AnyAsync(
+                u => u.AssociationId == associationId && u.RoleId == (int)RoleType.user_admin,
+                cancellationToken);
     }
 }

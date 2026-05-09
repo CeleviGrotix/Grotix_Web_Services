@@ -16,4 +16,7 @@ public interface IUserRepository : IAsyncRepository<User>
 
     /// <summary>Usuario por id solo si es agricultor; si no existe o es admin/staff, <c>null</c>.</summary>
     Task<User?> GetFarmerByIdAsync(int userId, CancellationToken cancellationToken = default);
+
+    /// <summary>Indica si la asociación ya tiene al menos un usuario con rol <c>user_admin</c> (3).</summary>
+    Task<bool> HasUserAdminForAssociationAsync(int associationId, CancellationToken cancellationToken = default);
 }

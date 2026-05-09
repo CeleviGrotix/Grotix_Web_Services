@@ -5,5 +5,5 @@ namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 
 public interface IContractCommandService
 {
-    Task<Contract> Handle(CreateContractCommand command);
+    Task<CreateContractResult> Handle(CreateContractCommand command);
 }

@@ -14,6 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Staff> StaffMembers { get; set; }
     public DbSet<Association> Associations { get; set; }
     public DbSet<Contract> Contracts { get; set; }
+    public DbSet<AssociationInvite> AssociationInvites { get; set; }
     public DbSet<Farm> Farms { get; set; }
     public DbSet<Crop> Crops { get; set; }
     public DbSet<Zone> Zones { get; set; }

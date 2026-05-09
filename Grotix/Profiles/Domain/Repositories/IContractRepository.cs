@@ -5,4 +5,5 @@ namespace GrotixBackend.Profiles.Domain.Repositories;
 
 public interface IContractRepository : IAsyncRepository<Contract>
 {
+    Task<IReadOnlyList<Contract>> ListByAssociationIdAsync(int associationId, CancellationToken cancellationToken = default);
 }
