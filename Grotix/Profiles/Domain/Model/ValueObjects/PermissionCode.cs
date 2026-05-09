@@ -1,8 +1,12 @@
+using System.Text.RegularExpressions;
+
 namespace GrotixBackend.Profiles.Domain.Model.ValueObjects;
 
-/// <summary>VO del informe Profile: código de permiso de acción (p. ej. irrigation:start).</summary>
+/// <summary>VO del informe Profile: código de permiso en formato UPPER_SNAKE (coincide con BD y JWT).</summary>
 public sealed class PermissionCode : IEquatable<PermissionCode>
 {
+    private static readonly Regex ValidPattern = new("^[A-Za-z0-9_]+$", RegexOptions.Compiled);
+
     public string Value { get; }
 
     private PermissionCode(string value) => Value = value;
@@ -11,10 +15,10 @@ public sealed class PermissionCode : IEquatable<PermissionCode>
     {
         if (string.IsNullOrWhiteSpace(code))
             throw new ArgumentException("El código de permiso no puede estar vacío.");
-        var trimmed = code.Trim().ToLowerInvariant();
-        if (trimmed.Length > 64 || trimmed.Contains(' ', StringComparison.Ordinal))
-            throw new ArgumentException("El código de permiso tiene un formato inválido.");
-        return new PermissionCode(trimmed);
+        var trimmed = code.Trim();
+        if (trimmed.Length > 64 || !ValidPattern.IsMatch(trimmed))
+            throw new ArgumentException("El código de permiso tiene un formato inválido (use UPPER_SNAKE).");
+        return new PermissionCode(trimmed.ToUpperInvariant());
     }
 
     public bool Equals(PermissionCode? other) => other is not null && Value == other.Value;

@@ -24,16 +24,18 @@ public class LoginCommandHandler(
             !passwordHasher.Verify(command.Password, identity.HashedPassword.HashedValue))
             return new LoginResponse(0, command.Email, false, "Credenciales inválidas.");
 
-        var roleNames = new List<string> { "User" };
+        var roleNames = new List<string>();
+        IReadOnlyList<string> permissionCodes = Array.Empty<string>();
         var profile = await userRepository.GetByIdentityIdAsync(identity.Id);
         if (profile != null)
         {
             var roleEntity = await roleRepository.GetByIdAsync(profile.RoleId);
             if (roleEntity != null)
                 roleNames = new List<string> { roleEntity.Name };
+            permissionCodes = await roleRepository.GetPermissionCodesByRoleIdAsync(profile.RoleId);
         }
 
-        var token = tokenService.GenerateToken(identity, roleNames);
+        var token = tokenService.GenerateToken(identity, roleNames, permissionCodes);
 
         return new LoginResponse(identity.Id, identity.UserName, true, "Login exitoso.", token);
     }

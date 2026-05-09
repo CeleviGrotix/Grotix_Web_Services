@@ -30,7 +30,10 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
      * <param name="roles">The list of roles for the user</param> // ¡NUEVO!
      * <returns>The generated Token</returns>
      */
-    public string GenerateToken(Identity user, IList<string> roles)
+    /// <summary>Alineado con <c>GrotixBackend.Profiles.Interfaces.REST.Auth.ClaimsPrincipalExtensions.PermissionClaimType</c>.</summary>
+    public const string PermissionClaimType = "permission";
+
+    public string GenerateToken(Identity user, IList<string> roles, IReadOnlyList<string>? permissionCodes = null)
     {
         var secret = _tokenSettings.Secret;
         var key = Encoding.ASCII.GetBytes(secret);
@@ -41,10 +44,15 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
             new Claim(ClaimTypes.Name, user.UserName)
         };
 
-        // ¡NUEVO! Añadir claims para cada rol
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        foreach (var code in permissionCodes ?? Array.Empty<string>())
+        {
+            if (!string.IsNullOrWhiteSpace(code))
+                claims.Add(new Claim(PermissionClaimType, code.Trim()));
         }
 
         var tokenDescriptor = new SecurityTokenDescriptor

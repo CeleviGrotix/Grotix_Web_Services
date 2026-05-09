@@ -11,7 +11,7 @@ namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 
 [ApiController]
 [Route("api/v1/staff")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "admin")]
 public class StaffController(
     IStaffCommandService staffCommandService,
     IStaffQueryService staffQueryService) : ControllerBase

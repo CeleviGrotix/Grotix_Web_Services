@@ -10,7 +10,7 @@ namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 /// <summary>Informe Profile: registro de asociaciones agrarias (Staff/Admin).</summary>
 [ApiController]
 [Route("api/v1/associations")]
-[Authorize(Roles = "Admin,Staff")]
+[Authorize(Roles = "admin,staff")]
 public class AssociationController(
     IAssociationRepository associationRepository,
     IUnitOfWork unitOfWork) : ControllerBase

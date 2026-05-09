@@ -12,7 +12,7 @@ namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 
 [ApiController]
 [Route("api/v1/contracts")]
-[Authorize(Roles = "Admin,Staff")]
+[Authorize(Roles = "admin,staff")]
 public sealed class ContractsController(
     IContractQueryService contractQueryService,
     IContractCommandService contractCommandService) : ControllerBase

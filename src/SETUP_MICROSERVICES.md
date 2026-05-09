@@ -15,6 +15,8 @@
 dotnet ef database update --project src/Profiles.Api/Profiles.Api.csproj
 ```
 
+Incluye la migración `UpdateRolesAndPermissions` (roles `admin`, `staff`, `user_admin`, `user_basic`, `user_advanced` y permisos en `permission` / `role_permission`).
+
 3. Start `Profiles.Api`:
 
 ```bash
@@ -32,6 +34,18 @@ dotnet run --project src/CultivationArea.Api/CultivationArea.Api.csproj --urls h
 ```bash
 dotnet run --project src/Gateway.Api/Gateway.Api.csproj --urls http://localhost:5100
 ```
+
+## Roles y permisos (resumen)
+
+| `role.Name` (JWT) | Uso |
+|-------------------|-----|
+| `admin` | Administrador del sistema (rol 1) |
+| `staff` | Operador técnico (rol 2) |
+| `user_admin` | Gestor de organización (rol 3) |
+| `user_basic` | Agricultor básico (rol 4) — registro por defecto |
+| `user_advanced` | Agricultor avanzado (rol 5) |
+
+En el login, además de `role`, el JWT incluye un claim `permission` por cada código (p. ej. `TELEMETRY_VIEW`). Definidos en `KnownPermissionCodes` y en la migración `UpdateRolesAndPermissions`.
 
 ## Routes through gateway
 

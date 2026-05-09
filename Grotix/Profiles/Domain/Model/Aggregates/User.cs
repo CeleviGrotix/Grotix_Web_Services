@@ -28,7 +28,7 @@ public class User
     public User(
         int identityId,
         UserEmail email,
-        int roleId = 3,
+        int roleId = 4,
         string? name = null,
         string? taxId = null,
         string? phone = null,

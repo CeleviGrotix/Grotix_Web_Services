@@ -72,7 +72,7 @@ public class ZonesController(
 
     private async Task<bool> CanAccessZoneAsync(Zone zone)
     {
-        if (User.IsInRole("Admin")) return true;
+        if (User.IsInRole("admin")) return true;
         var farm = await farmQueryService.Handle(new GetFarmByIdQuery(zone.FarmId));
         if (farm == null) return false;
         var profileId = await ResolveProfileUserIdAsync();

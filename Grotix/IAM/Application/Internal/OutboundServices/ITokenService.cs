@@ -19,7 +19,7 @@ public interface ITokenService
      * <param name="user">The user to generate the token for</param>
      * <returns>The generated token</returns>
      */
-    string GenerateToken(Identity user, IList<string> roles);
+    string GenerateToken(Identity user, IList<string> roles, IReadOnlyList<string>? permissionCodes = null);
 
     /**
      * <summary>

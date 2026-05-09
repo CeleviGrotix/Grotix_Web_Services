@@ -48,7 +48,7 @@ public class UserProfileController(
         if (identityId == null) return Unauthorized();
 
         var caller = await userQueryService.Handle(new GetUserByIdentityQuery(identityId.Value));
-        var isAdmin = User.IsInRole("Admin");
+        var isAdmin = User.IsInRole("admin");
         if (!isAdmin && (caller == null || caller.Id != userId))
             return Forbid();
 
@@ -75,7 +75,7 @@ public class UserProfileController(
         if (identityId == null) return Unauthorized();
 
         var caller = await userQueryService.Handle(new GetUserByIdentityQuery(identityId.Value));
-        var isAdmin = User.IsInRole("Admin");
+        var isAdmin = User.IsInRole("admin");
         if (!isAdmin && (caller == null || caller.Id != userId))
             return Forbid();
 
@@ -93,7 +93,7 @@ public class UserProfileController(
     public record AssignRoleRequest(int RoleId);
 
     [HttpPatch("{userId:int}/role")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> AssignRole(int userId, [FromBody] AssignRoleRequest request)
     {
         try

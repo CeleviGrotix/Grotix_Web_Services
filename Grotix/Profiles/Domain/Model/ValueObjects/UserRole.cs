@@ -1,7 +1,14 @@
 ﻿namespace GrotixBackend.Profiles.Domain.Model.ValueObjects;
 
-/// <summary>Coincide con los IDs sembrados en la tabla <c>role</c> (Admin=1, Staff=2, User=3).</summary>
-public enum RoleType { Admin = 1, Staff = 2, User = 3 }
+/// <summary>Coincide con los IDs en la tabla <c>role</c> tras la migración de roles.</summary>
+public enum RoleType
+{
+    admin = 1,
+    staff = 2,
+    user_admin = 3,
+    user_basic = 4,
+    user_advanced = 5
+}
 
 public class UserRole : IEquatable<UserRole>
 {
@@ -16,9 +23,9 @@ public class UserRole : IEquatable<UserRole>
         Name = role.ToString();
     }
 
-    public static UserRole Default() => new(RoleType.User);
-    public static UserRole Admin() => new(RoleType.Admin);
-    public static UserRole Staff() => new(RoleType.Staff);
+    public static UserRole Default() => new(RoleType.user_basic);
+    public static UserRole Admin() => new(RoleType.admin);
+    public static UserRole Staff() => new(RoleType.staff);
     public static UserRole From(int roleId) =>
         Enum.IsDefined(typeof(RoleType), roleId)
             ? new UserRole((RoleType)roleId)

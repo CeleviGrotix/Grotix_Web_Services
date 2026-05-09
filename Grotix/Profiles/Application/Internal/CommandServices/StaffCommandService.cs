@@ -23,7 +23,7 @@ public class StaffCommandService(
         var staff = new Staff(command.UserId, command.TechnicalRole, command.LastSystemAccess);
         await staffRepository.AddAsync(staff);
 
-        user.AssignRole((int)RoleType.Staff);
+        user.AssignRole((int)RoleType.staff);
 
         await unitOfWork.CompleteAsync();
         return staff;

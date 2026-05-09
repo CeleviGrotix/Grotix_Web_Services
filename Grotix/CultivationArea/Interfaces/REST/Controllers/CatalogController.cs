@@ -40,7 +40,7 @@ public class CatalogController(
         int MaxStressTime);
 
     [HttpPost("crops")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Roles = "admin,staff")]
     public async Task<IActionResult> CreateCrop([FromBody] CreateCropRequest request)
     {
         try

@@ -115,7 +115,7 @@ public class FarmsController(
 
     private async Task<bool> CanAccessFarmAsync(Farm farm)
     {
-        if (User.IsInRole("Admin")) return true;
+        if (User.IsInRole("admin")) return true;
         var profileId = await ResolveProfileUserIdAsync();
         return profileId.HasValue && farm.UserId == profileId.Value;
     }
