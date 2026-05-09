@@ -4,26 +4,21 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace GrotixBackend.Shared.Interfaces.REST.Controllers;
 
-/// <summary>Readiness probe: ping a MySQL central vía health checks (<c>SELECT 1</c>).</summary>
-/// <remarks>
-/// <para><b>/live</b> solo confirma que el proceso HTTP responde; no usa la base de datos.</para>
-/// <para><b>/ready/core</b> debe fallar (503) si MySQL no está disponible — útil para readiness en orquestadores.</para>
-/// </remarks>
+/// <summary>Readiness solo para TimescaleDB (telemetría). No mezcla con MySQL.</summary>
 [ApiController]
-[Route("ready/core")]
+[Route("ready/telemetry")]
 [AllowAnonymous]
-public sealed class ReadyController(HealthCheckService healthChecks) : ControllerBase
+public sealed class TelemetryReadyController(HealthCheckService healthChecks) : ControllerBase
 {
-    private static readonly Func<HealthCheckRegistration, bool> ReadyPredicate =
-        r => r.Tags.Contains("ready");
+    private static readonly Func<HealthCheckRegistration, bool> TimescalePredicate =
+        r => r.Tags.Contains("timescale");
 
-    /// <summary>Ejecuta los checks etiquetados <c>ready</c> (actualmente MySQL).</summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
-        var report = await healthChecks.CheckHealthAsync(ReadyPredicate, cancellationToken);
+        var report = await healthChecks.CheckHealthAsync(TimescalePredicate, cancellationToken);
         var payload = new
         {
             status = report.Status.ToString(),
@@ -31,7 +26,8 @@ public sealed class ReadyController(HealthCheckService healthChecks) : Controlle
             {
                 name = e.Key,
                 status = e.Value.Status.ToString(),
-                description = e.Value.Description
+                description = e.Value.Description,
+                exception = e.Value.Exception?.Message
             })
         };
 
