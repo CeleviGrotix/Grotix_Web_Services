@@ -19,6 +19,7 @@ public static class UserResourceFromEntityAssembler
             entity.RoleId,
             entity.AssociationId,
             entity.ProfilePicture,
+            entity.IsActive,
             new UserPreferencesResource(prefs.Push, prefs.Email),
             entity.CreatedAt,
             entity.UpdatedAt

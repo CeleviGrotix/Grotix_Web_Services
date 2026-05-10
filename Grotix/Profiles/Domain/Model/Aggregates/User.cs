@@ -22,6 +22,7 @@ public class User
     public string? PreferencesJson { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
+    public bool IsActive { get; private set; }
 
     protected User() { }
 
@@ -34,7 +35,8 @@ public class User
         string? phone = null,
         int? associationId = null,
         string? profilePicture = null,
-        UserPreferences? preferences = null)
+        UserPreferences? preferences = null,
+        bool isActive = true)
     {
         IdentityId = identityId;
         Email = email;
@@ -45,6 +47,7 @@ public class User
         AssociationId = associationId;
         ProfilePicture = profilePicture;
         PreferencesJson = preferences?.ToJson();
+        IsActive = isActive;
     }
 
     public UserPreferences GetPreferences() =>
@@ -69,6 +72,8 @@ public class User
     }
 
     public void AssignAssociation(int? associationId) => AssociationId = associationId;
+
+    public void SetActive(bool active) => IsActive = active;
 
     private static string? NormalizePhoneOrThrow(string? phone)
     {

@@ -2,13 +2,14 @@ using GrotixBackend.Profiles.Application.Internal.CommandServices;
 using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.Queries;
+using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Interfaces.REST.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 
-/// <summary>Invitaciones para registrar agricultores (<c>user_basic</c> / <c>user_advanced</c>) en una organización.</summary>
+/// <summary>Invitaciones con correo vinculado (roles <c>user_admin</c>, <c>user_basic</c>, <c>user_advanced</c>).</summary>
 [ApiController]
 [Route("api/v1/associations/{associationId:int}/invites")]
 [Authorize]
@@ -16,7 +17,7 @@ public sealed class AssociationInvitesController(
     IUserQueryService userQueryService,
     IAssociationInviteCommandService inviteCommandService) : ControllerBase
 {
-    public record CreateInviteRequest(int RoleId, DateTime? ExpiresAt);
+    public record CreateInviteRequest(string Email, int RoleId, DateTime? ExpiresAt);
 
     public record CreateInviteResponse(int InviteId, string Token, DateTime? ExpiresAt);
 
@@ -47,6 +48,7 @@ public sealed class AssociationInvitesController(
         {
             var result = await inviteCommandService.Handle(new CreateAssociationInviteCommand(
                 associationId,
+                UserEmail.Create(request.Email).Value,
                 request.RoleId,
                 request.ExpiresAt,
                 caller.Id));

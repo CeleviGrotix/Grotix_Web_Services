@@ -13,6 +13,7 @@ public record UserResource(
     int RoleId,
     int? AssociationId,
     string? ProfilePicture,
+    bool IsActive,
     UserPreferencesResource? Preferences,
     DateTime CreatedAt,
     DateTime UpdatedAt

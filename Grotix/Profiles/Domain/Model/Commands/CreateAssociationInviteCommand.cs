@@ -2,6 +2,7 @@ namespace GrotixBackend.Profiles.Domain.Model.Commands;
 
 public sealed record CreateAssociationInviteCommand(
     int AssociationId,
+    string InviteEmail,
     int RoleId,
     DateTime? ExpiresAt,
     int? CreatedByUserId);
