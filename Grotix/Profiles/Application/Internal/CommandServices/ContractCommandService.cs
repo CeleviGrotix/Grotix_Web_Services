@@ -4,6 +4,7 @@ using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
 using GrotixBackend.Shared.Domain.Repositories;
+using GrotixBackend.Profiles.Domain.Model.Enums;
 
 namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 
@@ -64,4 +65,49 @@ public class ContractCommandService(
             inviteResult.PlaintextToken,
             adminEmail);
     }
+
+public async Task<Contract?> Handle(UpdateContractCommand command)
+    {
+        // 1. Buscamos el contrato usando el nombre correcto: GetByIdAsync
+        var contract = await contractRepository.GetByIdAsync(command.ContractId);
+        if (contract == null)
+            throw new ArgumentException("El contrato especificado no existe.");
+
+        // 2. Aplicamos los cambios
+        contract.Update(
+            command.EndDate, 
+            command.Status, 
+            command.MaxZones, 
+            command.MaxMicrocontrollers, 
+            command.IsSuspended,
+            command.TotalAmount, // <--- Pasar aquí
+            command.PaymentFrequency
+            );
+
+        // 3. Guardamos. No hace falta 'Update()' porque Entity Framework 
+        // rastrea los cambios automáticamente. Solo confirmamos la transacción.
+        await unitOfWork.CompleteAsync();
+
+        return contract;
+    }
+
+public async Task Handle(DeleteContractCommand command)
+{
+    var contract = await contractRepository.GetByIdAsync(command.ContractId);
+    if (contract == null)
+        throw new ArgumentException("El contrato especificado no existe.");
+
+    // Usamos el valor directo del Enum. 
+    // Si tu Enum no tiene 'Canceled', puedes usar 'Draft' u otro estado de baja.
+    contract.Update(
+        null, 
+        ContractStatus.Cancelled, 
+        null, 
+        null, 
+        true,   // IsSuspended = true
+        null, 
+        null);
+
+    await unitOfWork.CompleteAsync();
+}
 }

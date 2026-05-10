@@ -128,4 +128,59 @@ public sealed class ContractsController(
             c.Currency.ToString(),
             c.PaymentFrequency.ToString(),
             c.IsSuspended);
+
+    public record UpdateContractRequest(
+        DateTime? EndDate,
+        ContractStatus? Status,
+        int? MaxZones,
+        int? MaxMicrocontrollers,
+        bool? IsSuspended,
+        float? TotalAmount, 
+        ContractPaymentFrequency? PaymentFrequency);
+
+    /// <summary>Edita un contrato existente. Solo envía los campos que deseas cambiar.</summary>
+    [HttpPatch("{contractId:int}")]
+    [Authorize(Roles = "admin,staff")]
+    public async Task<IActionResult> Update(int contractId, [FromBody] UpdateContractRequest request)
+    {
+        try
+        {
+            var command = new UpdateContractCommand(
+                contractId,
+                request.EndDate,
+                request.Status,
+                request.MaxZones,
+                request.MaxMicrocontrollers,
+                request.IsSuspended,
+                request.TotalAmount, 
+                request.PaymentFrequency);
+
+            var updatedContract = await contractCommandService.Handle(command);
+            
+            if (updatedContract == null) 
+                return NotFound(new { message = "Contrato no encontrado." });
+
+            return Ok(ToResource(updatedContract));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>Elimina físicamente un contrato (Hard Delete).</summary>
+    [HttpDelete("{contractId:int}")]
+    [Authorize(Roles = "admin")] // Protegido solo para admins por seguridad
+    public async Task<IActionResult> Delete(int contractId)
+    {
+        try
+        {
+            await contractCommandService.Handle(new DeleteContractCommand(contractId));
+            return NoContent(); // 204 No Content es el éxito estándar para un Delete
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
 }

@@ -53,4 +53,22 @@ public class Contract
         PaymentFrequency = paymentFrequency;
         IsSuspended = isSuspended;
     }
+
+    public void Update(
+        DateTime? endDate, 
+        ContractStatus? status, 
+        int? maxZones, 
+        int? maxMicrocontrollers, 
+        bool? isSuspended,
+        float? totalAmount,
+        ContractPaymentFrequency? paymentFrequency)
+    {
+        if (endDate.HasValue) EndDate = endDate.Value;
+        if (status.HasValue) Status = status.Value;
+        if (maxZones.HasValue) MaxZones = maxZones.Value;
+        if (maxMicrocontrollers.HasValue) MaxMicrocontrollers = maxMicrocontrollers.Value;
+        if (isSuspended.HasValue) IsSuspended = isSuspended.Value;
+        if (totalAmount.HasValue) TotalAmount = totalAmount.Value;
+        if (paymentFrequency.HasValue) PaymentFrequency = paymentFrequency.Value;
+    }
 }
