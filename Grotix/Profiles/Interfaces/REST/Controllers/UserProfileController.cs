@@ -11,13 +11,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 
-/// <summary>Informe Profile: UserProfileController — perfil y preferencias de notificación.</summary>
 [ApiController]
 [Route("api/v1/profile")]
 public class UserProfileController(
     IMediator mediator,
     IUserCommandService userCommandService,
-    IUserQueryService userQueryService) : ControllerBase
+    IUserQueryService userQueryService,
+    IStaffQueryService staffQueryService) : ControllerBase  // ← una sola vez
 {
     [HttpGet("me")]
     [Authorize]
@@ -58,7 +58,6 @@ public class UserProfileController(
 
     public record PatchPreferencesRequest(bool Push, bool Email);
 
-    /// <summary>Activar/desactivar envío de notificaciones (informe: UpdatePreferencesHandler).</summary>
     [HttpPatch("{userId:int}/preferences")]
     [Authorize]
     public async Task<IActionResult> PatchPreferences(int userId, [FromBody] PatchPreferencesRequest request)
@@ -101,5 +100,24 @@ public class UserProfileController(
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    [HttpGet("me/staff")]
+    [Authorize]
+    public async Task<IActionResult> GetMyStaffProfile()
+    {
+        var identityId = User.GetIdentityId();
+        if (identityId == null) return Unauthorized();
+
+        var staff = await staffQueryService.GetByIdentityIdAsync(identityId.Value);
+        if (staff == null) return NotFound(new { message = "Staff profile not found." });
+
+        return Ok(new {
+            staff.Id,
+            staff.UserId,
+            staff.TechnicalRole,
+            staff.LastSystemAccess,
+            staff.IsActive
+        });
     }
 }

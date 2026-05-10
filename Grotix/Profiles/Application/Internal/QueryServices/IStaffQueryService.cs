@@ -6,4 +6,6 @@ public interface IStaffQueryService
 {
     Task<IReadOnlyList<Staff>> GetAllAsync();
     Task<Staff?> GetByIdAsync(int staffId);
+
+    Task<Staff?> GetByIdentityIdAsync(int identityId);
 }
