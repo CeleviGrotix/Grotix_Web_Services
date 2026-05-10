@@ -16,4 +16,7 @@ public class ZoneRepository(AppDbContext context)
             .OrderBy(z => z.Id)
             .ToListAsync();
     }
+
+    public Task<bool> AnyByCropIdAsync(int cropId, CancellationToken cancellationToken = default) =>
+        Context.Set<Zone>().AnyAsync(z => z.CropId == cropId, cancellationToken);
 }

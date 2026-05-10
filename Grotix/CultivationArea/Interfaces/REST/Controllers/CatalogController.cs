@@ -62,4 +62,61 @@ public class CatalogController(
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    public record UpdateCropRequest(
+        string CommonName,
+        string ScientificName,
+        double OptimalTemperature,
+        double OptimalHumidity,
+        double OptimalLight,
+        int MaxStressTime,
+        string? ImageUrl = null);
+
+    /// <summary>Actualiza un cultivo del catálogo.</summary>
+    [HttpPut("crops/{cropId:int}")]
+    [Authorize(Roles = "admin,staff")]
+    public async Task<IActionResult> UpdateCrop(int cropId, [FromBody] UpdateCropRequest request)
+    {
+        try
+        {
+            var crop = await cropCommandService.Handle(new UpdateCropCommand(
+                cropId,
+                request.CommonName,
+                request.ScientificName,
+                request.OptimalTemperature,
+                request.OptimalHumidity,
+                request.OptimalLight,
+                request.MaxStressTime,
+                request.ImageUrl));
+            return Ok(CultivationAreaResourceAssembler.ToCropResource(crop));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>Elimina un cultivo si ninguna zona lo referencia.</summary>
+    [HttpDelete("crops/{cropId:int}")]
+    [Authorize(Roles = "admin,staff")]
+    public async Task<IActionResult> DeleteCrop(int cropId)
+    {
+        try
+        {
+            await cropCommandService.Handle(new DeleteCropCommand(cropId));
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+    }
 }

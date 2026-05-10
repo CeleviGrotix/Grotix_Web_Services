@@ -6,4 +6,6 @@ namespace GrotixBackend.CultivationArea.Domain.Repositories;
 public interface IZoneRepository : IAsyncRepository<Zone>
 {
     Task<IReadOnlyList<Zone>> ListByFarmIdAsync(int farmId);
+
+    Task<bool> AnyByCropIdAsync(int cropId, CancellationToken cancellationToken = default);
 }
