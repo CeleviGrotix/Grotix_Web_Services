@@ -13,8 +13,5 @@ public record CreateContractCommand(
     ContractCurrency Currency,
     ContractPaymentFrequency PaymentFrequency,
     bool IsSuspended,
-    /// <summary>Correo del primer administrador de la organización (rol <c>user_admin</c>).</summary>
-    string OrgAdminEmail,
-    string OrgAdminPassword,
-    /// <summary>Nombre visible opcional del administrador.</summary>
-    string? OrgAdminName);
+    /// <summary>Correo del administrador de organización: recibirá una invitación para registrarse como <c>user_admin</c>.</summary>
+    string OrgAdminEmail);

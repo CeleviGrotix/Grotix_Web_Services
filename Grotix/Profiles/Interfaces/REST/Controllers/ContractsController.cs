@@ -77,10 +77,11 @@ public sealed class ContractsController(
 
     public record CreateContractResponse(
         ContractResource Contract,
-        int OrganizationAdminUserId,
+        int OrgAdminInviteId,
+        string OrgAdminInviteToken,
         string OrganizationAdminEmail);
 
-    /// <summary>Crea el contrato y el usuario <c>user_admin</c> vinculado a la asociación (si aún no tiene uno).</summary>
+    /// <summary>Crea el contrato y una invitación para que el correo indicado se registre como <c>user_admin</c>.</summary>
     [HttpPost]
     [Authorize(Roles = "admin,staff")]
     public async Task<IActionResult> Create([FromBody] CreateContractRequest request)
@@ -98,14 +99,13 @@ public sealed class ContractsController(
                 request.Currency,
                 request.PaymentFrequency,
                 request.IsSuspended,
-                request.OrgAdminEmail,
-                request.OrgAdminPassword,
-                request.OrgAdminName));
+                request.OrgAdminEmail));
 
             var response = new CreateContractResponse(
                 ToResource(result.Contract),
-                result.OrganizationAdminUserId,
-                request.OrgAdminEmail.Trim());
+                result.OrgAdminInviteId,
+                result.OrgAdminInvitePlaintextToken,
+                result.OrgAdminEmail.Trim());
 
             return CreatedAtAction(nameof(GetById), new { contractId = result.Contract.Id }, response);
         }

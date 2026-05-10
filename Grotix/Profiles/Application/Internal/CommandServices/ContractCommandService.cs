@@ -1,11 +1,8 @@
-using GrotixBackend.IAM.Domain.Model.Aggregates;
-using GrotixBackend.IAM.Domain.Model.ValueObjects;
 using GrotixBackend.IAM.Domain.Repositories;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Profiles.Domain.Services;
 using GrotixBackend.Shared.Domain.Repositories;
 
 namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
@@ -15,8 +12,8 @@ public class ContractCommandService(
     IAssociationRepository associationRepository,
     IIdentityRepository identityRepository,
     IUserRepository userRepository,
-    IUserCommandService userCommandService,
-    IPasswordHasher passwordHasher,
+    IAssociationInviteRepository inviteRepository,
+    IAssociationInviteCommandService inviteCommandService,
     IUnitOfWork unitOfWork
 ) : IContractCommandService
 {
@@ -27,26 +24,17 @@ public class ContractCommandService(
 
         if (await userRepository.HasUserAdminForAssociationAsync(command.AssociationId))
             throw new ArgumentException(
-                "La asociación ya tiene un usuario administrador (user_admin). No se puede crear otro desde este flujo.");
+                "La asociación ya tiene un usuario administrador (user_admin). Use una invitación si debe registrarse otro contacto.");
 
-        var adminEmail = command.OrgAdminEmail.Trim();
+        var adminEmailVo = UserEmail.Create(command.OrgAdminEmail.Trim());
+        var adminEmail = adminEmailVo.Value;
+
         if (await identityRepository.ExistsByEmailAsync(adminEmail))
             throw new ArgumentException("El correo del administrador ya está registrado.");
 
-        Identity.VerifyPasswordStrength(command.OrgAdminPassword);
-
-        var hash = passwordHasher.Hash(command.OrgAdminPassword);
-        var identity = new Identity(adminEmail, PasswordHash.FromHash(hash));
-
-        await identityRepository.AddAsync(identity);
-        await unitOfWork.CompleteAsync();
-
-        var adminUser = await userCommandService.Handle(new CreateUserCommand(
-            identity.Id,
-            adminEmail,
-            RoleId: (int)RoleType.user_admin,
-            Name: command.OrgAdminName,
-            AssociationId: command.AssociationId));
+        if (await inviteRepository.HasPendingInviteForEmailAsync(command.AssociationId, adminEmail))
+            throw new ArgumentException(
+                "Ya existe una invitación pendiente para este correo en esta asociación.");
 
         var contract = new Contract(
             command.AssociationId,
@@ -63,6 +51,17 @@ public class ContractCommandService(
         await contractRepository.AddAsync(contract);
         await unitOfWork.CompleteAsync();
 
-        return new CreateContractResult(contract, adminUser.Id);
+        var inviteResult = await inviteCommandService.Handle(new CreateAssociationInviteCommand(
+            command.AssociationId,
+            adminEmail,
+            (int)RoleType.user_admin,
+            ExpiresAt: null,
+            CreatedByUserId: null));
+
+        return new CreateContractResult(
+            contract,
+            inviteResult.InviteId,
+            inviteResult.PlaintextToken,
+            adminEmail);
     }
 }

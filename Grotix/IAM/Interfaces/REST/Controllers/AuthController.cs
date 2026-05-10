@@ -12,7 +12,7 @@ public class AuthController(IMediator mediator) : ControllerBase
 {
     public record RegisterRequest(string Email, string Password, string InviteToken);
 
-    /// <summary>Registrar cuenta con invitación a una organización (<c>InviteToken</c>).</summary>
+    /// <summary>Registrar cuenta; el correo debe coincidir con el de la invitación (<c>InviteToken</c>).</summary>
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)

@@ -200,6 +200,7 @@ public static class AppDbContextModelConfiguration
             e.HasKey(i => i.Id);
             e.Property(i => i.Id).HasColumnName("InviteID").ValueGeneratedOnAdd();
             e.Property(i => i.AssociationId).HasColumnName("AssociationID");
+            e.Property(i => i.InviteEmail).HasColumnName("InviteEmail").HasMaxLength(100).IsRequired();
             e.Property(i => i.TokenHash).HasMaxLength(64).IsRequired();
             e.HasIndex(i => i.TokenHash).IsUnique();
             e.Property(i => i.RoleId).HasColumnName("RoleID");

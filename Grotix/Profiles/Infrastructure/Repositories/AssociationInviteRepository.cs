@@ -16,6 +16,14 @@ public sealed class AssociationInviteRepository(AppDbContext context)
             .FirstOrDefaultAsync(i => i.TokenHash == normalized, cancellationToken);
     }
 
+    public Task<bool> HasPendingInviteForEmailAsync(
+        int associationId,
+        string normalizedEmail,
+        CancellationToken cancellationToken = default) =>
+        Context.Set<AssociationInvite>().AnyAsync(
+            i => i.AssociationId == associationId && i.InviteEmail == normalizedEmail && i.UsedAt == null,
+            cancellationToken);
+
     public async Task<bool> TryMarkUsedAsync(int inviteId, CancellationToken cancellationToken = default)
     {
         var rows = await Context.Database.ExecuteSqlInterpolatedAsync(

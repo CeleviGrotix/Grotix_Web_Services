@@ -14,7 +14,5 @@ public sealed record CreateContractRequest(
     ContractCurrency Currency,
     ContractPaymentFrequency PaymentFrequency,
     bool IsSuspended,
-    /// <summary>Correo del administrador de organización (<c>user_admin</c>) creado con el contrato.</summary>
-    string OrgAdminEmail,
-    string OrgAdminPassword,
-    string? OrgAdminName);
+    /// <summary>Correo al que se enviará la invitación para registrarse como <c>user_admin</c> de la asociación.</summary>
+    string OrgAdminEmail);

@@ -35,18 +35,24 @@ public class CreateAccountHandler(
         var invite = await inviteRepository.GetByTokenHashAsync(tokenHash, cancellationToken)
                      ?? throw new ApplicationException("Invitación no válida o desconocida.");
 
+        var registrationEmail = UserEmail.Create(command.Email);
+        if (!string.Equals(registrationEmail.Value, invite.InviteEmail, StringComparison.OrdinalIgnoreCase))
+            throw new ApplicationException("El correo debe coincidir exactamente con el de la invitación.");
+
         if (invite.UsedAt != null)
             throw new ApplicationException("Esta invitación ya fue utilizada.");
 
         if (invite.ExpiresAt.HasValue && invite.ExpiresAt.Value < DateTime.UtcNow)
             throw new ApplicationException("La invitación ha expirado.");
 
-        if (invite.RoleId != (int)RoleType.user_basic && invite.RoleId != (int)RoleType.user_advanced)
-            throw new InvalidOperationException("La invitación no tiene un rol de agricultor válido.");
+        if (invite.RoleId != (int)RoleType.user_admin &&
+            invite.RoleId != (int)RoleType.user_basic &&
+            invite.RoleId != (int)RoleType.user_advanced)
+            throw new InvalidOperationException("La invitación no tiene un rol válido.");
 
         Identity.VerifyPasswordStrength(command.Password);
         var hash = passwordHasher.Hash(command.Password);
-        var identity = new Identity(command.Email, PasswordHash.FromHash(hash));
+        var identity = new Identity(registrationEmail.Value, PasswordHash.FromHash(hash));
 
         await identityRepository.AddAsync(identity);
         await unitOfWork.CompleteAsync();

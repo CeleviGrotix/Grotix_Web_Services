@@ -31,9 +31,12 @@ public class AdminRegisterUserHandler(
         if (!await roleRepository.ExistsAsync(command.RoleId))
             throw new ArgumentException($"El rol {command.RoleId} no existe.");
 
-        ValidateAssociationForRole(command.RoleId, command.AssociationId);
+        // JSON suele mandar 0 en lugar de omitir asociación; lo tratamos como null.
+        var associationId = command.AssociationId is > 0 ? command.AssociationId : null;
 
-        if (command.AssociationId is { } assocId && !await associationRepository.ExistsAsync(assocId))
+        ValidateAssociationForRole(command.RoleId, associationId);
+
+        if (associationId is { } assocId && !await associationRepository.ExistsAsync(assocId))
             throw new ArgumentException($"La asociación {assocId} no existe.");
 
         Identity.VerifyPasswordStrength(command.Password);
@@ -50,7 +53,7 @@ public class AdminRegisterUserHandler(
             Name: command.Name,
             TaxId: command.TaxId,
             Phone: command.Phone,
-            AssociationId: command.AssociationId,
+            AssociationId: associationId,
             IsActive: command.IsActive));
 
         await mediator.Publish(new UserRegisteredNotification(identity.Id, identity.UserName), cancellationToken);
