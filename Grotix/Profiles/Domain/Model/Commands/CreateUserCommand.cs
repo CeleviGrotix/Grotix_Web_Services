@@ -8,5 +8,6 @@ public record CreateUserCommand(
     string? Name = null,
     string? TaxId = null,
     string? Phone = null,
-    int? AssociationId = null
+    int? AssociationId = null,
+    bool IsActive = true
 );

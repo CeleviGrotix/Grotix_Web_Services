@@ -27,6 +27,9 @@ public class LoginCommandHandler(
         var roleNames = new List<string>();
         IReadOnlyList<string> permissionCodes = Array.Empty<string>();
         var profile = await userRepository.GetByIdentityIdAsync(identity.Id);
+        if (profile != null && !profile.IsActive)
+            return new LoginResponse(0, command.Email, false, "La cuenta está desactivada.");
+
         if (profile != null)
         {
             var roleEntity = await roleRepository.GetByIdAsync(profile.RoleId);

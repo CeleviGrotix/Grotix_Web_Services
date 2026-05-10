@@ -26,8 +26,10 @@ public class UserCommandService(
             command.Name,
             command.TaxId,
             command.Phone,
-            command.AssociationId
-        );
+            command.AssociationId,
+            profilePicture: null,
+            preferences: null,
+            isActive: command.IsActive);
 
         await userRepository.AddAsync(user);
         await unitOfWork.CompleteAsync();
@@ -50,6 +52,29 @@ public class UserCommandService(
         var user = await userRepository.GetByIdAsync(command.UserId)
                    ?? throw new KeyNotFoundException($"Usuario {command.UserId} no encontrado.");
         user.AssignRole(command.RoleId);
+        await unitOfWork.CompleteAsync();
+        return user;
+    }
+
+    public async Task<User> Handle(AdminPatchUserCommand command)
+    {
+        var user = await userRepository.GetByIdAsync(command.UserId)
+                   ?? throw new KeyNotFoundException($"Usuario {command.UserId} no encontrado.");
+
+        var hasProfileChange = command.Name is not null || command.TaxId is not null ||
+                               command.Phone is not null || command.ProfilePicture is not null;
+        if (hasProfileChange)
+        {
+            user.UpdateProfile(
+                command.Name is not null ? command.Name : user.Name,
+                command.TaxId is not null ? command.TaxId : user.TaxId,
+                command.Phone is not null ? command.Phone : user.Phone,
+                command.ProfilePicture is not null ? command.ProfilePicture : user.ProfilePicture);
+        }
+
+        if (command.IsActive.HasValue)
+            user.SetActive(command.IsActive.Value);
+
         await unitOfWork.CompleteAsync();
         return user;
     }

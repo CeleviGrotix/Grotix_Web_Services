@@ -84,6 +84,7 @@ public static class AppDbContextModelConfiguration
             e.Property(u => u.AssociationId).HasColumnName("AssociationID");
             e.Property(u => u.ProfilePicture).HasColumnName("profilePicture").HasMaxLength(255);
             e.Property(u => u.PreferencesJson).HasColumnName("Preferences").HasColumnType("json");
+            e.Property(u => u.IsActive).HasColumnName("IsActive");
 
             e.HasOne<Role>().WithMany().HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);

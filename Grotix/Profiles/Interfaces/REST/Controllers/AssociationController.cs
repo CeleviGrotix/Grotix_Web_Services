@@ -35,5 +35,30 @@ public class AssociationController(
             new AssociationResource(entity.Id, entity.Name, entity.ContactEmail.Value));
     }
 
+    /// <summary>Solo <c>admin</c>. Actualización parcial: omitir propiedad = mantener valor actual.</summary>
+    public record PatchAssociationRequest(string? Name, string? Email);
+
+    [HttpPatch("{associationId:int}")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> Patch(int associationId, [FromBody] PatchAssociationRequest request)
+    {
+        var entity = await associationRepository.GetByIdAsync(associationId);
+        if (entity == null)
+            return NotFound();
+
+        try
+        {
+            var name = request.Name ?? entity.Name;
+            var email = request.Email != null ? UserEmail.Create(request.Email) : entity.ContactEmail;
+            entity.Update(name, email);
+            await unitOfWork.CompleteAsync();
+            return Ok(new AssociationResource(entity.Id, entity.Name, entity.ContactEmail.Value));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     public record AssociationResource(int Id, string Name, string Email);
 }
