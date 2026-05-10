@@ -76,8 +76,8 @@ public static class AppDbContextModelConfiguration
             e.Property(u => u.RoleId).HasColumnName("RoleID");
             e.Property(u => u.Email).HasColumnName("Email").IsRequired()
                 .HasConversion(v => v.Value, v => UserEmail.Create(v)).HasMaxLength(100);
-            e.Property(u => u.Name).HasColumnName("Name").IsRequired(false);
-            e.Property(u => u.TaxId).HasColumnName("TaxID").IsRequired(false);
+            e.Property(u => u.Name).HasColumnName("Name").IsRequired(false).HasMaxLength(200);
+            e.Property(u => u.TaxId).HasColumnName("TaxID").IsRequired(false).HasMaxLength(50);
             e.Property(u => u.Phone).HasColumnName("Phone").IsRequired(false).HasMaxLength(20);
             e.Property(u => u.CreatedAt).HasColumnName("CreatedAt");
             e.Property(u => u.UpdatedAt).HasColumnName("UpdatedAt");
@@ -100,7 +100,8 @@ public static class AppDbContextModelConfiguration
             e.Property(s => s.IsActive).HasColumnName("IsActive");
             e.Property(s => s.TechnicalRole)
                 .HasColumnName("TechnicalRole")
-                .HasConversion<string>();
+                .HasConversion<string>()
+                .HasMaxLength(32);
             e.Property(s => s.LastSystemAccess)
                 .HasColumnName("LastSystemAccess")
                 .HasColumnType("datetime(6)");
