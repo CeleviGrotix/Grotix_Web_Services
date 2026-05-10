@@ -18,7 +18,8 @@ public class CropCommandService(
             command.OptimalTemperature,
             command.OptimalHumidity,
             command.OptimalLight,
-            command.MaxStressTime);
+            command.MaxStressTime,
+            command.ImageUrl);
 
         await cropRepository.AddAsync(crop);
         await unitOfWork.CompleteAsync();

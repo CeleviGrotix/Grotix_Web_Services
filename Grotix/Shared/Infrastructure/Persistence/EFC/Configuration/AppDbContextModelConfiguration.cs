@@ -121,6 +121,7 @@ public static class AppDbContextModelConfiguration
             e.Property(c => c.OptimalHumidity);
             e.Property(c => c.OptimalLight);
             e.Property(c => c.MaxStressTime);
+            e.Property(c => c.ImageUrl).HasColumnName("ImageURL").HasMaxLength(512);
         });
 
         modelBuilder.Entity<Farm>(e =>

@@ -37,7 +37,8 @@ public class CatalogController(
         double OptimalTemperature,
         double OptimalHumidity,
         double OptimalLight,
-        int MaxStressTime);
+        int MaxStressTime,
+        string? ImageUrl = null);
 
     [HttpPost("crops")]
     [Authorize(Roles = "admin,staff")]
@@ -51,7 +52,8 @@ public class CatalogController(
                 request.OptimalTemperature,
                 request.OptimalHumidity,
                 request.OptimalLight,
-                request.MaxStressTime));
+                request.MaxStressTime,
+                request.ImageUrl));
             return CreatedAtAction(nameof(GetCrop), new { cropId = crop.Id },
                 CultivationAreaResourceAssembler.ToCropResource(crop));
         }

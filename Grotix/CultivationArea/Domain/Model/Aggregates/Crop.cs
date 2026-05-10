@@ -10,6 +10,7 @@ public class Crop
     public double OptimalHumidity { get; private set; }
     public double OptimalLight { get; private set; }
     public int MaxStressTime { get; private set; }
+    public string? ImageUrl { get; private set; }
 
     protected Crop() { }
 
@@ -19,7 +20,8 @@ public class Crop
         double optimalTemperature,
         double optimalHumidity,
         double optimalLight,
-        int maxStressTime)
+        int maxStressTime,
+        string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(commonName))
             throw new ArgumentException("CommonName no puede estar vacío.");
@@ -34,6 +36,7 @@ public class Crop
         OptimalHumidity = optimalHumidity;
         OptimalLight = optimalLight;
         MaxStressTime = maxStressTime;
+        ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
     }
 
     public void UpdateBiologicalProfile(
@@ -59,4 +62,7 @@ public class Crop
         CommonName = commonName.Trim();
         ScientificName = scientificName.Trim();
     }
+
+    public void UpdateImageUrl(string? imageUrl) =>
+        ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
 }

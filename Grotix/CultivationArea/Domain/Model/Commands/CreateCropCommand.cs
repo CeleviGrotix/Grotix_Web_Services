@@ -6,4 +6,5 @@ public record CreateCropCommand(
     double OptimalTemperature,
     double OptimalHumidity,
     double OptimalLight,
-    int MaxStressTime);
+    int MaxStressTime,
+    string? ImageUrl = null);
