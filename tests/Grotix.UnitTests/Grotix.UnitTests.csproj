@@ -1,26 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.4" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <Compile Include="..\..\Grotix\IAM\Domain\**\*.cs" />
+    <Compile Include="..\..\Grotix\IAM\Application\**\*.cs" />
+    <Compile Include="..\..\Grotix\Profiles\Domain\**\*.cs" />
+    <Compile Include="..\..\Grotix\Profiles\Application\**\*.cs" />
+    <Compile Include="..\..\Grotix\CultivationArea\Domain\**\*.cs" />
+    <Compile Include="..\..\Grotix\CultivationArea\Application\**\*.cs" />
+    <Compile Include="..\..\Grotix\Shared\Domain\**\*.cs" />
+    <Compile Include="..\..\Grotix\Shared\ErrorHandling\**\*.cs" />
+    <Compile Include="..\..\Grotix\Shared\Validation\**\*.cs" />
+    <Compile Include="..\..\Grotix\Shared\Resources\**\*.cs" />
+
+    <!-- Excluir archivos que violan capas y dependen de Infrastructure/Interfaces -->
+    <Compile Remove="..\..\Grotix\Profiles\Application\Internal\QueryServices\SearchQueryService.cs" />
+    <Compile Remove="..\..\Grotix\Profiles\Domain\Model\Queries\GetGlobalSearchQuery.cs" />
+    <Compile Remove="..\..\Grotix\Shared\Domain\Repositories\IBaseRepository.cs" />
+</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Profiles.Api\Profiles.Api.csproj" />
-    <ProjectReference Include="..\..\src\CultivationArea.Api\CultivationArea.Api.csproj" />
-  </ItemGroup>
-
 </Project>

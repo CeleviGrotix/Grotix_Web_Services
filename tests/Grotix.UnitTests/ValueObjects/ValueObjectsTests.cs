@@ -1,3 +1,4 @@
+using Xunit;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 
 namespace Grotix.UnitTests.ValueObjects;
