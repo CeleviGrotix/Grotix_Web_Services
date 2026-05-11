@@ -21,9 +21,12 @@
     <Compile Remove="..\..\Grotix\Profiles\Application\Internal\QueryServices\SearchQueryService.cs" />
     <Compile Remove="..\..\Grotix\Profiles\Domain\Model\Queries\GetGlobalSearchQuery.cs" />
     <Compile Remove="..\..\Grotix\Shared\Domain\Repositories\IBaseRepository.cs" />
+    <Compile Include="..\..\Grotix\Shared\Infrastructure\Persistence\EFC\Configuration\AppDbContext.cs" />
+    <Compile Include="..\..\Grotix\Shared\Infrastructure\Persistence\EFC\Configuration\AppDbContextModelConfiguration.cs" />
 </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="xunit" Version="2.7.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
@@ -31,6 +34,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
