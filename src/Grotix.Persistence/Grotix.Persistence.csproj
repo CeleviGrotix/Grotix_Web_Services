@@ -29,13 +29,15 @@
 
   <ItemGroup>
     <Compile Remove="**\*.cs" />
-    <Compile Include="..\..\Grotix\Shared\Infrastructure\Persistence\EFC\**\*.cs" />
+    <Compile Include="..\..\Grotix\Shared\Infrastructure\Persistence\EFC\**\*.cs"
+             Exclude="..\..\Grotix\Shared\Infrastructure\Persistence\EFC\Migrations\AppDbContextModelSnapshot.cs" />
     <Compile Include="..\..\Grotix\Shared\Infrastructure\Health\MySqlReadinessHealthCheck.cs" />
     <Compile Include="..\..\Grotix\Shared\Domain\Repositories\IBaseRepository.cs" />
     <Compile Include="..\..\Grotix\IAM\Infrastructure\Repositories\**\*.cs" />
     <Compile Include="..\..\Grotix\Profiles\Infrastructure\Repositories\**\*.cs" />
     <Compile Include="..\..\Grotix\CultivationArea\Infrastructure\Repositories\**\*.cs" />
     <Compile Include="..\..\Grotix\Profiles\Application\Internal\QueryServices\SearchQueryService.cs" />
+    <Compile Include="GrotixBackend\Shared\Infrastructure\Persistence\EFC\Migrations\**\*.cs" />
   </ItemGroup>
 
 </Project>
