@@ -3,8 +3,11 @@ namespace GrotixBackend.BuildingBlocks.Configuration;
 public static class DotEnvBootstrap
 {
     public static void LoadFromCurrentDirectory(string fileName = ".env")
+        => LoadFromDirectory(Directory.GetCurrentDirectory(), fileName);
+
+    public static void LoadFromDirectory(string startDirectory, string fileName = ".env")
     {
-        var filePath = FindUpwards(Directory.GetCurrentDirectory(), fileName);
+        var filePath = FindUpwards(startDirectory, fileName);
         if (filePath == null || !File.Exists(filePath))
             return;
 

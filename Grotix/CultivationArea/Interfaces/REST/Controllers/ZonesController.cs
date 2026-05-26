@@ -1,12 +1,11 @@
 using GrotixBackend.Contracts.Auth.Claims;
+using GrotixBackend.Contracts.Profiles.Access;
 using GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
 using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
 using GrotixBackend.CultivationArea.Domain.Model.Commands;
 using GrotixBackend.CultivationArea.Domain.Model.Queries;
 using GrotixBackend.CultivationArea.Interfaces.REST.Transform;
-using GrotixBackend.Profiles.Application.Internal.QueryServices;
-using GrotixBackend.Profiles.Domain.Model.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +15,7 @@ namespace GrotixBackend.CultivationArea.Interfaces.REST.Controllers;
 [Route("api/v1/zones")]
 [Authorize]
 public class ZonesController(
-    IUserQueryService userQueryService,
+    IUserAccessContextService userAccessContextService,
     IFarmQueryService farmQueryService,
     IZoneCommandService zoneCommandService,
     IZoneQueryService zoneQueryService) : ControllerBase
@@ -66,8 +65,8 @@ public class ZonesController(
     {
         var identityId = User.GetIdentityId();
         if (identityId == null) return null;
-        var profile = await userQueryService.Handle(new GetUserByIdentityQuery(identityId.Value));
-        return profile?.Id;
+        var accessContext = await userAccessContextService.GetByIdentityIdAsync(identityId.Value);
+        return accessContext?.UserId;
     }
 
     private async Task<bool> CanAccessZoneAsync(Zone zone)

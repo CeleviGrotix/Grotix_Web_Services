@@ -1,3 +1,4 @@
+using GrotixBackend.BuildingBlocks.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     public AppDbContext CreateDbContext(string[] args)
     {
         var basePath = ResolveConfigurationBasePath();
+        DotEnvBootstrap.LoadFromDirectory(basePath);
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(basePath)

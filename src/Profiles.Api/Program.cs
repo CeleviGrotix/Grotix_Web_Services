@@ -1,6 +1,7 @@
 using GrotixBackend.BuildingBlocks.Auth;
 using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.BuildingBlocks.RabbitMq;
+using GrotixBackend.Contracts.Profiles.Access;
 using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.IAM.Application.Internal.OutboundServices;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
@@ -77,6 +78,7 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IStaffRepository, StaffRepository>();
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IUserAccessContextService, UserAccessContextService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 builder.Services.AddScoped<IStaffQueryService, StaffQueryService>();
 builder.Services.AddScoped<IStaffCommandService, StaffCommandService>();

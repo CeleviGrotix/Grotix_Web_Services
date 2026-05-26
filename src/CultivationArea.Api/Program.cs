@@ -3,6 +3,7 @@ using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.BuildingBlocks.RabbitMq;
 using GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
+using GrotixBackend.Contracts.Profiles.Access;
 using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.CultivationArea.Domain.Repositories;
 using GrotixBackend.CultivationArea.Infrastructure.Repositories;
@@ -77,6 +78,7 @@ builder.Services.AddScoped<IAssociationRepository, CoreDbAssociationRepository>(
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IUserAccessContextService, UserAccessContextService>();
 
 builder.Services.AddScoped<IAssociationInviteRepository, AssociationInviteRepository>();
 builder.Services.AddScoped<IAssociationInviteCommandService, AssociationInviteCommandService>();
