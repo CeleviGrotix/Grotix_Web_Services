@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.csproj" />
+    <ProjectReference Include="..\Grotix.Shared\Grotix.Shared.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Auth\Grotix.Contracts.Auth.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Integration\Grotix.Contracts.Integration.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Profiles\Grotix.Contracts.Profiles.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+    <Compile Include="..\..\Grotix\Profiles\**\*.cs"
+             Exclude="..\..\Grotix\Profiles\Infrastructure\Repositories\**\*.cs;..\..\Grotix\Profiles\Application\Internal\QueryServices\SearchQueryService.cs" />
+  </ItemGroup>
+
+</Project>

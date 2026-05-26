@@ -1,8 +1,11 @@
 using GrotixBackend.BuildingBlocks.Auth;
 using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.BuildingBlocks.RabbitMq;
+using GrotixBackend.Contracts.Auth.Admin;
+using GrotixBackend.Contracts.Auth.Lookup;
 using GrotixBackend.Contracts.Profiles.Access;
 using GrotixBackend.Contracts.Profiles.Provisioning;
+using GrotixBackend.IAM.Application.ACL;
 using GrotixBackend.IAM.Application.Internal.OutboundServices;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
@@ -38,7 +41,11 @@ DotEnvBootstrap.LoadFromCurrentDirectory();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+    cfg.RegisterServicesFromAssemblies(
+        typeof(Program).Assembly,
+        typeof(TokenService).Assembly,
+        typeof(UserCommandService).Assembly,
+        typeof(AppDbContext).Assembly));
 
 builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));
@@ -70,6 +77,8 @@ builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<INotificationServiceAdapter, NoOpNotificationServiceAdapter>();
 
 builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
+builder.Services.AddScoped<IIdentityLookupService, IdentityLookupService>();
+builder.Services.AddScoped<IAdminIdentityRegistrationService, AdminIdentityRegistrationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IUserRepository, CoreDbUserRepository>();

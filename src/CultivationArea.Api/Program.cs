@@ -38,7 +38,9 @@ DotEnvBootstrap.LoadFromCurrentDirectory();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+    cfg.RegisterServicesFromAssemblies(
+        typeof(Program).Assembly,
+        typeof(FarmCommandService).Assembly));
 
 builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));

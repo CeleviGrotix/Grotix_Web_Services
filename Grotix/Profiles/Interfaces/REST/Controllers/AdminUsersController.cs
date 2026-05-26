@@ -1,5 +1,4 @@
-using MediatR;
-using GrotixBackend.IAM.Domain.Model.Commands;
+using GrotixBackend.Contracts.Auth.Admin;
 using GrotixBackend.Profiles.Application.Internal.CommandServices;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Interfaces.REST.Resources;
@@ -13,7 +12,9 @@ namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 [ApiController]
 [Route("api/v1/admin/users")]
 [Authorize(Roles = "admin")]
-public sealed class AdminUsersController(IUserCommandService userCommandService, IMediator mediator) : ControllerBase
+public sealed class AdminUsersController(
+    IUserCommandService userCommandService,
+    IAdminIdentityRegistrationService adminIdentityRegistrationService) : ControllerBase
 {
     public record AdminPatchUserRequest(
         string? Name,
@@ -38,7 +39,7 @@ public sealed class AdminUsersController(IUserCommandService userCommandService,
     {
         try
         {
-            var result = await mediator.Send(new AdminRegisterUserCommand(
+            var result = await adminIdentityRegistrationService.RegisterAsync(new AdminRegisterUserRequest(
                 request.Email.Trim(),
                 request.Password,
                 request.RoleId,

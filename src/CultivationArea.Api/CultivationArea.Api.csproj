@@ -9,6 +9,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.csproj" />
+    <ProjectReference Include="..\Grotix.Shared\Grotix.Shared.csproj" />
+    <ProjectReference Include="..\Grotix.IAM\Grotix.IAM.csproj" />
+    <ProjectReference Include="..\Grotix.Profiles\Grotix.Profiles.csproj" />
+    <ProjectReference Include="..\Grotix.CultivationArea\Grotix.CultivationArea.csproj" />
+    <ProjectReference Include="..\Grotix.Persistence\Grotix.Persistence.csproj" />
     <ProjectReference Include="..\Grotix.Contracts.Auth\Grotix.Contracts.Auth.csproj" />
     <ProjectReference Include="..\Grotix.Contracts.Integration\Grotix.Contracts.Integration.csproj" />
     <ProjectReference Include="..\Grotix.Contracts.Profiles\Grotix.Contracts.Profiles.csproj" />
@@ -30,10 +35,6 @@
 
   <ItemGroup>
     <Compile Remove="**\*.cs" />
-    <Compile Include="..\..\Grotix\CultivationArea\**\*.cs" />
-    <Compile Include="..\..\Grotix\Profiles\**\*.cs" />
-    <Compile Include="..\..\Grotix\IAM\**\*.cs" />
-    <Compile Include="..\..\Grotix\Shared\**\*.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
 

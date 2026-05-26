@@ -1,5 +1,6 @@
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace GrotixBackend.Shared.Infrastructure.Health;

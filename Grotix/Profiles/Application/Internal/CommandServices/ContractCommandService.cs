@@ -1,4 +1,4 @@
-using GrotixBackend.IAM.Domain.Repositories;
+using GrotixBackend.Contracts.Auth.Lookup;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
@@ -11,7 +11,7 @@ namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 public class ContractCommandService(
     IContractRepository contractRepository,
     IAssociationRepository associationRepository,
-    IIdentityRepository identityRepository,
+    IIdentityLookupService identityLookupService,
     IUserRepository userRepository,
     IAssociationInviteRepository inviteRepository,
     IAssociationInviteCommandService inviteCommandService,
@@ -30,7 +30,7 @@ public class ContractCommandService(
         var adminEmailVo = UserEmail.Create(command.OrgAdminEmail.Trim());
         var adminEmail = adminEmailVo.Value;
 
-        if (await identityRepository.ExistsByEmailAsync(adminEmail))
+        if (await identityLookupService.ExistsByEmailAsync(adminEmail))
             throw new ArgumentException("El correo del administrador ya está registrado.");
 
         if (await inviteRepository.HasPendingInviteForEmailAsync(command.AssociationId, adminEmail))

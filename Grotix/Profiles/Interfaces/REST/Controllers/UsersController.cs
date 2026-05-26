@@ -3,6 +3,7 @@ using GrotixBackend.Profiles.Domain.Model.Queries;
 using GrotixBackend.Contracts.Auth.Claims;
 using GrotixBackend.Profiles.Interfaces.REST.Transform;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;

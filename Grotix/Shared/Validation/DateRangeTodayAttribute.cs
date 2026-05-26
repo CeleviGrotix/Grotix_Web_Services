@@ -65,7 +65,7 @@ namespace GrotixBackend.Shared.Validation
         /// Retorna un <see cref="ValidationResult"/> con un mensaje de error si la fecha está fuera de rango
         /// o si el valor no es de tipo <see cref="DateTime"/>.
         /// </returns>
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value == null)
             {

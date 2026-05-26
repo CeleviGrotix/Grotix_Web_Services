@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="8.0.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+    <Compile Include="..\..\Grotix\Shared\**\*.cs"
+             Exclude="..\..\Grotix\Shared\Infrastructure\Persistence\EFC\**\*.cs;..\..\Grotix\Shared\Infrastructure\Health\MySqlReadinessHealthCheck.cs;..\..\Grotix\Shared\Domain\Repositories\IBaseRepository.cs" />
+  </ItemGroup>
+
+</Project>
