@@ -1,4 +1,7 @@
 using GrotixBackend.BuildingBlocks.Auth;
+using GrotixBackend.BuildingBlocks.Configuration;
+
+DotEnvBootstrap.LoadFromCurrentDirectory();
 
 var builder = WebApplication.CreateBuilder(args);
 

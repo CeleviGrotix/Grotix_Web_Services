@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 using System.Text;
+using GrotixBackend.Contracts.Auth.Claims;
 using GrotixBackend.IAM.Application.Internal.OutboundServices;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
@@ -30,9 +31,6 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
      * <param name="roles">The list of roles for the user</param> // ¡NUEVO!
      * <returns>The generated Token</returns>
      */
-    /// <summary>Alineado con <c>GrotixBackend.Profiles.Interfaces.REST.Auth.ClaimsPrincipalExtensions.PermissionClaimType</c>.</summary>
-    public const string PermissionClaimType = "permission";
-
     public string GenerateToken(Identity user, IList<string> roles, IReadOnlyList<string>? permissionCodes = null)
     {
         var secret = _tokenSettings.Secret;
@@ -40,7 +38,7 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
         
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Sid, user.Id.ToString()),
+            new Claim(JwtClaimTypes.IdentityId, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName)
         };
 
@@ -52,7 +50,7 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
         foreach (var code in permissionCodes ?? Array.Empty<string>())
         {
             if (!string.IsNullOrWhiteSpace(code))
-                claims.Add(new Claim(PermissionClaimType, code.Trim()));
+                claims.Add(new Claim(JwtClaimTypes.Permission, code.Trim()));
         }
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -93,7 +91,7 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
             });
 
             var jwtToken = (JsonWebToken)tokenValidationResult.SecurityToken;
-            var userId = int.Parse(jwtToken.Claims.First(claim => claim.Type == ClaimTypes.Sid).Value);
+            var userId = int.Parse(jwtToken.Claims.First(claim => claim.Type == JwtClaimTypes.IdentityId).Value);
             return userId;
         }
         catch (Exception e)

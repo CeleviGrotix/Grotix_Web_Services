@@ -1,7 +1,8 @@
 using GrotixBackend.BuildingBlocks.Auth;
+using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.BuildingBlocks.RabbitMq;
+using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.IAM.Application.Internal.OutboundServices;
-using GrotixBackend.IAM.Application.Internal.OutboundServices.ACL;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
 using GrotixBackend.IAM.Domain.Repositories;
@@ -30,6 +31,8 @@ using Microsoft.OpenApi.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System.Reflection;
 using System.Text.Json.Serialization;
+
+DotEnvBootstrap.LoadFromCurrentDirectory();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -148,7 +151,10 @@ try
         await identityRepository.AddAsync(adminIdentity);
         await unitOfWork.CompleteAsync();
 
-        await aclService.CreateUserAndReturnId(adminIdentity.Id, adminIdentity.UserName, roleId: adminRoleId);
+        await aclService.CreateUserAndReturnId(new CreateProfileUserRequest(
+            adminIdentity.Id,
+            adminIdentity.UserName,
+            adminRoleId));
     }
 
     var existingAdminIdentity = await identityRepository.GetByEmailAsync(adminEmail);
@@ -157,7 +163,10 @@ try
         var adminProfile = await userRepository.GetByIdentityIdAsync(existingAdminIdentity.Id);
         if (adminProfile == null)
         {
-            await aclService.CreateUserAndReturnId(existingAdminIdentity.Id, existingAdminIdentity.UserName, roleId: adminRoleId);
+            await aclService.CreateUserAndReturnId(new CreateProfileUserRequest(
+                existingAdminIdentity.Id,
+                existingAdminIdentity.UserName,
+                adminRoleId));
         }
         else
         {

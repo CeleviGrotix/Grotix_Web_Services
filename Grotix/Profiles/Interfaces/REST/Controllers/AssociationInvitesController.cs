@@ -1,9 +1,9 @@
+using GrotixBackend.Contracts.Auth.Claims;
 using GrotixBackend.Profiles.Application.Internal.CommandServices;
 using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.Queries;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
-using GrotixBackend.Profiles.Interfaces.REST.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

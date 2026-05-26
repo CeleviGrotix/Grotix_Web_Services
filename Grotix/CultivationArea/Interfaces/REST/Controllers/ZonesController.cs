@@ -1,3 +1,4 @@
+using GrotixBackend.Contracts.Auth.Claims;
 using GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
 using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
@@ -6,7 +7,6 @@ using GrotixBackend.CultivationArea.Domain.Model.Queries;
 using GrotixBackend.CultivationArea.Interfaces.REST.Transform;
 using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.Domain.Model.Queries;
-using GrotixBackend.Profiles.Interfaces.REST.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

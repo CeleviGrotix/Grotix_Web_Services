@@ -1,10 +1,10 @@
 using MediatR;
+using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.Notifications;
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
 using GrotixBackend.IAM.Domain.Repositories;
-using GrotixBackend.IAM.Application.Internal.OutboundServices.ACL;
 using GrotixBackend.Profiles.Domain.Services;
 using GrotixBackend.Profiles.Domain.Repositories;
 using GrotixBackend.Profiles.Domain.Security;
@@ -57,11 +57,11 @@ public class CreateAccountHandler(
         await identityRepository.AddAsync(identity);
         await unitOfWork.CompleteAsync();
 
-        await profileService.CreateUserAndReturnId(
+        await profileService.CreateUserAndReturnId(new CreateProfileUserRequest(
             identity.Id,
             identity.UserName,
             invite.RoleId,
-            invite.AssociationId);
+            invite.AssociationId));
 
         var marked = await inviteRepository.TryMarkUsedAsync(invite.Id, cancellationToken);
         if (!marked)

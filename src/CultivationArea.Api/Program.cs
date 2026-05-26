@@ -1,11 +1,12 @@
 using GrotixBackend.BuildingBlocks.Auth;
+using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.BuildingBlocks.RabbitMq;
 using GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
+using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.CultivationArea.Domain.Repositories;
 using GrotixBackend.CultivationArea.Infrastructure.Repositories;
 using GrotixBackend.IAM.Application.Internal.OutboundServices;
-using GrotixBackend.IAM.Application.Internal.OutboundServices.ACL;
 using GrotixBackend.IAM.Domain.Repositories;
 using GrotixBackend.IAM.Infrastructure.Repositories;
 using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
@@ -30,6 +31,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System.Reflection;
+
+DotEnvBootstrap.LoadFromCurrentDirectory();
 
 var builder = WebApplication.CreateBuilder(args);
 

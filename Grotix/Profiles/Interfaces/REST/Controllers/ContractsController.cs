@@ -1,10 +1,10 @@
+using GrotixBackend.Contracts.Auth.Claims;
 using GrotixBackend.Profiles.Application.Internal.CommandServices;
 using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.Enums;
 using GrotixBackend.Profiles.Domain.Model.Queries;
-using GrotixBackend.Profiles.Interfaces.REST.Auth;
 using GrotixBackend.Profiles.Interfaces.REST.Requests;
 using GrotixBackend.Profiles.Interfaces.REST.Resources;
 using Microsoft.AspNetCore.Authorization;

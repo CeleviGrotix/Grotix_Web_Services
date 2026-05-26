@@ -1,9 +1,9 @@
 using MediatR;
+using GrotixBackend.Contracts.Auth.Claims;
 using GrotixBackend.Profiles.Application.Internal.CommandServices;
 using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.Queries;
-using GrotixBackend.Profiles.Interfaces.REST.Auth;
 using GrotixBackend.Profiles.Interfaces.REST.Resources;
 using GrotixBackend.Profiles.Interfaces.REST.Transform;
 using Microsoft.AspNetCore.Authorization;
