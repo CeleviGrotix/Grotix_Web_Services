@@ -13,16 +13,16 @@
         /// <summary>
         /// A short, human-readable summary of the problem type.
         /// </summary>
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         /// <summary>
         /// A human-readable explanation specific to this occurrence of the problem.
         /// </summary>
-        public string Detail { get; set; }
+        public string Detail { get; set; } = string.Empty;
 
         /// <summary>
         /// An optional, unique identifier for the request, useful for correlating logs.
         /// </summary>
-        public string TraceId { get; set; }
+        public string TraceId { get; set; } = string.Empty;
     }
 }

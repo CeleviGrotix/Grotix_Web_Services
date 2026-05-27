@@ -13,7 +13,7 @@ public enum RoleType
 public class UserRole : IEquatable<UserRole>
 {
     public int RoleId { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = string.Empty;
 
     private UserRole() { }
 

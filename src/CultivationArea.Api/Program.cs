@@ -1,4 +1,5 @@
 using GrotixBackend.BuildingBlocks.Auth;
+using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.BuildingBlocks.RabbitMq;
 using GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
@@ -30,6 +31,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System.Reflection;
+
+DotEnvBootstrap.LoadFromCurrentDirectory();
 
 var builder = WebApplication.CreateBuilder(args);
 

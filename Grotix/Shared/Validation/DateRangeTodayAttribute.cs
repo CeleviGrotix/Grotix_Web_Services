@@ -65,7 +65,7 @@ namespace GrotixBackend.Shared.Validation
         /// Retorna un <see cref="ValidationResult"/> con un mensaje de error si la fecha está fuera de rango
         /// o si el valor no es de tipo <see cref="DateTime"/>.
         /// </returns>
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value == null)
             {
@@ -93,7 +93,7 @@ namespace GrotixBackend.Shared.Validation
                 {
                     
                     var localizerFactory = validationContext.GetService(typeof(IStringLocalizerFactory)) as IStringLocalizerFactory;
-                    IStringLocalizer localizer = null;
+                    IStringLocalizer? localizer = null;
 
                     if (localizerFactory != null && ErrorResourceType != null)
                     {
@@ -109,7 +109,10 @@ namespace GrotixBackend.Shared.Validation
                         parsedMinDate.ToShortDateString() 
                     );
 
-                    return new ValidationResult(finalErrorMessage, new[] { validationContext.MemberName });
+                    var memberNames = !string.IsNullOrWhiteSpace(validationContext.MemberName)
+                        ? new[] { validationContext.MemberName! }
+                        : null;
+                    return new ValidationResult(finalErrorMessage, memberNames);
                 }
             }
             
