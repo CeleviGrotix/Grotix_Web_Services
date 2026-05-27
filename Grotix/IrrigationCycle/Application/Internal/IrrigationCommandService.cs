@@ -53,4 +53,23 @@ public sealed class IrrigationCommandService(
         await unitOfWork.CompleteAsync(cancellationToken);
         completedPublisher.Publish(cycle);
     }
+
+    public async Task<IrrigationCycleRecord> AbortActiveByZoneAsync(
+        int zoneId,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (!await zoneAccessService.ZoneExistsAsync(zoneId))
+            throw new ArgumentException("La zona no existe.");
+
+        var active = await cycleRepository.GetActiveByZoneAsync(zoneId);
+        if (active == null)
+            throw new InvalidOperationException($"No hay un ciclo activo en la zona {zoneId}.");
+
+        active.Abort(reason ?? "MANUAL_CANCEL");
+        await actuatorControlService.TryDeactivateIrrigationAsync(zoneId, cancellationToken);
+        await unitOfWork.CompleteAsync(cancellationToken);
+        completedPublisher.Publish(active);
+        return active;
+    }
 }

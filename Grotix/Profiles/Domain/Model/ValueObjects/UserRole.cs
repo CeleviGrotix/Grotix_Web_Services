@@ -1,4 +1,4 @@
-﻿namespace GrotixBackend.Profiles.Domain.Model.ValueObjects;
+namespace GrotixBackend.Profiles.Domain.Model.ValueObjects;
 
 /// <summary>Coincide con los IDs en la tabla <c>role</c> tras la migración de roles.</summary>
 public enum RoleType

@@ -21,6 +21,8 @@ public sealed class IrrigationController(
 {
     public sealed record StartIrrigationRequest(double? VolumeLiters, int? DurationMinutes);
 
+    public sealed record StopIrrigationRequest(string? Reason);
+
     [HttpPost("start/{zoneId:int}")]
     public async Task<IActionResult> Start(
         int zoneId,
@@ -38,6 +40,33 @@ public sealed class IrrigationController(
                 request?.DurationMinutes,
                 cancellationToken);
             return Ok(new { cycleId = cycle.Id });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("stop/{zoneId:int}")]
+    public async Task<IActionResult> Stop(
+        int zoneId,
+        [FromBody] StopIrrigationRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (!CanExecute()) return Forbid();
+        if (!await CanAccessZoneAsync(zoneId, cancellationToken)) return Forbid();
+
+        try
+        {
+            var cycle = await commandService.AbortActiveByZoneAsync(
+                zoneId,
+                request?.Reason,
+                cancellationToken);
+            return Ok(ToCycleDto(cycle));
         }
         catch (ArgumentException ex)
         {
@@ -195,7 +224,8 @@ public sealed class IrrigationController(
         startTime = c.StartTime,
         endTime = c.EndTime,
         volumeLiters = c.VolumeLiters,
-        status = CycleStatuses.ToApiStatus(c.Status)
+        status = CycleStatuses.ToApiStatus(c.Status),
+        abortReason = c.AbortReason
     };
 
     private bool CanRead() =>

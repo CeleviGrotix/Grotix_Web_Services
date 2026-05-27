@@ -1,4 +1,4 @@
-﻿namespace GrotixBackend.Shared.ErrorHandling
+namespace GrotixBackend.Shared.ErrorHandling
 {
     /// <summary>
     /// Represents a standardized error response structure for API errors.

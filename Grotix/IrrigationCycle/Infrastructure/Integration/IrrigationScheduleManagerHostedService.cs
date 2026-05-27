@@ -1,3 +1,4 @@
+using System.Globalization;
 using GrotixBackend.IrrigationCycle.Application.Internal;
 using GrotixBackend.IrrigationCycle.Application.ACL;
 using GrotixBackend.IrrigationCycle.Domain.Model.Aggregates;
@@ -62,8 +63,8 @@ public sealed class IrrigationScheduleManagerHostedService(
         {
             logger.LogInformation(
                 "Rain predicted today for configured location ({Lat},{Lon}). precipitation={PrecipitationMm}mm probability={Probability}%",
-                _weatherOptions.Latitude,
-                _weatherOptions.Longitude,
+                _weatherOptions.Latitude.ToString(CultureInfo.InvariantCulture),
+                _weatherOptions.Longitude.ToString(CultureInfo.InvariantCulture),
                 rainForecast.PrecipitationMm,
                 rainForecast.PrecipitationProbabilityPercent);
         }

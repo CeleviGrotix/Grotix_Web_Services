@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using GrotixBackend.IrrigationCycle.Application.ACL;
 using Microsoft.Extensions.Logging;
@@ -14,8 +15,11 @@ public sealed class OpenMeteoWeatherForecastAdapter(
 
     public async Task<DailyRainForecast> GetTodayRainForecastAsync(CancellationToken cancellationToken = default)
     {
+        // InvariantCulture: en es-ES el interpolado de double usa coma y Open-Meteo devuelve 400.
+        var lat = _options.Latitude.ToString(CultureInfo.InvariantCulture);
+        var lon = _options.Longitude.ToString(CultureInfo.InvariantCulture);
         var url =
-            $"{_options.BaseUrl}?latitude={_options.Latitude}&longitude={_options.Longitude}" +
+            $"{_options.BaseUrl}?latitude={lat}&longitude={lon}" +
             "&daily=precipitation_sum,precipitation_probability_max&forecast_days=1&timezone=UTC";
 
         try

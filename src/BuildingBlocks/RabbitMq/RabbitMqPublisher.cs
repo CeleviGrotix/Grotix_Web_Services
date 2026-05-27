@@ -29,6 +29,12 @@ public sealed class RabbitMqPublisher(
                 routingKey: routingKey,
                 basicProperties: props,
                 body: body);
+
+            logger.LogInformation(
+                "RabbitMQ published: exchange={Exchange}, routingKey={RoutingKey}, bytes={Bytes}",
+                _options.ExchangeName,
+                routingKey,
+                body.Length);
         }
         catch (Exception ex)
         {

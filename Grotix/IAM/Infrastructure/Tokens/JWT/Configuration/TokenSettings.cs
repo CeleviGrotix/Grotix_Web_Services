@@ -1,4 +1,4 @@
-﻿namespace GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
+namespace GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
 
 /**
  * <summary>
