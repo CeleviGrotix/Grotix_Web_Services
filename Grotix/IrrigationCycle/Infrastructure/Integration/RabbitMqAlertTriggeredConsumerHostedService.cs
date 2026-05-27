@@ -47,7 +47,7 @@ public sealed class RabbitMqAlertTriggeredConsumerHostedService(
             {
                 var json = Encoding.UTF8.GetString(ea.Body.Span);
                 var evt = JsonSerializer.Deserialize<AlertTriggeredIntegrationEvent>(json);
-                if (evt != null && evt.Value < evt.Threshold)
+                if (evt != null && ShouldAutoIrrigate(evt))
                 {
                     await using var scope = services.CreateAsyncScope();
                     var command = scope.ServiceProvider.GetRequiredService<IIrrigationCommandService>();
@@ -55,8 +55,11 @@ public sealed class RabbitMqAlertTriggeredConsumerHostedService(
                     {
                         await command.StartManualAsync(evt.ZoneId, volumeLiters: null, durationMinutes: null, stoppingToken);
                         logger.LogInformation(
-                            "Auto-irrigation started for zone {ZoneId} after alert",
-                            evt.ZoneId);
+                            "Auto-irrigation started for zone {ZoneId} after {SensorType} alert (value={Value}, threshold={Threshold})",
+                            evt.ZoneId,
+                            evt.SensorType,
+                            evt.Value,
+                            evt.Threshold);
                     }
                     catch (InvalidOperationException)
                     {
@@ -84,5 +87,15 @@ public sealed class RabbitMqAlertTriggeredConsumerHostedService(
         {
             // shutdown
         }
+    }
+
+    private static bool ShouldAutoIrrigate(AlertTriggeredIntegrationEvent evt)
+    {
+        if (!string.Equals(evt.BreachDirection, "BELOW_MIN", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var type = evt.SensorType.ToUpperInvariant();
+        return type.Contains("MOIST", StringComparison.Ordinal) ||
+               type.Contains("HUMID", StringComparison.Ordinal);
     }
 }

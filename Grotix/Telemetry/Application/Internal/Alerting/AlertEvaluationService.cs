@@ -3,15 +3,18 @@ using GrotixBackend.Telemetry.Application.ACL;
 using GrotixBackend.Telemetry.Domain.Model.Entities;
 using GrotixBackend.Telemetry.Domain.Repositories;
 using GrotixBackend.Telemetry.Domain.Services;
+using Microsoft.Extensions.Options;
 
 namespace GrotixBackend.Telemetry.Application.Internal.Alerting;
 
 public sealed class AlertEvaluationService(
     IEffectiveThresholdResolver thresholdResolver,
     IThresholdBreachTrackerRepository breachTrackerRepository,
-    IAlertPublisher alertPublisher) : IAlertEvaluationService
+    IAlertRecordRepository alertRecordRepository,
+    IAlertPublisher alertPublisher,
+    IOptions<AlertEvaluationOptions> options) : IAlertEvaluationService
 {
-    private const int SustainedCyclesBeforeAlert = 4;
+    private readonly AlertEvaluationOptions _options = options.Value;
 
     public async Task EvaluateAsync(
         Sensor sensor,
@@ -47,20 +50,47 @@ public sealed class AlertEvaluationService(
         await breachTrackerRepository.UpsertAsync(tracker, cancellationToken);
         await breachTrackerRepository.SaveChangesAsync(cancellationToken);
 
-        if (tracker.ConsecutiveCount < SustainedCyclesBeforeAlert)
+        var required = Math.Max(1, _options.SustainedReadingsBeforeAlert);
+        if (tracker.ConsecutiveCount < required)
             return;
 
         var breachedThreshold = ThresholdEvaluator.NearestBreachedThreshold(
             smoothedValue,
             threshold.MinValue,
             threshold.MaxValue);
+        var breachDirection = ThresholdEvaluator.GetBreachDirection(
+            smoothedValue,
+            threshold.MinValue,
+            threshold.MaxValue);
 
-        alertPublisher.Publish(new AlertTriggeredIntegrationEvent(
+        var alertEvent = new AlertTriggeredIntegrationEvent(
             sensor.ZoneId,
             sensor.Id,
+            sensor.Type,
             smoothedValue,
             breachedThreshold,
-            timestamp));
+            threshold.MinValue,
+            threshold.MaxValue,
+            breachDirection,
+            timestamp);
+
+        await alertRecordRepository.AddAsync(
+            new AlertRecord
+            {
+                ZoneId = sensor.ZoneId,
+                SensorId = sensor.Id,
+                SensorType = sensor.Type,
+                Value = smoothedValue,
+                MinThreshold = threshold.MinValue,
+                MaxThreshold = threshold.MaxValue,
+                BreachedThreshold = breachedThreshold,
+                BreachDirection = breachDirection,
+                TriggeredAt = timestamp
+            },
+            cancellationToken);
+        await breachTrackerRepository.SaveChangesAsync(cancellationToken);
+
+        alertPublisher.Publish(alertEvent);
 
         tracker.ConsecutiveCount = 0;
         await breachTrackerRepository.UpsertAsync(tracker, cancellationToken);

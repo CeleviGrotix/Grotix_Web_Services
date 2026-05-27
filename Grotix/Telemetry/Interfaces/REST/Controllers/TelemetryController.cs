@@ -15,7 +15,8 @@ public sealed class TelemetryController(
     IUserAccessContextService userAccessContextService,
     IZoneAuthorizationService zoneAuthorizationService,
     ITelemetryQueryService telemetryQueryService,
-    IZoneThresholdService zoneThresholdService) : ControllerBase
+    IZoneThresholdService zoneThresholdService,
+    IAlertQueryService alertQueryService) : ControllerBase
 {
     [HttpGet("{zoneId:int}")]
     public async Task<IActionResult> GetZoneHistory(
@@ -55,6 +56,37 @@ public sealed class TelemetryController(
                 readings = s.Readings.Select(r => new { value = r.Value, timestamp = r.Timestamp })
             })
         });
+    }
+
+    [HttpGet("{zoneId:int}/alerts")]
+    public async Task<IActionResult> GetAlerts(
+        int zoneId,
+        [FromQuery] int limit = 50,
+        CancellationToken cancellationToken = default)
+    {
+        if (!User.HasPermission(KnownPermissionCodes.TelemetryView) && !User.IsInRole("admin"))
+            return Forbid();
+
+        if (!await CanAccessZoneAsync(zoneId, cancellationToken))
+            return Forbid();
+
+        if (!await zoneAuthorizationService.ZoneExistsAsync(zoneId, cancellationToken))
+            return NotFound();
+
+        var alerts = await alertQueryService.ListByZoneAsync(zoneId, limit, cancellationToken);
+        return Ok(alerts.Select(a => new
+        {
+            id = a.Id,
+            zoneId = a.ZoneId,
+            sensorId = a.SensorId,
+            sensorType = a.SensorType,
+            value = a.Value,
+            minThreshold = a.MinThreshold,
+            maxThreshold = a.MaxThreshold,
+            breachedThreshold = a.BreachedThreshold,
+            breachDirection = a.BreachDirection,
+            triggeredAt = a.TriggeredAt
+        }));
     }
 
     [HttpGet("{zoneId:int}/thresholds")]

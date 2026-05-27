@@ -9,6 +9,7 @@ public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : 
     public DbSet<SensorReading> SensorReadings => Set<SensorReading>();
     public DbSet<ActiveThreshold> ActiveThresholds => Set<ActiveThreshold>();
     public DbSet<ThresholdBreachTracker> ThresholdBreachTrackers => Set<ThresholdBreachTracker>();
+    public DbSet<AlertRecord> AlertRecords => Set<AlertRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +55,23 @@ public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : 
             entity.Property(e => e.SensorType).HasColumnName("sensor_type").HasMaxLength(64);
             entity.Property(e => e.ConsecutiveCount).HasColumnName("consecutive_count");
             entity.Property(e => e.LastEvaluatedAt).HasColumnName("last_evaluated_at").HasColumnType("timestamptz");
+        });
+
+        modelBuilder.Entity<AlertRecord>(entity =>
+        {
+            entity.ToTable("alert_log");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ZoneId).HasColumnName("zone_id");
+            entity.Property(e => e.SensorId).HasColumnName("sensor_id");
+            entity.Property(e => e.SensorType).HasColumnName("sensor_type").HasMaxLength(64);
+            entity.Property(e => e.Value).HasColumnName("value");
+            entity.Property(e => e.MinThreshold).HasColumnName("min_threshold");
+            entity.Property(e => e.MaxThreshold).HasColumnName("max_threshold");
+            entity.Property(e => e.BreachedThreshold).HasColumnName("breached_threshold");
+            entity.Property(e => e.BreachDirection).HasColumnName("breach_direction").HasMaxLength(16);
+            entity.Property(e => e.TriggeredAt).HasColumnName("triggered_at").HasColumnType("timestamptz");
+            entity.HasIndex(e => new { e.ZoneId, e.TriggeredAt });
         });
     }
 }

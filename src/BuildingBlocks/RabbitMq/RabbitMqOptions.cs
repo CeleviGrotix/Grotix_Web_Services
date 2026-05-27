@@ -28,8 +28,11 @@ public sealed class RabbitMqOptions
 
     public string AlertTriggeredRoutingKey { get; set; } = "alert.triggered";
 
-    /// <summary>Cola consumida por IrrigationCycle para alertas críticas.</summary>
-    public string AlertTriggeredQueueName { get; set; } = "irrigation.alert.triggered";
+  /// <summary>Cola consumida por IrrigationCycle para alertas críticas.</summary>
+  public string AlertTriggeredQueueName { get; set; } = "irrigation.alert.triggered";
+
+  /// <summary>Cola consumida por Profiles para notificaciones de alerta.</summary>
+  public string AlertNotificationQueueName { get; set; } = "profiles.alert.triggered";
 
     public string IrrigationCompletedRoutingKey { get; set; } = "irrigation.completed";
 

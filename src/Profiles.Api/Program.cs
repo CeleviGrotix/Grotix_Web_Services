@@ -12,6 +12,7 @@ using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
 using GrotixBackend.Profiles.Application.Internal.CommandServices;
 using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.DependencyInjection;
+using GrotixBackend.Profiles.Infrastructure.Integration;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
 using GrotixBackend.Shared.Infrastructure.Health;
@@ -44,6 +45,7 @@ builder.Services.AddGrotixIamPersistence(builder.Configuration);
 builder.Services.AddGrotixIamModule();
 builder.Services.AddGrotixProfilesModule();
 builder.Services.AddGrotixRabbitMqPublisher(builder.Configuration);
+builder.Services.AddGrotixProfilesRabbitMq(builder.Configuration);
 
 builder.Services
     .AddControllers()

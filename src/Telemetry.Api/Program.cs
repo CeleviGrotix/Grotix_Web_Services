@@ -27,7 +27,7 @@ builder.Services.AddGrotixCultivationAreaPersistence(builder.Configuration);
 builder.Services.AddGrotixProfilesAccessModule();
 builder.Services.AddGrotixCultivationAreaModule();
 builder.Services.AddGrotixTelemetryPersistence(builder.Configuration);
-builder.Services.AddGrotixTelemetryModule();
+builder.Services.AddGrotixTelemetryModule(builder.Configuration);
 builder.Services.AddGrotixRabbitMqPublisher(builder.Configuration);
 builder.Services.AddGrotixTelemetryAlertPublisher();
 builder.Services.AddGrotixTelemetryRabbitMq(builder.Configuration);
