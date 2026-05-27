@@ -11,8 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.csproj" />
     <ProjectReference Include="..\Grotix.Shared\Grotix.Shared.csproj" />
     <ProjectReference Include="..\Grotix.HardwareDevice\Grotix.HardwareDevice.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Integration\Grotix.Contracts.Integration.csproj" />
     <ProjectReference Include="..\Grotix.Persistence.Telemetry\Grotix.Persistence.Telemetry.csproj" />
   </ItemGroup>
 

@@ -38,4 +38,9 @@ public sealed class RabbitMqOptions
 
     /// <summary>Cola que consume Hardware (o bridge MQTT) para ejecutar comandos físicos.</summary>
     public string ActuatorCommandQueueName { get; set; } = "hardware.actuator.command";
+
+    public string DeviceStatusChangedRoutingKey { get; set; } = "hardware.device.status.changed";
+
+    /// <summary>Cola consumida por Irrigation para reaccionar a cambios de estado del hardware.</summary>
+    public string DeviceStatusChangedQueueName { get; set; } = "irrigation.hardware.device.status.changed";
 }

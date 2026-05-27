@@ -1,4 +1,5 @@
 using GrotixBackend.HardwareDevice.Application.ACL;
+using GrotixBackend.HardwareDevice.Application.Internal;
 using GrotixBackend.HardwareDevice.Domain.Repositories;
 using GrotixBackend.HardwareDevice.Infrastructure.Integration;
 using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMicrocontrollerRepository, MicrocontrollerRepository>();
         services.AddScoped<IDeviceSensorRepository, DeviceSensorRepository>();
         services.AddScoped<IDeviceActuatorRepository, DeviceActuatorRepository>();
+        services.AddScoped<IDeviceStatusChangedPublisher, RabbitMqDeviceStatusChangedPublisher>();
         services.AddScoped<ITelemetryCatalogSyncService, TelemetryCatalogSyncService>();
         services.AddHostedService<HardwareDatabaseInitializer>();
 

@@ -13,6 +13,11 @@ public interface IDeviceCommandService
     Task LinkToZoneAsync(int deviceId, int zoneId, CancellationToken cancellationToken = default);
 
     Task UnlinkFromZoneAsync(int deviceId, int zoneId, CancellationToken cancellationToken = default);
+
+    Task UpdateStatusAsync(
+        int deviceId,
+        UpdateDeviceStatusRequest request,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed record RegisterDeviceRequest(
@@ -29,3 +34,5 @@ public sealed record RegisterSensorRequest(
     double? MaxPhysical);
 
 public sealed record UpdateDeviceRequest(int? ZoneId, string? Model, string? MacAddress);
+
+public sealed record UpdateDeviceStatusRequest(string Status, DateTime? LastSeen);

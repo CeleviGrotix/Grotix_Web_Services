@@ -37,6 +37,16 @@ public sealed class IrrigationRabbitMqTopologyInitializer(
                 _options.AlertTriggeredRoutingKey);
 
             channel.QueueDeclare(
+                _options.DeviceStatusChangedQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+            channel.QueueBind(
+                _options.DeviceStatusChangedQueueName,
+                _options.ExchangeName,
+                _options.DeviceStatusChangedRoutingKey);
+
+            channel.QueueDeclare(
                 _options.ActuatorCommandQueueName,
                 durable: true,
                 exclusive: false,
@@ -47,9 +57,10 @@ public sealed class IrrigationRabbitMqTopologyInitializer(
                 _options.ActuatorCommandRoutingKey);
 
             logger.LogInformation(
-                "Irrigation RabbitMQ topology OK: alertQueue={AlertQueue}, actuatorQueue={ActuatorQueue}",
+                "Irrigation RabbitMQ topology OK: alertQueue={AlertQueue}, actuatorQueue={ActuatorQueue}, statusQueue={StatusQueue}",
                 _options.AlertTriggeredQueueName,
-                _options.ActuatorCommandQueueName);
+                _options.ActuatorCommandQueueName,
+                _options.DeviceStatusChangedQueueName);
         }
         catch (Exception ex)
         {

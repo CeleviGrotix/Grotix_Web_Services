@@ -8,6 +8,7 @@ public sealed class DeviceCommandService(
     IMicrocontrollerRepository deviceRepository,
     IDeviceSensorRepository sensorRepository,
     IDeviceActuatorRepository actuatorRepository,
+    IDeviceStatusChangedPublisher deviceStatusChangedPublisher,
     IHardwareDeviceUnitOfWork unitOfWork,
     IZoneAccessService zoneAccessService,
     ITelemetryCatalogSyncService telemetryCatalogSync) : IDeviceCommandService
@@ -123,5 +124,21 @@ public sealed class DeviceCommandService(
 
         await sensorRepository.AssignZoneToDeviceAsync(deviceId, null, cancellationToken);
         await unitOfWork.CompleteAsync(cancellationToken);
+    }
+
+    public async Task UpdateStatusAsync(
+        int deviceId,
+        UpdateDeviceStatusRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var device = await deviceRepository.GetByIdAsync(deviceId)
+            ?? throw new KeyNotFoundException($"Dispositivo {deviceId} no encontrado.");
+
+        var oldStatus = device.Status;
+        device.UpdateStatus(request.Status, request.LastSeen);
+        await unitOfWork.CompleteAsync(cancellationToken);
+
+        if (!string.Equals(oldStatus, device.Status, StringComparison.OrdinalIgnoreCase))
+            deviceStatusChangedPublisher.Publish(device, oldStatus, device.Status);
     }
 }

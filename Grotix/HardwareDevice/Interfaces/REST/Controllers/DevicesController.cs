@@ -280,6 +280,31 @@ public sealed class DevicesController(
         });
     }
 
+    public sealed record PatchDeviceStatusRequest(string Status, DateTime? LastSeen);
+
+    [HttpPatch("devices/{id:int}/status")]
+    public async Task<IActionResult> PatchStatus(int id, [FromBody] PatchDeviceStatusRequest request, CancellationToken cancellationToken)
+    {
+        if (!CanWrite()) return Forbid();
+
+        try
+        {
+            await deviceCommandService.UpdateStatusAsync(
+                id,
+                new UpdateDeviceStatusRequest(request.Status, request.LastSeen),
+                cancellationToken);
+            return Ok(new { success = true });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
     public sealed record DiagnosticRequest(bool? IncludeSensors, bool? IncludeActuators);
 
     [HttpGet("devices/{id:int}/diagnostic")]

@@ -23,6 +23,7 @@ public static class IrrigationRabbitMqServiceCollectionExtensions
         services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
         services.AddHostedService<IrrigationRabbitMqTopologyInitializer>();
         services.AddHostedService<RabbitMqAlertTriggeredConsumerHostedService>();
+        services.AddHostedService<RabbitMqDeviceStatusChangedConsumerHostedService>();
         return services;
     }
 }
