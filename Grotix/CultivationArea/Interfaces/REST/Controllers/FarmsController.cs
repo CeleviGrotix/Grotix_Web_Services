@@ -5,6 +5,7 @@ using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
 using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
 using GrotixBackend.CultivationArea.Domain.Model.Commands;
 using GrotixBackend.CultivationArea.Domain.Model.Queries;
+using GrotixBackend.CultivationArea.Domain.Repositories;
 using GrotixBackend.CultivationArea.Interfaces.REST.Transform;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,8 @@ public class FarmsController(
     IFarmQueryService farmQueryService,
     IAssociationFarmOwnerSyncService associationFarmOwnerSyncService,
     IZoneCommandService zoneCommandService,
-    IZoneQueryService zoneQueryService) : ControllerBase
+    IZoneQueryService zoneQueryService,
+    IZoneMemberRepository zoneMemberRepository) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> ListMine()
@@ -33,13 +35,29 @@ public class FarmsController(
         {
             farms = await farmQueryService.Handle(new ListAllFarmsQuery());
         }
-        else if (accessContext.AssociationId is { } associationId)
+        else if (User.IsInRole("user_admin") && accessContext.AssociationId is { } adminAssociationId)
         {
-            farms = await farmQueryService.Handle(new ListFarmsForAssociationQuery(associationId));
+            farms = await farmQueryService.Handle(new ListFarmsForAssociationQuery(adminAssociationId));
         }
         else
         {
-            farms = [];
+            var farmIds = await zoneMemberRepository.ListFarmIdsForUserAsync(accessContext.UserId);
+            if (farmIds.Count == 0)
+            {
+                farms = [];
+            }
+            else
+            {
+                var allAssigned = new List<Farm>();
+                foreach (var farmId in farmIds)
+                {
+                    var farm = await farmQueryService.Handle(new GetFarmByIdQuery(farmId));
+                    if (farm != null)
+                        allAssigned.Add(farm);
+                }
+
+                farms = allAssigned;
+            }
         }
 
         return Ok(farms.Select(CultivationAreaResourceAssembler.ToFarmResource).ToList());
@@ -103,7 +121,21 @@ public class FarmsController(
         if (farm == null) return NotFound();
         if (!await CanAccessFarmAsync(farm)) return Forbid();
         var zones = await zoneQueryService.Handle(new ListZonesForFarmQuery(farmId));
-        return Ok(zones.Select(CultivationAreaResourceAssembler.ToZoneResource).ToList());
+
+        if (User.IsInRole("admin") || User.IsInRole("staff"))
+            return Ok(zones.Select(CultivationAreaResourceAssembler.ToZoneResource).ToList());
+
+        var accessContext = await ResolveAccessContextAsync();
+        if (accessContext == null) return Unauthorized();
+
+        var isOrgAdmin = User.IsInRole("user_admin") &&
+                         accessContext.AssociationId == farm.AssociationId;
+        if (isOrgAdmin)
+            return Ok(zones.Select(CultivationAreaResourceAssembler.ToZoneResource).ToList());
+
+        var allowedZoneIds = await zoneMemberRepository.ListAssignedZoneIdsForFarmAsync(farmId, accessContext.UserId);
+        var visible = zones.Where(z => allowedZoneIds.Contains(z.Id)).ToList();
+        return Ok(visible.Select(CultivationAreaResourceAssembler.ToZoneResource).ToList());
     }
 
     public record CreateZoneRequest(
@@ -167,7 +199,12 @@ public class FarmsController(
         if (accessContext == null) return false;
 
         if (accessContext.AssociationId.HasValue && farm.AssociationId == accessContext.AssociationId.Value)
-            return true;
+        {
+            if (User.IsInRole("user_admin"))
+                return true;
+
+            return await zoneMemberRepository.ListAssignedZoneIdsForFarmAsync(farm.Id, accessContext.UserId) is { Count: > 0 };
+        }
 
         return farm.UserId.HasValue && accessContext.UserId == farm.UserId.Value;
     }

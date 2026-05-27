@@ -6,17 +6,20 @@ public sealed record ZoneMemberDto(
     string Email,
     int RoleId,
     string RoleName,
-    DateTime InvitedAt,
-    int? InvitedBy);
+    DateTime AssignedAt,
+    int AssignedByUserId);
 
 public interface IZoneMemberService
 {
-    Task<IReadOnlyList<ZoneMemberDto>> ListAsync(int zoneId, int? roleId, CancellationToken cancellationToken = default);
-    Task<int> InviteAsync(
+    Task<IReadOnlyList<ZoneMemberDto>> ListAsync(int zoneId, CancellationToken cancellationToken = default);
+
+    Task AssignAsync(
         int zoneId,
-        string email,
-        int roleId,
-        int invitedByUserId,
+        int userId,
+        int assignedByUserId,
         CancellationToken cancellationToken = default);
+
     Task<bool> RemoveAsync(int zoneId, int userId, CancellationToken cancellationToken = default);
+
+    Task<bool> CanUserAccessZoneAsync(int zoneId, int userId, bool isOrgAdmin, CancellationToken cancellationToken = default);
 }

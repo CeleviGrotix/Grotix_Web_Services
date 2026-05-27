@@ -7,6 +7,7 @@ using GrotixBackend.CultivationArea.Domain.Model.Commands;
 using GrotixBackend.CultivationArea.Domain.Model.Queries;
 using GrotixBackend.CultivationArea.Interfaces.REST.Transform;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GrotixBackend.CultivationArea.Interfaces.REST.Controllers;
@@ -62,19 +63,18 @@ public class ZonesController(
         }
     }
 
-    public sealed record InviteZoneMemberRequest(string Email, int? RoleId);
+    public sealed record AssignZoneMemberRequest(int UserId);
 
+    /// <summary>Lista personal asignado a la zona (permiso de visibilidad).</summary>
     [HttpGet("{zoneId:int}/members")]
-    public async Task<IActionResult> ListMembers(
-        int zoneId,
-        [FromQuery] int? roleId,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ListMembers(int zoneId, CancellationToken cancellationToken = default)
     {
         var zone = await zoneQueryService.Handle(new GetZoneByIdQuery(zoneId));
         if (zone == null) return NotFound();
-        if (!await CanAccessZoneAsync(zone)) return Forbid();
+        if (!await CanManageZoneMembersAsync(zone))
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "No tienes permiso para gestionar miembros de esta zona." });
 
-        var members = await zoneMemberService.ListAsync(zoneId, roleId, cancellationToken);
+        var members = await zoneMemberService.ListAsync(zoneId, cancellationToken);
         return Ok(members.Select(m => new
         {
             userId = m.UserId,
@@ -82,34 +82,30 @@ public class ZonesController(
             email = m.Email,
             roleId = m.RoleId,
             roleName = m.RoleName,
-            invitedAt = m.InvitedAt,
-            invitedBy = m.InvitedBy
+            assignedAt = m.AssignedAt,
+            assignedByUserId = m.AssignedByUserId
         }));
     }
 
-    [HttpPost("{zoneId:int}/invite")]
-    public async Task<IActionResult> InviteMember(
+    /// <summary>Asigna un miembro existente de la organización a la zona.</summary>
+    [HttpPost("{zoneId:int}/members")]
+    public async Task<IActionResult> AssignMember(
         int zoneId,
-        [FromBody] InviteZoneMemberRequest request,
+        [FromBody] AssignZoneMemberRequest request,
         CancellationToken cancellationToken = default)
     {
         var zone = await zoneQueryService.Handle(new GetZoneByIdQuery(zoneId));
         if (zone == null) return NotFound();
-        if (!await CanAccessZoneAsync(zone)) return Forbid();
+        if (!await CanManageZoneMembersAsync(zone))
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "No tienes permiso para gestionar miembros de esta zona." });
 
         var callerId = await ResolveProfileUserIdAsync();
         if (!callerId.HasValue) return Unauthorized();
 
         try
         {
-            var inviteId = await zoneMemberService.InviteAsync(
-                zoneId,
-                request.Email,
-                request.RoleId ?? 4,
-                callerId.Value,
-                cancellationToken);
-
-            return Ok(new { inviteId });
+            await zoneMemberService.AssignAsync(zoneId, request.UserId, callerId.Value, cancellationToken);
+            return Ok(new { success = true });
         }
         catch (ArgumentException ex)
         {
@@ -121,6 +117,7 @@ public class ZonesController(
         }
     }
 
+    /// <summary>Quita la asignación de un miembro a la zona (no lo expulsa de la organización).</summary>
     [HttpDelete("{zoneId:int}/members/{userId:int}")]
     public async Task<IActionResult> RemoveMember(
         int zoneId,
@@ -129,7 +126,8 @@ public class ZonesController(
     {
         var zone = await zoneQueryService.Handle(new GetZoneByIdQuery(zoneId));
         if (zone == null) return NotFound();
-        if (!await CanAccessZoneAsync(zone)) return Forbid();
+        if (!await CanManageZoneMembersAsync(zone))
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "No tienes permiso para gestionar miembros de esta zona." });
 
         var removed = await zoneMemberService.RemoveAsync(zoneId, userId, cancellationToken);
         if (!removed) return NotFound();
@@ -153,15 +151,33 @@ public class ZonesController(
     {
         if (User.IsInRole("admin") || User.IsInRole("staff")) return true;
 
-        var farm = await farmQueryService.Handle(new GetFarmByIdQuery(zone.FarmId));
-        if (farm == null) return false;
-
         var accessContext = await ResolveAccessContextAsync();
         if (accessContext == null) return false;
 
-        if (accessContext.AssociationId.HasValue && farm.AssociationId == accessContext.AssociationId.Value)
+        var farm = await farmQueryService.Handle(new GetFarmByIdQuery(zone.FarmId));
+        if (farm == null) return false;
+
+        var isOrgAdmin = User.IsInRole("user_admin") &&
+                         accessContext.AssociationId == farm.AssociationId;
+
+        if (isOrgAdmin)
             return true;
 
-        return farm.UserId.HasValue && accessContext.UserId == farm.UserId.Value;
+        return await zoneMemberService.CanUserAccessZoneAsync(
+            zone.Id,
+            accessContext.UserId,
+            isOrgAdmin: false);
+    }
+
+    private async Task<bool> CanManageZoneMembersAsync(Zone zone)
+    {
+        if (User.IsInRole("admin") || User.IsInRole("staff")) return true;
+        if (!User.IsInRole("user_admin")) return false;
+
+        var accessContext = await ResolveAccessContextAsync();
+        if (accessContext?.AssociationId == null) return false;
+
+        var farm = await farmQueryService.Handle(new GetFarmByIdQuery(zone.FarmId));
+        return farm != null && farm.AssociationId == accessContext.AssociationId.Value;
     }
 }

@@ -1,6 +1,6 @@
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
-using GrotixBackend.Profiles.Domain.Model.Aggregates;
-using GrotixBackend.Profiles.Domain.Security;
+using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
+using GrotixBackend.CultivationArea.Domain.Repositories;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,123 +8,93 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Repositories;
 
 public sealed class ZoneMemberService(
     CultivationAreaDbContext cultivationDb,
-    ProfilesDbContext profilesDb) : IZoneMemberService
+    ProfilesDbContext profilesDb,
+    IZoneMemberRepository zoneMemberRepository,
+    ICultivationAreaUnitOfWork unitOfWork) : IZoneMemberService
 {
     public async Task<IReadOnlyList<ZoneMemberDto>> ListAsync(
         int zoneId,
-        int? roleId,
         CancellationToken cancellationToken = default)
     {
-        var associationId = await ResolveAssociationIdByZoneAsync(zoneId, cancellationToken);
-        if (associationId == null)
+        var assignments = await zoneMemberRepository.ListByZoneIdAsync(zoneId);
+        if (assignments.Count == 0)
             return [];
 
+        var userIds = assignments.Select(a => a.UserId).ToList();
         var roles = await profilesDb.Roles
             .AsNoTracking()
             .ToDictionaryAsync(r => r.Id, r => r.Name, cancellationToken);
 
-        var usersQuery = profilesDb.Users
+        var users = await profilesDb.Users
             .AsNoTracking()
-            .Where(u => u.AssociationId == associationId && u.IsActive);
-
-        if (roleId.HasValue)
-            usersQuery = usersQuery.Where(u => u.RoleId == roleId.Value);
-
-        var users = await usersQuery
-            .OrderBy(u => u.Id)
+            .Where(u => userIds.Contains(u.Id) && u.IsActive)
             .ToListAsync(cancellationToken);
 
-        return users
-            .Select(u => new ZoneMemberDto(
-                u.Id,
-                u.Name,
-                u.Email.Value,
-                u.RoleId,
-                roles.TryGetValue(u.RoleId, out var roleName) ? roleName : "unknown",
-                u.CreatedAt,
-                null))
+        return assignments
+            .Select(a =>
+            {
+                var user = users.FirstOrDefault(u => u.Id == a.UserId);
+                if (user == null)
+                    return null;
+
+                return new ZoneMemberDto(
+                    user.Id,
+                    user.Name,
+                    user.Email.Value,
+                    user.RoleId,
+                    roles.TryGetValue(user.RoleId, out var roleName) ? roleName : "unknown",
+                    a.AssignedAt,
+                    a.AssignedByUserId);
+            })
+            .Where(dto => dto != null)
+            .Cast<ZoneMemberDto>()
             .ToList();
     }
 
-    public async Task<int> InviteAsync(
+    public async Task AssignAsync(
         int zoneId,
-        string email,
-        int roleId,
-        int invitedByUserId,
+        int userId,
+        int assignedByUserId,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Email requerido.");
-
         var associationId = await ResolveAssociationIdByZoneAsync(zoneId, cancellationToken)
-            ?? throw new ArgumentException("La zona no tiene una asociación vinculada.");
+                            ?? throw new ArgumentException("La zona no tiene una asociación vinculada.");
 
-        var normalizedEmail = email.Trim().ToLowerInvariant();
-
-        var roleExists = await profilesDb.Roles
+        var targetUser = await profilesDb.Users
             .AsNoTracking()
-            .AnyAsync(r => r.Id == roleId, cancellationToken);
-        if (!roleExists)
-            throw new ArgumentException("RoleId inválido.");
+            .FirstOrDefaultAsync(
+                u => u.Id == userId && u.AssociationId == associationId && u.IsActive,
+                cancellationToken)
+            ?? throw new ArgumentException("El usuario no pertenece a la organización de la zona.");
 
-        var memberEmails = await profilesDb.Users
-            .AsNoTracking()
-            .Where(u => u.AssociationId == associationId && u.IsActive)
-            .Select(u => u.Email)
-            .ToListAsync(cancellationToken);
+        if (await zoneMemberRepository.ExistsAsync(zoneId, userId))
+            throw new InvalidOperationException("El usuario ya está asignado a esta zona.");
 
-        var memberExists = memberEmails.Any(e =>
-            string.Equals(e.Value, normalizedEmail, StringComparison.OrdinalIgnoreCase));
-
-        if (memberExists)
-            throw new InvalidOperationException("El correo ya pertenece a la asociación de la zona.");
-
-        var pendingInviteExists = await profilesDb.AssociationInvites
-            .AsNoTracking()
-            .AnyAsync(
-                i => i.AssociationId == associationId &&
-                     i.InviteEmail == normalizedEmail &&
-                     i.UsedAt == null,
-                cancellationToken);
-
-        if (pendingInviteExists)
-            throw new InvalidOperationException("Ya existe una invitación pendiente para este correo.");
-
-        var token = InviteTokenHasher.GenerateToken();
-        var tokenHash = InviteTokenHasher.Hash(token);
-
-        var invite = new AssociationInvite(
-            associationId,
-            normalizedEmail,
-            tokenHash,
-            roleId,
-            expiresAt: DateTime.UtcNow.AddDays(7),
-            createdByUserId: invitedByUserId);
-
-        await profilesDb.AssociationInvites.AddAsync(invite, cancellationToken);
-        await profilesDb.SaveChangesAsync(cancellationToken);
-        return invite.Id;
+        await zoneMemberRepository.AddAsync(new ZoneMember(zoneId, targetUser.Id, assignedByUserId));
+        await unitOfWork.CompleteAsync();
     }
 
     public async Task<bool> RemoveAsync(int zoneId, int userId, CancellationToken cancellationToken = default)
     {
-        var associationId = await ResolveAssociationIdByZoneAsync(zoneId, cancellationToken);
-        if (associationId == null)
+        var assignment = await zoneMemberRepository.GetByZoneAndUserAsync(zoneId, userId);
+        if (assignment == null)
             return false;
 
-        var user = await profilesDb.Users
-            .FirstOrDefaultAsync(
-                u => u.Id == userId &&
-                     u.AssociationId == associationId &&
-                     u.IsActive,
-                cancellationToken);
-
-        if (user == null)
-            return false;
-
-        user.AssignAssociation(null);
-        await profilesDb.SaveChangesAsync(cancellationToken);
+        await zoneMemberRepository.DeleteAsync(assignment);
+        await unitOfWork.CompleteAsync();
         return true;
+    }
+
+    public async Task<bool> CanUserAccessZoneAsync(
+        int zoneId,
+        int userId,
+        bool isOrgAdmin,
+        CancellationToken cancellationToken = default)
+    {
+        if (isOrgAdmin)
+            return true;
+
+        return await zoneMemberRepository.IsUserAssignedToZoneAsync(zoneId, userId);
     }
 
     private async Task<int?> ResolveAssociationIdByZoneAsync(int zoneId, CancellationToken cancellationToken)
@@ -141,16 +111,6 @@ public sealed class ZoneMemberService(
         if (farm == null)
             return null;
 
-        if (farm.AssociationId > 0)
-            return farm.AssociationId;
-
-        if (farm.UserId == null)
-            return null;
-
-        var owner = await profilesDb.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == farm.UserId, cancellationToken);
-
-        return owner?.AssociationId;
+        return farm.AssociationId > 0 ? farm.AssociationId : null;
     }
 }

@@ -92,6 +92,8 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssociationId");
+
                     b.ToTable("farm", (string)null);
                 });
 
@@ -139,6 +141,41 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                     b.ToTable("zone", (string)null);
                 });
 
+            modelBuilder.Entity("GrotixBackend.CultivationArea.Domain.Model.Aggregates.ZoneMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ZoneMemberID");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("AssignedAt");
+
+                    b.Property<int>("AssignedByUserId")
+                        .HasColumnType("int")
+                        .HasColumnName("AssignedByUserID");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserID");
+
+                    b.Property<int>("ZoneId")
+                        .HasColumnType("int")
+                        .HasColumnName("ZoneID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ZoneId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("zone_member", (string)null);
+                });
+
             modelBuilder.Entity("GrotixBackend.CultivationArea.Domain.Model.Aggregates.Zone", b =>
                 {
                     b.HasOne("GrotixBackend.CultivationArea.Domain.Model.Aggregates.Crop", null)
@@ -150,6 +187,15 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                     b.HasOne("GrotixBackend.CultivationArea.Domain.Model.Aggregates.Farm", null)
                         .WithMany()
                         .HasForeignKey("FarmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GrotixBackend.CultivationArea.Domain.Model.Aggregates.ZoneMember", b =>
+                {
+                    b.HasOne("GrotixBackend.CultivationArea.Domain.Model.Aggregates.Zone", null)
+                        .WithMany()
+                        .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

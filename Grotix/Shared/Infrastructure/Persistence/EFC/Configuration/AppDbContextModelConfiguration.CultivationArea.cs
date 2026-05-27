@@ -51,5 +51,22 @@ public static partial class AppDbContextModelConfiguration
             e.HasOne<Crop>().WithMany().HasForeignKey(z => z.CropId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+        modelBuilder.Entity<ZoneMember>(e =>
+        {
+            e.ToTable("zone_member");
+            e.HasKey(m => m.Id);
+            e.Property(m => m.Id).HasColumnName("ZoneMemberID").ValueGeneratedOnAdd();
+            e.Property(m => m.ZoneId).HasColumnName("ZoneID");
+            e.Property(m => m.UserId).HasColumnName("UserID");
+            e.Property(m => m.AssignedAt).HasColumnName("AssignedAt");
+            e.Property(m => m.AssignedByUserId).HasColumnName("AssignedByUserID");
+
+            e.HasIndex(m => new { m.ZoneId, m.UserId }).IsUnique();
+            e.HasIndex(m => m.UserId);
+
+            e.HasOne<Zone>().WithMany().HasForeignKey(m => m.ZoneId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

@@ -8,6 +8,7 @@ public class CultivationAreaDbContext(DbContextOptions<CultivationAreaDbContext>
     public DbSet<Farm> Farms { get; set; }
     public DbSet<Crop> Crops { get; set; }
     public DbSet<Zone> Zones { get; set; }
+    public DbSet<ZoneMember> ZoneMembers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
