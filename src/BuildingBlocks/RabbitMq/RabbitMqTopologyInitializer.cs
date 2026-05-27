@@ -28,11 +28,15 @@ public sealed class RabbitMqTopologyInitializer(
             channel.ExchangeDeclare(_options.ExchangeName, ExchangeType.Topic, durable: true, autoDelete: false);
             channel.QueueDeclare(_options.UserRegisteredQueueName, durable: true, exclusive: false, autoDelete: false);
             channel.QueueBind(_options.UserRegisteredQueueName, _options.ExchangeName, _options.UserRegisteredRoutingKey);
+
+            channel.QueueDeclare(_options.TelemetryReceivedQueueName, durable: true, exclusive: false, autoDelete: false);
+            channel.QueueBind(_options.TelemetryReceivedQueueName, _options.ExchangeName, _options.TelemetryReceivedRoutingKey);
+
             logger.LogInformation(
-                "RabbitMQ topology OK: exchange={Exchange}, queue={Queue}, routingKey={Key}",
+                "RabbitMQ topology OK: exchange={Exchange}, queues={UserQueue},{TelemetryQueue}",
                 _options.ExchangeName,
                 _options.UserRegisteredQueueName,
-                _options.UserRegisteredRoutingKey);
+                _options.TelemetryReceivedQueueName);
         }
         catch (Exception ex)
         {

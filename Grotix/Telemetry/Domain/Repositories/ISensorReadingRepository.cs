@@ -1,0 +1,17 @@
+using GrotixBackend.Telemetry.Domain.Model.Entities;
+
+namespace GrotixBackend.Telemetry.Domain.Repositories;
+
+public interface ISensorReadingRepository
+{
+    Task AddAsync(SensorReading reading, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<SensorReading>> ListBySensorAsync(
+        int sensorId,
+        DateTime? start,
+        DateTime? end,
+        int limit,
+        CancellationToken cancellationToken = default);
+
+    Task<double?> GetLatestSmoothedValueAsync(int sensorId, CancellationToken cancellationToken = default);
+}

@@ -1,0 +1,133 @@
+using GrotixBackend.Contracts.Auth.Claims;
+using GrotixBackend.Contracts.Profiles.Access;
+using GrotixBackend.Profiles.Domain.Model.ValueObjects;
+using GrotixBackend.Telemetry.Application.ACL;
+using GrotixBackend.Telemetry.Application.Internal;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace GrotixBackend.Telemetry.Interfaces.REST.Controllers;
+
+[ApiController]
+[Route("telemetry/zones")]
+[Authorize]
+public sealed class TelemetryController(
+    IUserAccessContextService userAccessContextService,
+    IZoneAuthorizationService zoneAuthorizationService,
+    ITelemetryQueryService telemetryQueryService,
+    IZoneThresholdService zoneThresholdService) : ControllerBase
+{
+    [HttpGet("{zoneId:int}")]
+    public async Task<IActionResult> GetZoneHistory(
+        int zoneId,
+        [FromQuery] DateTime? startTime,
+        [FromQuery] DateTime? endTime,
+        [FromQuery] string[]? sensorTypes,
+        [FromQuery] int limit = 1000,
+        CancellationToken cancellationToken = default)
+    {
+        if (!User.HasPermission(KnownPermissionCodes.TelemetryView) && !User.IsInRole("admin"))
+            return Forbid();
+
+        if (!await CanAccessZoneAsync(zoneId, cancellationToken))
+            return Forbid();
+
+        var history = await telemetryQueryService.GetZoneHistoryAsync(
+            zoneId,
+            startTime,
+            endTime,
+            sensorTypes,
+            Math.Clamp(limit, 1, 10_000),
+            cancellationToken);
+
+        if (history == null)
+            return NotFound();
+
+        return Ok(new
+        {
+            zoneId = history.ZoneId,
+            period = new { start = history.Start, end = history.End },
+            sensors = history.Sensors.Select(s => new
+            {
+                sensorId = s.SensorId,
+                type = s.Type,
+                unit = s.Unit,
+                readings = s.Readings.Select(r => new { value = r.Value, timestamp = r.Timestamp })
+            })
+        });
+    }
+
+    [HttpGet("{zoneId:int}/thresholds")]
+    public async Task<IActionResult> GetThresholds(int zoneId, CancellationToken cancellationToken = default)
+    {
+        if (!User.HasPermission(KnownPermissionCodes.TelemetryView) && !User.IsInRole("admin"))
+            return Forbid();
+
+        if (!await CanAccessZoneAsync(zoneId, cancellationToken))
+            return Forbid();
+
+        if (!await zoneAuthorizationService.ZoneExistsAsync(zoneId, cancellationToken))
+            return NotFound();
+
+        var thresholds = await zoneThresholdService.GetEffectiveThresholdsAsync(zoneId, cancellationToken);
+        return Ok(thresholds.Select(t => new
+        {
+            sensorType = t.SensorType,
+            minValue = t.MinValue,
+            maxValue = t.MaxValue,
+            source = t.Source
+        }));
+    }
+
+    public sealed record ThresholdPatchItem(string SensorType, double? MinValue, double? MaxValue);
+
+    [HttpPatch("{zoneId:int}/thresholds")]
+    public async Task<IActionResult> PatchThresholds(
+        int zoneId,
+        [FromBody] ThresholdPatchItem[] request,
+        CancellationToken cancellationToken = default)
+    {
+        if (!User.HasPermission(KnownPermissionCodes.ThresholdWrite) && !User.IsInRole("admin"))
+            return Forbid();
+
+        if (!await CanAccessZoneAsync(zoneId, cancellationToken))
+            return Forbid();
+
+        if (!await zoneAuthorizationService.ZoneExistsAsync(zoneId, cancellationToken))
+            return NotFound();
+
+        try
+        {
+            var updates = request
+                .Select(r => new ThresholdUpdateRequest(r.SensorType, r.MinValue, r.MaxValue))
+                .ToList();
+
+            await zoneThresholdService.UpdateCustomThresholdsAsync(zoneId, updates, cancellationToken);
+            return Ok(new { success = true });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    private async Task<bool> CanAccessZoneAsync(int zoneId, CancellationToken cancellationToken)
+    {
+        var profileId = await ResolveProfileUserIdAsync(cancellationToken);
+        return await zoneAuthorizationService.CanAccessZoneAsync(
+            zoneId,
+            User.IsInRole("admin"),
+            profileId,
+            cancellationToken);
+    }
+
+    private async Task<int?> ResolveProfileUserIdAsync(CancellationToken cancellationToken)
+    {
+        var identityId = User.GetIdentityId();
+        if (identityId == null)
+            return null;
+
+        var accessContext = await userAccessContextService.GetByIdentityIdAsync(identityId.Value, cancellationToken);
+        return accessContext?.UserId;
+    }
+}

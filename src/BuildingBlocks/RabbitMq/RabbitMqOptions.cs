@@ -21,4 +21,10 @@ public sealed class RabbitMqOptions
     public string UserRegisteredQueueName { get; set; } = "cultivation.user.registered";
 
     public string UserRegisteredRoutingKey { get; set; } = "user.registered";
+
+    public string TelemetryReceivedQueueName { get; set; } = "telemetry.received";
+
+    public string TelemetryReceivedRoutingKey { get; set; } = "telemetry.received";
+
+    public string AlertTriggeredRoutingKey { get; set; } = "alert.triggered";
 }
