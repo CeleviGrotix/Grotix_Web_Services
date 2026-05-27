@@ -1,7 +1,7 @@
 ﻿namespace GrotixBackend.IAM.Domain.Model.Aggregates;
 
+using GrotixBackend.Contracts.Auth.Identity;
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
-using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using System.Text.RegularExpressions;
 
 /// <summary>
@@ -18,8 +18,7 @@ public class Identity
     /// <summary>Crea identidad con correo validado y hash ya calculado por el servicio de aplicación.</summary>
     public Identity(string email, PasswordHash passwordHash)
     {
-        var vo = UserEmail.Create(email);
-        UserName = vo.Value;
+        UserName = AuthEmail.Normalize(email);
         HashedPassword = passwordHash ?? throw new ArgumentNullException(nameof(passwordHash));
     }
 

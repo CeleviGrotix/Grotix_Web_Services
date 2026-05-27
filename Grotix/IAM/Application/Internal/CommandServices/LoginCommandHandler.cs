@@ -1,17 +1,16 @@
 ﻿using MediatR;
+using GrotixBackend.Contracts.Auth.Lookup;
 using GrotixBackend.IAM.Application.Internal.OutboundServices;
 using GrotixBackend.IAM.Application.Resources;
 using GrotixBackend.IAM.Domain.Model.Commands;
 using GrotixBackend.IAM.Domain.Repositories;
-using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Profiles.Domain.Services;
+using GrotixBackend.Contracts.Auth.Security;
 
 namespace GrotixBackend.IAM.Application.Internal.CommandServices;
 
 public class LoginCommandHandler(
     IIdentityRepository identityRepository,
-    IUserRepository userRepository,
-    IRoleRepository roleRepository,
+    IUserAuthorizationContextService authorizationContextService,
     ITokenService tokenService,
     IPasswordHasher passwordHasher
 ) : IRequestHandler<LoginCommand, LoginResponse>
@@ -26,16 +25,14 @@ public class LoginCommandHandler(
 
         var roleNames = new List<string>();
         IReadOnlyList<string> permissionCodes = Array.Empty<string>();
-        var profile = await userRepository.GetByIdentityIdAsync(identity.Id);
-        if (profile != null && !profile.IsActive)
+        var authorizationContext = await authorizationContextService.GetByIdentityIdAsync(identity.Id, cancellationToken);
+        if (authorizationContext != null && !authorizationContext.IsActive)
             return new LoginResponse(0, command.Email, false, "La cuenta está desactivada.");
 
-        if (profile != null)
+        if (authorizationContext != null)
         {
-            var roleEntity = await roleRepository.GetByIdAsync(profile.RoleId);
-            if (roleEntity != null)
-                roleNames = new List<string> { roleEntity.Name };
-            permissionCodes = await roleRepository.GetPermissionCodesByRoleIdAsync(profile.RoleId);
+            roleNames = authorizationContext.RoleNames.ToList();
+            permissionCodes = authorizationContext.PermissionCodes;
         }
 
         var token = tokenService.GenerateToken(identity, roleNames, permissionCodes);

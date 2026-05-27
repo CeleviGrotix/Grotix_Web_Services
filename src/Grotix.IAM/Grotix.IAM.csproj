@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Grotix.Shared\Grotix.Shared.csproj" />
-    <ProjectReference Include="..\Grotix.Profiles\Grotix.Profiles.csproj" />
     <ProjectReference Include="..\Grotix.Contracts.Auth\Grotix.Contracts.Auth.csproj" />
     <ProjectReference Include="..\Grotix.Contracts.Profiles\Grotix.Contracts.Profiles.csproj" />
   </ItemGroup>

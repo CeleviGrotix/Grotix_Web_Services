@@ -1,38 +1,25 @@
 using GrotixBackend.BuildingBlocks.Auth;
 using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.BuildingBlocks.RabbitMq;
-using GrotixBackend.Contracts.Auth.Admin;
-using GrotixBackend.Contracts.Auth.Lookup;
-using GrotixBackend.Contracts.Profiles.Access;
+using GrotixBackend.Contracts.Auth.Security;
 using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.IAM.Application.ACL;
-using GrotixBackend.IAM.Application.Internal.OutboundServices;
+using GrotixBackend.IAM.DependencyInjection;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
 using GrotixBackend.IAM.Domain.Repositories;
-using GrotixBackend.IAM.Infrastructure.Repositories;
 using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
-using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Services;
-using GrotixBackend.Profiles.Application.ACL;
 using GrotixBackend.Profiles.Application.Internal.CommandServices;
-using GrotixBackend.Profiles.Application.Internal.OutboundServices;
-using GrotixBackend.Profiles.Application.Internal.QueryServices;
+using GrotixBackend.Profiles.DependencyInjection;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Profiles.Domain.Services;
-using GrotixBackend.Profiles.Infrastructure.Adapters;
-using GrotixBackend.Profiles.Infrastructure.Repositories;
-using GrotixBackend.Profiles.Infrastructure.Security;
 using GrotixBackend.Shared.Domain.Repositories;
 using GrotixBackend.Shared.Infrastructure.Health;
 using GrotixBackend.Shared.Infrastructure.OpenApi;
-using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
-using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories;
+using GrotixBackend.Shared.Infrastructure.Persistence.EFC.DependencyInjection;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -43,61 +30,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(
         typeof(Program).Assembly,
-        typeof(TokenService).Assembly,
-        typeof(UserCommandService).Assembly,
-        typeof(AppDbContext).Assembly));
+        typeof(AdminIdentityRegistrationService).Assembly,
+        typeof(UserCommandService).Assembly));
 
 builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));
 
 builder.Services.AddGrotixJwt(builder.Configuration);
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var mysqlVersionString = builder.Configuration["MySql:ServerVersion"];
-Version mysqlVersion;
-if (string.IsNullOrWhiteSpace(mysqlVersionString))
-{
-    mysqlVersion = new Version(8, 0, 36);
-}
-else
-{
-    var segments = mysqlVersionString.Trim().Split('.', StringSplitOptions.RemoveEmptyEntries);
-    var major = segments.Length > 0 ? int.Parse(segments[0]) : 8;
-    var minor = segments.Length > 1 ? int.Parse(segments[1]) : 0;
-    var build = segments.Length > 2 ? int.Parse(segments[2]) : 0;
-    mysqlVersion = new Version(major, minor, build);
-}
-
-var mysqlServerVersion = new MySqlServerVersion(mysqlVersion);
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, mysqlServerVersion));
-
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
-builder.Services.AddScoped<INotificationServiceAdapter, NoOpNotificationServiceAdapter>();
-
-builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
-builder.Services.AddScoped<IIdentityLookupService, IdentityLookupService>();
-builder.Services.AddScoped<IAdminIdentityRegistrationService, AdminIdentityRegistrationService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-
-builder.Services.AddScoped<IUserRepository, CoreDbUserRepository>();
-builder.Services.AddScoped<IAssociationRepository, CoreDbAssociationRepository>();
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-builder.Services.AddScoped<IStaffRepository, StaffRepository>();
-builder.Services.AddScoped<IUserCommandService, UserCommandService>();
-builder.Services.AddScoped<IUserQueryService, UserQueryService>();
-builder.Services.AddScoped<IUserAccessContextService, UserAccessContextService>();
-builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
-builder.Services.AddScoped<IStaffQueryService, StaffQueryService>();
-builder.Services.AddScoped<IStaffCommandService, StaffCommandService>();
-builder.Services.AddScoped<IContractRepository, ContractRepository>();
-builder.Services.AddScoped<IContractQueryService, ContractQueryService>();
-builder.Services.AddScoped<IContractCommandService, ContractCommandService>();
-builder.Services.AddScoped<IAssociationInviteRepository, AssociationInviteRepository>();
-builder.Services.AddScoped<IAssociationInviteCommandService, AssociationInviteCommandService>();
-builder.Services.AddScoped<IExternalProfileService, ExternalProfileService>();
-
+builder.Services.AddGrotixPersistence(builder.Configuration);
+builder.Services.AddGrotixIamModule();
+builder.Services.AddGrotixProfilesModule();
 builder.Services.AddGrotixRabbitMqPublisher(builder.Configuration);
 
 builder.Services
@@ -116,7 +58,6 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHealthChecks()
-    .AddCheck<MySqlReadinessHealthCheck>("mysql", tags: ["ready"])
     .AddCheck<TimescaleTelemetryHealthCheck>("timescale", tags: ["timescale"]);
 
 builder.Services.AddCors(options =>

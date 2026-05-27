@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GrotixBackend.IAM.Domain.Model.ValueObjects;
 
-/// <summary>VO de credencial: solo almacena el hash persistido (el hashing lo hace <see cref="GrotixBackend.Profiles.Domain.Services.IPasswordHasher"/>).</summary>
+/// <summary>VO de credencial: solo almacena el hash persistido (el hashing lo hace <see cref="GrotixBackend.Contracts.Auth.Security.IPasswordHasher"/>).</summary>
 public class PasswordHash : IEquatable<PasswordHash>
 {
     public string HashedValue { get; private set; } = null!;

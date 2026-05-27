@@ -1,6 +1,6 @@
 using MediatR;
+using GrotixBackend.Contracts.Auth.Notifications;
 using GrotixBackend.Profiles.Application.Internal.OutboundServices;
-using GrotixBackend.Profiles.Domain.Model.Notifications;
 
 namespace GrotixBackend.Profiles.Application.Internal.EventHandlers;
 

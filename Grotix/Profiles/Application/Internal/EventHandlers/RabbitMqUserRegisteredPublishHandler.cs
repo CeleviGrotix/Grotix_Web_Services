@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using GrotixBackend.BuildingBlocks.RabbitMq;
+using GrotixBackend.Contracts.Auth.Notifications;
 using GrotixBackend.Contracts.Integration.Users;
-using GrotixBackend.Profiles.Domain.Model.Notifications;
 using MediatR;
 using Microsoft.Extensions.Options;
 

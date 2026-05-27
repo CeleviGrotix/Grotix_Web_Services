@@ -1,4 +1,4 @@
-using GrotixBackend.Profiles.Domain.Services;
+using GrotixBackend.Contracts.Auth.Security;
 
 namespace GrotixBackend.Profiles.Infrastructure.Security;
 
