@@ -93,7 +93,7 @@ namespace GrotixBackend.Shared.Validation
                 {
                     
                     var localizerFactory = validationContext.GetService(typeof(IStringLocalizerFactory)) as IStringLocalizerFactory;
-                    IStringLocalizer localizer = null;
+                    IStringLocalizer? localizer = null;
 
                     if (localizerFactory != null && ErrorResourceType != null)
                     {
@@ -109,7 +109,10 @@ namespace GrotixBackend.Shared.Validation
                         parsedMinDate.ToShortDateString() 
                     );
 
-                    return new ValidationResult(finalErrorMessage, new[] { validationContext.MemberName });
+                    var memberNames = validationContext.MemberName is { } memberName
+                        ? new[] { memberName }
+                        : null;
+                    return new ValidationResult(finalErrorMessage, memberNames);
                 }
             }
             

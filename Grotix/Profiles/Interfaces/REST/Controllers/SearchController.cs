@@ -15,6 +15,8 @@ public class SearchController(IMediator mediator, IUserQueryService userQuerySer
     [HttpGet]
     public async Task<IActionResult> GlobalSearch([FromQuery] string? q = "")
     {
+        var searchTerm = q ?? string.Empty;
+
         // 1. Validar identidad del que llama
         var identityId = User.GetIdentityId();
         if (identityId == null) return Unauthorized();
@@ -31,7 +33,7 @@ public class SearchController(IMediator mediator, IUserQueryService userQuerySer
             : user.AssociationId;
 
         // 4. Ejecutar la búsqueda mediante MediatR
-        var query = new GetGlobalSearchQuery(q, filterAssocId);
+        var query = new GetGlobalSearchQuery(searchTerm, filterAssocId);
         var results = await mediator.Send(query);
 
         return Ok(results);
