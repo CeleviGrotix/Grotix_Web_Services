@@ -45,7 +45,8 @@ public sealed class DevicesController(
         int? ZoneId,
         string Model,
         string MacAddress,
-        CreateSensorRequest[]? Sensors);
+        CreateSensorRequest[]? Sensors,
+        CreateActuatorRequest[]? Actuators);
 
     public sealed record CreateSensorRequest(
         string Type,
@@ -53,6 +54,8 @@ public sealed class DevicesController(
         int Pin,
         double? MinPhysical,
         double? MaxPhysical);
+
+    public sealed record CreateActuatorRequest(string Type, int Pin);
 
     [HttpPost("devices")]
     public async Task<IActionResult> Create([FromBody] CreateDeviceRequest request, CancellationToken cancellationToken)
@@ -66,9 +69,12 @@ public sealed class DevicesController(
             IReadOnlyList<RegisterSensorRequest>? sensors = request.Sensors?
                 .Select(s => new RegisterSensorRequest(s.Type, s.Unit, s.Pin, s.MinPhysical, s.MaxPhysical))
                 .ToList();
+            IReadOnlyList<RegisterActuatorRequest>? actuators = request.Actuators?
+                .Select(a => new RegisterActuatorRequest(a.Type, a.Pin))
+                .ToList();
 
             var device = await deviceCommandService.RegisterAsync(
-                new RegisterDeviceRequest(request.ZoneId, request.Model, request.MacAddress, sensors),
+                new RegisterDeviceRequest(request.ZoneId, request.Model, request.MacAddress, sensors, actuators),
                 cancellationToken);
 
             return CreatedAtAction(nameof(GetById), new { id = device.Id }, new { deviceId = device.Id });
@@ -76,6 +82,119 @@ public sealed class DevicesController(
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("devices/{id:int}/sensors")]
+    public async Task<IActionResult> AddSensor(
+        int id,
+        [FromBody] CreateSensorRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!CanWrite()) return Forbid();
+
+        var device = await deviceQueryService.GetDetailAsync(id);
+        if (device == null) return NotFound();
+        if (!await CanAccessDeviceAsync(device.Device, cancellationToken)) return Forbid();
+
+        try
+        {
+            var sensor = await deviceCommandService.AddSensorAsync(
+                id,
+                new RegisterSensorRequest(request.Type, request.Unit, request.Pin, request.MinPhysical, request.MaxPhysical),
+                cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { id }, new
+            {
+                sensorId = sensor.Id,
+                type = sensor.Type,
+                unit = sensor.Unit,
+                pin = sensor.Pin,
+                zoneId = sensor.ZoneId
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("devices/{id:int}/actuators")]
+    public async Task<IActionResult> AddActuator(
+        int id,
+        [FromBody] CreateActuatorRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!CanWrite()) return Forbid();
+
+        var device = await deviceQueryService.GetDetailAsync(id);
+        if (device == null) return NotFound();
+        if (!await CanAccessDeviceAsync(device.Device, cancellationToken)) return Forbid();
+
+        try
+        {
+            var actuator = await deviceCommandService.AddActuatorAsync(
+                id,
+                new RegisterActuatorRequest(request.Type, request.Pin),
+                cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { id }, new
+            {
+                actuatorId = actuator.Id,
+                type = actuator.Type,
+                pin = actuator.Pin,
+                status = actuator.Status
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("devices/{id:int}/sensors/{sensorId:int}")]
+    public async Task<IActionResult> DeleteSensor(int id, int sensorId, CancellationToken cancellationToken)
+    {
+        if (!CanWrite()) return Forbid();
+
+        var device = await deviceQueryService.GetDetailAsync(id);
+        if (device == null) return NotFound();
+        if (!await CanAccessDeviceAsync(device.Device, cancellationToken)) return Forbid();
+
+        try
+        {
+            await deviceCommandService.DeleteSensorAsync(id, sensorId, cancellationToken);
+            return Ok(new { success = true });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpDelete("devices/{id:int}/actuators/{actuatorId:int}")]
+    public async Task<IActionResult> DeleteActuator(int id, int actuatorId, CancellationToken cancellationToken)
+    {
+        if (!CanWrite()) return Forbid();
+
+        var device = await deviceQueryService.GetDetailAsync(id);
+        if (device == null) return NotFound();
+        if (!await CanAccessDeviceAsync(device.Device, cancellationToken)) return Forbid();
+
+        try
+        {
+            await deviceCommandService.DeleteActuatorAsync(id, actuatorId, cancellationToken);
+            return Ok(new { success = true });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
         }
     }
 

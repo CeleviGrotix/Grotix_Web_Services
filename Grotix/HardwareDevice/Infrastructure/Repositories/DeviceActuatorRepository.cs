@@ -18,4 +18,15 @@ public sealed class DeviceActuatorRepository(HardwareDeviceDbContext db) : IDevi
 
     public Task<int> CountByDeviceAsync(int deviceId) =>
         db.Actuators.CountAsync(a => a.MicrocontrollerId == deviceId);
+
+    public Task<DeviceActuator?> GetByIdAsync(int actuatorId) =>
+        db.Actuators.FirstOrDefaultAsync(a => a.Id == actuatorId);
+
+    public async Task AddAsync(DeviceActuator actuator) => await db.Actuators.AddAsync(actuator);
+
+    public Task DeleteAsync(DeviceActuator actuator)
+    {
+        db.Actuators.Remove(actuator);
+        return Task.CompletedTask;
+    }
 }

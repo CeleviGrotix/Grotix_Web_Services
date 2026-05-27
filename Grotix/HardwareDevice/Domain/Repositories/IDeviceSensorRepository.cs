@@ -7,6 +7,8 @@ public interface IDeviceSensorRepository
     Task<IReadOnlyList<DeviceSensor>> ListByDeviceAsync(int deviceId);
     Task<int> CountByDeviceAsync(int deviceId);
     Task AddAsync(DeviceSensor sensor);
+    Task<DeviceSensor?> GetByIdAsync(int sensorId);
+    Task DeleteAsync(DeviceSensor sensor);
 
     Task AssignZoneToDeviceAsync(int deviceId, int? zoneId, CancellationToken cancellationToken = default);
 }

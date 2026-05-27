@@ -18,13 +18,28 @@ public interface IDeviceCommandService
         int deviceId,
         UpdateDeviceStatusRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<DeviceSensor> AddSensorAsync(
+        int deviceId,
+        RegisterSensorRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<DeviceActuator> AddActuatorAsync(
+        int deviceId,
+        RegisterActuatorRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task DeleteSensorAsync(int deviceId, int sensorId, CancellationToken cancellationToken = default);
+
+    Task DeleteActuatorAsync(int deviceId, int actuatorId, CancellationToken cancellationToken = default);
 }
 
 public sealed record RegisterDeviceRequest(
     int? ZoneId,
     string Model,
     string MacAddress,
-    IReadOnlyList<RegisterSensorRequest>? Sensors);
+    IReadOnlyList<RegisterSensorRequest>? Sensors,
+    IReadOnlyList<RegisterActuatorRequest>? Actuators = null);
 
 public sealed record RegisterSensorRequest(
     string Type,
@@ -32,6 +47,8 @@ public sealed record RegisterSensorRequest(
     int Pin,
     double? MinPhysical,
     double? MaxPhysical);
+
+public sealed record RegisterActuatorRequest(string Type, int Pin);
 
 public sealed record UpdateDeviceRequest(int? ZoneId, string? Model, string? MacAddress);
 

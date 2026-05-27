@@ -21,6 +21,15 @@ public sealed class DeviceSensorRepository(HardwareDeviceDbContext db) : IDevice
 
     public async Task AddAsync(DeviceSensor sensor) => await db.Sensors.AddAsync(sensor);
 
+    public Task<DeviceSensor?> GetByIdAsync(int sensorId) =>
+        db.Sensors.FirstOrDefaultAsync(s => s.Id == sensorId);
+
+    public Task DeleteAsync(DeviceSensor sensor)
+    {
+        db.Sensors.Remove(sensor);
+        return Task.CompletedTask;
+    }
+
     public async Task AssignZoneToDeviceAsync(int deviceId, int? zoneId, CancellationToken cancellationToken = default)
     {
         var sensors = await db.Sensors.Where(s => s.MicrocontrollerId == deviceId).ToListAsync(cancellationToken);
