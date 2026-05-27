@@ -19,9 +19,12 @@ public class CoreDbUserRepository(ProfilesDbContext context)
             .FirstOrDefaultAsync(u => u.IdentityId == identityId);
     }
 
-    public Task<User?> GetByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default) =>
-        Context.Set<User>()
-            .FirstOrDefaultAsync(u => u.Email.Value == normalizedEmail, cancellationToken);
+    public async Task<User?> GetByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default)
+    {
+        var email = UserEmail.Create(normalizedEmail);
+        return await Context.Set<User>()
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
 
     public Task<User?> GetUserAdminByAssociationIdAsync(int associationId, CancellationToken cancellationToken = default) =>
         Context.Set<User>()

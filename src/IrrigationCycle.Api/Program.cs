@@ -62,6 +62,20 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+var rabbitMqEnabled = app.Configuration.GetValue("RabbitMq:Enabled", true);
+if (rabbitMqEnabled)
+{
+    app.Logger.LogInformation(
+        "RabbitMQ habilitado. Broker esperado en {Host}:{Port}.",
+        app.Configuration["RabbitMq:HostName"] ?? "localhost",
+        app.Configuration.GetValue("RabbitMq:Port", 5672));
+}
+else
+{
+    app.Logger.LogWarning(
+        "RabbitMQ deshabilitado (RabbitMq:Enabled=false). No se registran topología ni consumidores.");
+}
+
 var enableSwagger = app.Environment.IsDevelopment()
     || app.Configuration.GetValue("Swagger:Enabled", false);
 if (enableSwagger)
