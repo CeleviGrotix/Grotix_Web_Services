@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations;
 
-[DbContext(typeof(AppDbContext))]
+[DbContext(typeof(ProfilesDbContext))]
 [Migration("20260512120000_UserIsActive")]
 public partial class UserIsActive
 {

@@ -3,14 +3,13 @@ using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 
 namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 
 public class UserCommandService(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
-    IUnitOfWork unitOfWork
+    IProfilesUnitOfWork unitOfWork
 ) : IUserCommandService
 {
     public async Task<User> Handle(CreateUserCommand command)

@@ -2,14 +2,13 @@ using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 
 namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 
 public class StaffCommandService(
     IStaffRepository staffRepository,
     IUserRepository userRepository,
-    IUnitOfWork unitOfWork
+    IProfilesUnitOfWork unitOfWork
 ) : IStaffCommandService
 {
     public async Task<Staff> Handle(CreateStaffCommand command)

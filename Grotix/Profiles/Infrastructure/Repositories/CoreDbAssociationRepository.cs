@@ -5,5 +5,5 @@ using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories;
 
 namespace GrotixBackend.Profiles.Infrastructure.Repositories;
 
-public class CoreDbAssociationRepository(AppDbContext context)
+public class CoreDbAssociationRepository(ProfilesDbContext context)
     : BaseRepository<Association>(context), IAssociationRepository;

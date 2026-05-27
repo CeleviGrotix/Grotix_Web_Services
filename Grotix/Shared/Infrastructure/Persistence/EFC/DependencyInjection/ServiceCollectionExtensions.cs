@@ -19,9 +19,26 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGrotixPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddGrotixAppPersistence(configuration);
+        services.AddGrotixProfilesPersistence(configuration);
         services.AddGrotixIamPersistence(configuration);
         services.AddGrotixCultivationAreaPersistence(configuration);
+        return services;
+    }
+
+    public static IServiceCollection AddGrotixProfilesPersistence(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var mysqlServerVersion = ResolveMySqlServerVersion(configuration["MySql:ServerVersion"]);
+
+        services.AddDbContext<ProfilesDbContext>(options =>
+            options.UseMySql(connectionString, mysqlServerVersion));
+
+        services.AddScoped<IProfilesUnitOfWork, ProfilesUnitOfWork>();
+        services.AddHealthChecks()
+            .AddCheck<MySqlReadinessHealthCheck>("mysql", tags: ["ready"]);
+
+        services.AddProfilesRepositories();
+
         return services;
     }
 
@@ -29,6 +46,9 @@ public static class ServiceCollectionExtensions
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         var mysqlServerVersion = ResolveMySqlServerVersion(configuration["MySql:ServerVersion"]);
+
+        services.AddDbContext<ProfilesDbContext>(options =>
+            options.UseMySql(connectionString, mysqlServerVersion));
         services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(connectionString, mysqlServerVersion));
 
@@ -36,7 +56,7 @@ public static class ServiceCollectionExtensions
         services.AddHealthChecks()
             .AddCheck<MySqlReadinessHealthCheck>("mysql", tags: ["ready"]);
 
-        services.AddProfilesPersistence();
+        services.AddProfilesRepositories();
 
         return services;
     }
@@ -81,7 +101,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddProfilesPersistence(this IServiceCollection services)
+    private static IServiceCollection AddProfilesRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, CoreDbUserRepository>();
         services.AddScoped<IAssociationRepository, CoreDbAssociationRepository>();

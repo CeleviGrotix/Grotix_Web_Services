@@ -15,7 +15,7 @@ public sealed class MySqlReadinessHealthCheck(IServiceProvider services) : IHeal
         try
         {
             await using var scope = services.CreateAsyncScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var db = scope.ServiceProvider.GetRequiredService<ProfilesDbContext>();
             await db.Database.ExecuteSqlRawAsync("SELECT 1", cancellationToken);
             return HealthCheckResult.Healthy();
         }

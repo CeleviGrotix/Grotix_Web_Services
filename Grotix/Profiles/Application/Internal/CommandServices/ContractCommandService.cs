@@ -1,10 +1,9 @@
 using GrotixBackend.Contracts.Auth.Lookup;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Commands;
+using GrotixBackend.Profiles.Domain.Model.Enums;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
-using GrotixBackend.Profiles.Domain.Model.Enums;
 
 namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 
@@ -15,7 +14,7 @@ public class ContractCommandService(
     IUserRepository userRepository,
     IAssociationInviteRepository inviteRepository,
     IAssociationInviteCommandService inviteCommandService,
-    IUnitOfWork unitOfWork
+    IProfilesUnitOfWork unitOfWork
 ) : IContractCommandService
 {
     public async Task<CreateContractResult> Handle(CreateContractCommand command)

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations;
 
-[DbContext(typeof(AppDbContext))]
+[DbContext(typeof(ProfilesDbContext))]
 [Migration("20260509120000_AddAssociationInvite")]
 public partial class AddAssociationInvite
 {

@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations;
 
-[DbContext(typeof(AppDbContext))]
-public partial class AppDbContextModelSnapshot : ModelSnapshot
+[DbContext(typeof(ProfilesDbContext))]
+public partial class ProfilesDbContextModelSnapshot : ModelSnapshot
 {
     protected override void BuildModel(ModelBuilder modelBuilder) =>
         AppDbContextModelSnapshotFactory.Apply(modelBuilder);

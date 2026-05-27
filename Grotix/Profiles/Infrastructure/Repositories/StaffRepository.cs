@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.Profiles.Infrastructure.Repositories;
 
-public class StaffRepository(AppDbContext context)
+public class StaffRepository(ProfilesDbContext context)
     : BaseRepository<Staff>(context), IStaffRepository
 {
     public async Task<Staff?> GetByUserIdAsync(int userId)

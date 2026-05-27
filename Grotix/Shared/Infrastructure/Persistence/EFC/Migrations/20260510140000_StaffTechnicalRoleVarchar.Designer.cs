@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations;
 
-[DbContext(typeof(AppDbContext))]
+[DbContext(typeof(ProfilesDbContext))]
 [Migration("20260510140000_StaffTechnicalRoleVarchar")]
 public partial class StaffTechnicalRoleVarchar
 {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations;
 
-[DbContext(typeof(AppDbContext))]
+[DbContext(typeof(ProfilesDbContext))]
 [Migration("20260527012000_HandoffCultivationAreaToDedicatedContext")]
 public partial class HandoffCultivationAreaToDedicatedContext
 {

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.Profiles.Infrastructure.Repositories;
 
-public class RoleRepository(AppDbContext context)
+public class RoleRepository(ProfilesDbContext context)
     : BaseRepository<Role>(context), IRoleRepository
 {
     public async Task<IReadOnlyList<string>> GetPermissionCodesByRoleIdAsync(int roleId)

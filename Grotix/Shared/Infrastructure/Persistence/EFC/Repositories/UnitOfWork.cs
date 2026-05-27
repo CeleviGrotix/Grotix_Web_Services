@@ -9,13 +9,13 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories
     /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly AppDbContext _context;
+        private readonly ProfilesDbContext _context;
 
         /// <summary>
         /// Inicializa una nueva instancia de la clase <see cref="UnitOfWork"/>.
         /// </summary>
-        /// <param name="context">El contexto de la base de datos de Grotix.</param>
-        public UnitOfWork(AppDbContext context)
+        /// <param name="context">El contexto de Profiles de Grotix.</param>
+        public UnitOfWork(ProfilesDbContext context)
         {
             _context = context;
         }

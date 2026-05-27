@@ -3,14 +3,13 @@ using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
 using GrotixBackend.Profiles.Domain.Security;
-using GrotixBackend.Shared.Domain.Repositories;
 
 namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 
 public sealed class AssociationInviteCommandService(
     IAssociationInviteRepository inviteRepository,
     IAssociationRepository associationRepository,
-    IUnitOfWork unitOfWork
+    IProfilesUnitOfWork unitOfWork
 ) : IAssociationInviteCommandService
 {
     public async Task<CreateAssociationInviteResult> Handle(CreateAssociationInviteCommand command)

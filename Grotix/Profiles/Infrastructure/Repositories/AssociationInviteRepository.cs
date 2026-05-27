@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.Profiles.Infrastructure.Repositories;
 
-public sealed class AssociationInviteRepository(AppDbContext context)
+public sealed class AssociationInviteRepository(ProfilesDbContext context)
     : BaseRepository<AssociationInvite>(context), IAssociationInviteRepository
 {
     public async Task<AssociationInvite?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)

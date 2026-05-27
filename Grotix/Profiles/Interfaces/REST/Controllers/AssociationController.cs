@@ -1,7 +1,6 @@
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +12,7 @@ namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 [Authorize(Roles = "admin,staff")]
 public class AssociationController(
     IAssociationRepository associationRepository,
-    IUnitOfWork unitOfWork) : ControllerBase
+    IProfilesUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()

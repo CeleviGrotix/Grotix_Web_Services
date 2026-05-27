@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public abstract class ProfilesDbContextBase(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
@@ -35,3 +35,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         return await base.SaveChangesAsync(ct);
     }
 }
+
+public class ProfilesDbContext(DbContextOptions<ProfilesDbContext> options) : ProfilesDbContextBase(options);
+
+/// <summary>
+/// Alias temporal de compatibilidad mientras los hosts y servicios migran a <see cref="ProfilesDbContext"/>.
+/// </summary>
+public class AppDbContext(DbContextOptions<AppDbContext> options) : ProfilesDbContextBase(options);

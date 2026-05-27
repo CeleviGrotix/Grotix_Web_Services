@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GrotixBackend.Profiles.Infrastructure.Repositories;
 
 /// <summary>Informe Profile: persistencia Core DB para agregado usuario.</summary>
-public class CoreDbUserRepository(AppDbContext context)
+public class CoreDbUserRepository(ProfilesDbContext context)
     : BaseRepository<User>(context), IUserRepository
 {
     public async Task<User?> GetByIdentityIdAsync(int identityId)

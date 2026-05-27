@@ -13,7 +13,6 @@ using GrotixBackend.Profiles.Application.Internal.CommandServices;
 using GrotixBackend.Profiles.DependencyInjection;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 using GrotixBackend.Shared.Infrastructure.Health;
 using GrotixBackend.Shared.Infrastructure.OpenApi;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.DependencyInjection;
@@ -37,7 +36,7 @@ builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));
 
 builder.Services.AddGrotixJwt(builder.Configuration);
-builder.Services.AddGrotixAppPersistence(builder.Configuration);
+builder.Services.AddGrotixProfilesPersistence(builder.Configuration);
 builder.Services.AddGrotixIamPersistence(builder.Configuration);
 builder.Services.AddGrotixIamModule();
 builder.Services.AddGrotixProfilesModule();
@@ -87,7 +86,7 @@ try
     using var scope = app.Services.CreateScope();
     var identityRepository = scope.ServiceProvider.GetRequiredService<IIdentityRepository>();
     var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-    var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+    var unitOfWork = scope.ServiceProvider.GetRequiredService<IProfilesUnitOfWork>();
     var iamUnitOfWork = scope.ServiceProvider.GetRequiredService<IIamUnitOfWork>();
     var aclService = scope.ServiceProvider.GetRequiredService<IExternalProfileService>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();

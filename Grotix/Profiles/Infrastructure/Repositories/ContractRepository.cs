@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.Profiles.Infrastructure.Repositories;
 
-public class ContractRepository(AppDbContext context)
+public class ContractRepository(ProfilesDbContext context)
     : BaseRepository<Contract>(context), IContractRepository
 {
     public override async Task<IEnumerable<Contract>> ListAsync() =>

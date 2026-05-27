@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.Profiles.Application.Internal.QueryServices;
 
-public class SearchQueryHandler(AppDbContext context) : IRequestHandler<GetGlobalSearchQuery, IEnumerable<GlobalSearchResultResource>>
+public class SearchQueryHandler(ProfilesDbContext context) : IRequestHandler<GetGlobalSearchQuery, IEnumerable<GlobalSearchResultResource>>
 {
     public async Task<IEnumerable<GlobalSearchResultResource>> Handle(GetGlobalSearchQuery request, CancellationToken ct)
     {
