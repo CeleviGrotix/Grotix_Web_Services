@@ -105,6 +105,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddProfilesRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, CoreDbUserRepository>();
+        services.AddScoped<IUserNotificationRepository, CoreDbUserNotificationRepository>();
         services.AddScoped<IAssociationRepository, CoreDbAssociationRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IStaffRepository, StaffRepository>();

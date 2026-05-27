@@ -78,6 +78,26 @@ public static partial class AppDbContextModelConfiguration
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
+        modelBuilder.Entity<UserNotification>(e =>
+        {
+            e.ToTable("user_notification");
+            e.HasKey(n => n.Id);
+            e.Property(n => n.Id).HasColumnName("NotificationID").ValueGeneratedOnAdd();
+            e.Property(n => n.UserId).HasColumnName("UserID");
+            e.Property(n => n.Title).HasColumnName("Title").HasMaxLength(150).IsRequired();
+            e.Property(n => n.Message).HasColumnName("Message").HasMaxLength(1000).IsRequired();
+            e.Property(n => n.Type).HasColumnName("Type").HasMaxLength(32).IsRequired();
+            e.Property(n => n.IsRead).HasColumnName("IsRead");
+            e.Property(n => n.CreatedAt).HasColumnName("CreatedAt");
+            e.Property(n => n.ReadAt).HasColumnName("ReadAt").IsRequired(false);
+
+            e.HasIndex(n => new { n.UserId, n.IsRead });
+            e.HasIndex(n => n.CreatedAt);
+
+            e.HasOne<User>().WithMany().HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<Staff>(e =>
         {
             e.ToTable("staff");

@@ -29,6 +29,8 @@ public static class ServiceCollectionExtensions
 
         services.AddGrotixProfilesAccessModule();
         services.AddScoped<IUserCommandService, UserCommandService>();
+        services.AddScoped<IUserNotificationCommandService, UserNotificationCommandService>();
+        services.AddScoped<IUserNotificationQueryService, UserNotificationQueryService>();
         services.AddScoped<IUserAuthorizationContextService, UserAuthorizationContextService>();
         services.AddScoped<IRoleQueryService, RoleQueryService>();
         services.AddScoped<IStaffQueryService, StaffQueryService>();

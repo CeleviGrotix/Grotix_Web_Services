@@ -17,6 +17,8 @@ public class UserProfileController(
     IMediator mediator,
     IUserCommandService userCommandService,
     IUserQueryService userQueryService,
+    IUserNotificationCommandService userNotificationCommandService,
+    IUserNotificationQueryService userNotificationQueryService,
     IStaffQueryService staffQueryService) : ControllerBase  // ← una sola vez
 {
     [HttpGet("me")]
@@ -120,4 +122,100 @@ public class UserProfileController(
             staff.IsActive
         });
     }
+
+    public record CreateNotificationRequest(string Title, string Message, string? Type);
+
+    [HttpPost("{userId:int}/notifications")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> CreateNotification(int userId, [FromBody] CreateNotificationRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var notification = await userNotificationCommandService.CreateAsync(
+                userId,
+                request.Title,
+                request.Message,
+                request.Type,
+                cancellationToken);
+
+            return Ok(ToNotificationDto(notification));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("me/notifications")]
+    [Authorize]
+    public async Task<IActionResult> GetMyNotifications(
+        [FromQuery] bool unreadOnly = false,
+        [FromQuery] int limit = 50,
+        CancellationToken cancellationToken = default)
+    {
+        var caller = await GetCallerProfileAsync(cancellationToken);
+        if (caller == null) return Unauthorized();
+
+        var notifications = await userNotificationQueryService.ListByUserAsync(caller.Id, unreadOnly, limit);
+        return Ok(notifications.Select(ToNotificationDto));
+    }
+
+    [HttpGet("me/notifications/unread-count")]
+    [Authorize]
+    public async Task<IActionResult> GetMyUnreadNotificationCount(CancellationToken cancellationToken = default)
+    {
+        var caller = await GetCallerProfileAsync(cancellationToken);
+        if (caller == null) return Unauthorized();
+
+        var unreadCount = await userNotificationQueryService.CountUnreadAsync(caller.Id);
+        return Ok(new { unreadCount });
+    }
+
+    [HttpPatch("me/notifications/{notificationId:int}/read")]
+    [Authorize]
+    public async Task<IActionResult> MarkMyNotificationAsRead(int notificationId, CancellationToken cancellationToken = default)
+    {
+        var caller = await GetCallerProfileAsync(cancellationToken);
+        if (caller == null) return Unauthorized();
+
+        var updated = await userNotificationCommandService.MarkAsReadAsync(caller.Id, notificationId, cancellationToken);
+        if (!updated) return NotFound();
+        return Ok(new { success = true });
+    }
+
+    [HttpPatch("me/notifications/read-all")]
+    [Authorize]
+    public async Task<IActionResult> MarkAllMyNotificationsAsRead(CancellationToken cancellationToken = default)
+    {
+        var caller = await GetCallerProfileAsync(cancellationToken);
+        if (caller == null) return Unauthorized();
+
+        var updated = await userNotificationCommandService.MarkAllAsReadAsync(caller.Id, cancellationToken);
+        return Ok(new { success = true, updated });
+    }
+
+    private async Task<Domain.Model.Aggregates.User?> GetCallerProfileAsync(CancellationToken cancellationToken)
+    {
+        var identityId = User.GetIdentityId();
+        if (identityId == null)
+            return null;
+
+        return await userQueryService.Handle(new GetUserByIdentityQuery(identityId.Value));
+    }
+
+    private static object ToNotificationDto(Domain.Model.Aggregates.UserNotification notification) => new
+    {
+        id = notification.Id,
+        userId = notification.UserId,
+        title = notification.Title,
+        message = notification.Message,
+        type = notification.Type,
+        isRead = notification.IsRead,
+        createdAt = notification.CreatedAt,
+        readAt = notification.ReadAt
+    };
 }

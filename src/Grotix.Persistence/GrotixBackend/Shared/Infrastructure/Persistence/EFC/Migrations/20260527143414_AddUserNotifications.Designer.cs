@@ -4,16 +4,19 @@ using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations
+namespace Grotix.Persistence.GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations
 {
     [DbContext(typeof(ProfilesDbContext))]
-    partial class ProfilesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260527143414_AddUserNotifications")]
+    partial class AddUserNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

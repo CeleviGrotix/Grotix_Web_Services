@@ -8,6 +8,7 @@ public abstract class ProfilesDbContextBase(DbContextOptions options) : DbContex
     public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserNotification> UserNotifications { get; set; }
     public DbSet<Staff> StaffMembers { get; set; }
     public DbSet<Association> Associations { get; set; }
     public DbSet<Contract> Contracts { get; set; }
