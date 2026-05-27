@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Grotix.Shared\Grotix.Shared.csproj" />
+    <ProjectReference Include="..\Grotix.CultivationArea\Grotix.CultivationArea.csproj" />
+    <ProjectReference Include="..\Grotix.Profiles\Grotix.Profiles.csproj" />
+    <ProjectReference Include="..\Grotix.Telemetry\Grotix.Telemetry.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Auth\Grotix.Contracts.Auth.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Profiles\Grotix.Contracts.Profiles.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+    <Compile Include="..\..\Grotix\HardwareDevice\**\*.cs"
+             Exclude="..\..\Grotix\HardwareDevice\Infrastructure\Persistence\**\*.cs;..\..\Grotix\HardwareDevice\Infrastructure\Repositories\**\*.cs;..\..\Grotix\HardwareDevice\Infrastructure\Integration\**\*.cs" />
+  </ItemGroup>
+
+</Project>

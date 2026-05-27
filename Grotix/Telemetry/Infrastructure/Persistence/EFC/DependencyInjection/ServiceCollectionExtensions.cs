@@ -1,7 +1,5 @@
 using GrotixBackend.Shared.Infrastructure.Health;
-using GrotixBackend.Telemetry.Application.Internal.Alerting;
 using GrotixBackend.Telemetry.Domain.Repositories;
-using GrotixBackend.Telemetry.Infrastructure.Integration;
 using GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Configuration;
 using GrotixBackend.Telemetry.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +27,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
         services.AddScoped<IActiveThresholdRepository, ActiveThresholdRepository>();
         services.AddScoped<IThresholdBreachTrackerRepository, ThresholdBreachTrackerRepository>();
-        services.AddScoped<IAlertPublisher, RabbitMqAlertPublisher>();
 
         services.AddHealthChecks()
             .AddCheck<TimescaleTelemetryHealthCheck>("timescale", tags: ["timescale"]);

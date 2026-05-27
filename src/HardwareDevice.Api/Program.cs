@@ -1,14 +1,12 @@
 using GrotixBackend.BuildingBlocks.Auth;
 using GrotixBackend.BuildingBlocks.Configuration;
-using GrotixBackend.BuildingBlocks.RabbitMq;
 using GrotixBackend.CultivationArea.DependencyInjection;
+using GrotixBackend.HardwareDevice.DependencyInjection;
+using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.DependencyInjection;
 using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
 using GrotixBackend.Profiles.DependencyInjection;
-using GrotixBackend.Shared.Infrastructure.Health;
 using GrotixBackend.Shared.Infrastructure.OpenApi;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.DependencyInjection;
-using GrotixBackend.Telemetry.DependencyInjection;
-using GrotixBackend.Telemetry.Infrastructure.Integration;
 using GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi.Models;
@@ -26,11 +24,9 @@ builder.Services.AddGrotixAppPersistence(builder.Configuration);
 builder.Services.AddGrotixCultivationAreaPersistence(builder.Configuration);
 builder.Services.AddGrotixProfilesAccessModule();
 builder.Services.AddGrotixCultivationAreaModule();
+builder.Services.AddGrotixHardwareDevicePersistence(builder.Configuration);
+builder.Services.AddGrotixHardwareDeviceModule();
 builder.Services.AddGrotixTelemetryPersistence(builder.Configuration);
-builder.Services.AddGrotixTelemetryModule();
-builder.Services.AddGrotixRabbitMqPublisher(builder.Configuration);
-builder.Services.AddGrotixTelemetryAlertPublisher();
-builder.Services.AddGrotixTelemetryRabbitMq(builder.Configuration);
 
 builder.Services
     .AddControllers()
@@ -41,18 +37,17 @@ builder.Services
             .FirstOrDefault();
         if (defaultProvider != null)
             manager.FeatureProviders.Remove(defaultProvider);
-        manager.FeatureProviders.Add(new TelemetryControllerFeatureProvider());
+        manager.FeatureProviders.Add(new HardwareControllerFeatureProvider());
     });
 
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllPolicy", policy =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Telemetry API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "HardwareDevice API", Version = "v1" });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -82,11 +77,11 @@ app.MapControllers();
 
 app.Run();
 
-file sealed class TelemetryControllerFeatureProvider : ControllerFeatureProvider
+file sealed class HardwareControllerFeatureProvider : ControllerFeatureProvider
 {
     private static readonly string[] AllowedNamespaces =
     [
-        "GrotixBackend.Telemetry.Interfaces.REST.Controllers"
+        "GrotixBackend.HardwareDevice.Interfaces.REST.Controllers"
     ];
 
     protected override bool IsController(TypeInfo typeInfo)
