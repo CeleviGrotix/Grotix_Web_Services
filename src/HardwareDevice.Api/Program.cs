@@ -2,6 +2,7 @@ using GrotixBackend.BuildingBlocks.Auth;
 using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.CultivationArea.DependencyInjection;
 using GrotixBackend.HardwareDevice.DependencyInjection;
+using GrotixBackend.HardwareDevice.Infrastructure.Integration;
 using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.DependencyInjection;
 using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
 using GrotixBackend.Profiles.DependencyInjection;
@@ -26,6 +27,7 @@ builder.Services.AddGrotixProfilesAccessModule();
 builder.Services.AddGrotixCultivationAreaModule();
 builder.Services.AddGrotixHardwareDevicePersistence(builder.Configuration);
 builder.Services.AddGrotixHardwareDeviceModule();
+builder.Services.AddGrotixHardwareRabbitMq(builder.Configuration);
 builder.Services.AddGrotixTelemetryPersistence(builder.Configuration);
 
 builder.Services

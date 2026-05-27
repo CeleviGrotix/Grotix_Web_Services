@@ -35,9 +35,21 @@ public sealed class IrrigationRabbitMqTopologyInitializer(
                 _options.AlertTriggeredQueueName,
                 _options.ExchangeName,
                 _options.AlertTriggeredRoutingKey);
+
+            channel.QueueDeclare(
+                _options.ActuatorCommandQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+            channel.QueueBind(
+                _options.ActuatorCommandQueueName,
+                _options.ExchangeName,
+                _options.ActuatorCommandRoutingKey);
+
             logger.LogInformation(
-                "Irrigation RabbitMQ topology OK: queue={Queue}",
-                _options.AlertTriggeredQueueName);
+                "Irrigation RabbitMQ topology OK: alertQueue={AlertQueue}, actuatorQueue={ActuatorQueue}",
+                _options.AlertTriggeredQueueName,
+                _options.ActuatorCommandQueueName);
         }
         catch (Exception ex)
         {

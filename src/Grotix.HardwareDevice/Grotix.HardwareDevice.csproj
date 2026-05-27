@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Grotix.Profiles\Grotix.Profiles.csproj" />
     <ProjectReference Include="..\Grotix.Telemetry\Grotix.Telemetry.csproj" />
     <ProjectReference Include="..\Grotix.Contracts.Auth\Grotix.Contracts.Auth.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Integration\Grotix.Contracts.Integration.csproj" />
     <ProjectReference Include="..\Grotix.Contracts.Profiles\Grotix.Contracts.Profiles.csproj" />
   </ItemGroup>
 

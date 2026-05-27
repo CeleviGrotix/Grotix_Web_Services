@@ -32,4 +32,10 @@ public sealed class RabbitMqOptions
     public string AlertTriggeredQueueName { get; set; } = "irrigation.alert.triggered";
 
     public string IrrigationCompletedRoutingKey { get; set; } = "irrigation.completed";
+
+    /// <summary>Routing key para comandos de actuadores del flujo de riego.</summary>
+    public string ActuatorCommandRoutingKey { get; set; } = "hardware.actuator.command";
+
+    /// <summary>Cola que consume Hardware (o bridge MQTT) para ejecutar comandos físicos.</summary>
+    public string ActuatorCommandQueueName { get; set; } = "hardware.actuator.command";
 }
