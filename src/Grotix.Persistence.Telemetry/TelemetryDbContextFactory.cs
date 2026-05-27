@@ -9,8 +9,11 @@ public sealed class TelemetryDbContextFactory : IDesignTimeDbContextFactory<Tele
     public TelemetryDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<TelemetryDbContext>();
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__TelemetryTimescale")
+            ?? "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=Grotix2026!";
+
         optionsBuilder.UseNpgsql(
-            "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres",
+            connectionString,
             npgsql => npgsql.MigrationsAssembly("Grotix.Persistence.Telemetry"));
 
         return new TelemetryDbContext(optionsBuilder.Options);

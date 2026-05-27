@@ -4,16 +4,19 @@ using GrotixBackend.IrrigationCycle.Infrastructure.Persistence.EFC.Configuration
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GrotixBackend.IrrigationCycle.Infrastructure.Persistence.EFC.Migrations
+namespace Grotix.Persistence.IrrigationCycle.GrotixBackend.IrrigationCycle.Infrastructure.Persistence.EFC.Migrations
 {
     [DbContext(typeof(IrrigationCycleDbContext))]
-    partial class IrrigationCycleDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260527151347_SyncIrrigationCycleModel")]
+    partial class SyncIrrigationCycleModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
