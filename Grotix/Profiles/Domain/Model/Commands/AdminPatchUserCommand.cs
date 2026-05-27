@@ -7,4 +7,6 @@ public record AdminPatchUserCommand(
     string? TaxId,
     string? Phone,
     string? ProfilePicture,
+    int? RoleId,
+    int? AssociationId,
     bool? IsActive);
