@@ -24,4 +24,18 @@ public class DeviceActuator
         Type = type.Trim().ToUpperInvariant();
         Pin = pin;
     }
+
+    public void SetOpen()
+    {
+        CurrentState = true;
+        Status = "OPEN";
+        LastSeen = DateTime.UtcNow;
+    }
+
+    public void SetClosed()
+    {
+        CurrentState = false;
+        Status = "CLOSED";
+        LastSeen = DateTime.UtcNow;
+    }
 }

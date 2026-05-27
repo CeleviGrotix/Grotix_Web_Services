@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.csproj" />
+    <ProjectReference Include="..\Grotix.Shared\Grotix.Shared.csproj" />
+    <ProjectReference Include="..\Grotix.IrrigationCycle\Grotix.IrrigationCycle.csproj" />
+    <ProjectReference Include="..\Grotix.HardwareDevice\Grotix.HardwareDevice.csproj" />
+    <ProjectReference Include="..\Grotix.Persistence.HardwareDevice\Grotix.Persistence.HardwareDevice.csproj" />
+    <ProjectReference Include="..\Grotix.Telemetry\Grotix.Telemetry.csproj" />
+    <ProjectReference Include="..\Grotix.Persistence.Telemetry\Grotix.Persistence.Telemetry.csproj" />
+    <ProjectReference Include="..\Grotix.CultivationArea\Grotix.CultivationArea.csproj" />
+    <ProjectReference Include="..\Grotix.Contracts.Integration\Grotix.Contracts.Integration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+    <Compile Include="..\..\Grotix\IrrigationCycle\Infrastructure\Persistence\**\*.cs" />
+    <Compile Include="..\..\Grotix\IrrigationCycle\Infrastructure\Repositories\**\*.cs" />
+    <Compile Include="..\..\Grotix\IrrigationCycle\Infrastructure\Integration\**\*.cs" />
+    <Compile Include="GrotixBackend\IrrigationCycle\Infrastructure\Persistence\EFC\Migrations\**\*.cs" />
+  </ItemGroup>
+
+</Project>

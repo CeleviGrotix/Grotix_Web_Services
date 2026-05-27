@@ -27,4 +27,9 @@ public sealed class RabbitMqOptions
     public string TelemetryReceivedRoutingKey { get; set; } = "telemetry.received";
 
     public string AlertTriggeredRoutingKey { get; set; } = "alert.triggered";
+
+    /// <summary>Cola consumida por IrrigationCycle para alertas críticas.</summary>
+    public string AlertTriggeredQueueName { get; set; } = "irrigation.alert.triggered";
+
+    public string IrrigationCompletedRoutingKey { get; set; } = "irrigation.completed";
 }
