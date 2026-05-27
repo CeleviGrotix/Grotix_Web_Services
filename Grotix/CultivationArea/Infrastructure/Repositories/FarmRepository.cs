@@ -43,4 +43,20 @@ public class FarmRepository(CultivationAreaDbContext context)
 
         return farms.Count;
     }
+
+    public Task<bool> ExistsByAssociationAndNameAsync(
+        int associationId,
+        string name,
+        int? excludingFarmId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedName = name.Trim();
+        return Context.Set<Farm>()
+            .AsNoTracking()
+            .AnyAsync(
+                f => f.AssociationId == associationId &&
+                     f.Name == normalizedName &&
+                     (!excludingFarmId.HasValue || f.Id != excludingFarmId.Value),
+                cancellationToken);
+    }
 }

@@ -332,6 +332,12 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations
 
                     b.HasIndex("RoleId");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IdentityId")
+                        .IsUnique();
+
                     b.ToTable("user", (string)null);
                 });
 

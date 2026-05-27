@@ -19,6 +19,9 @@ public static partial class AppDbContextModelConfiguration
             e.Property(c => c.OptimalLight);
             e.Property(c => c.MaxStressTime);
             e.Property(c => c.ImageUrl).HasColumnName("ImageURL").HasMaxLength(512);
+
+            e.HasIndex(c => c.CommonName).IsUnique();
+            e.HasIndex(c => c.ScientificName).IsUnique();
         });
 
         modelBuilder.Entity<Farm>(e =>
@@ -31,6 +34,7 @@ public static partial class AppDbContextModelConfiguration
             e.Property(f => f.Name).HasMaxLength(200).IsRequired();
             e.Property(f => f.Location).HasMaxLength(500).IsRequired();
             e.HasIndex(f => f.AssociationId);
+            e.HasIndex(f => new { f.AssociationId, f.Name }).IsUnique();
         });
 
         modelBuilder.Entity<Zone>(e =>

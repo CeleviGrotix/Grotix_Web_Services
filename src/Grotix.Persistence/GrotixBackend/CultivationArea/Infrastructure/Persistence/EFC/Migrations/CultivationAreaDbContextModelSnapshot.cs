@@ -60,6 +60,12 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CommonName")
+                        .IsUnique();
+
+                    b.HasIndex("ScientificName")
+                        .IsUnique();
+
                     b.ToTable("crop", (string)null);
                 });
 
@@ -93,6 +99,9 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                     b.HasKey("Id");
 
                     b.HasIndex("AssociationId");
+
+                    b.HasIndex("AssociationId", "Name")
+                        .IsUnique();
 
                     b.ToTable("farm", (string)null);
                 });

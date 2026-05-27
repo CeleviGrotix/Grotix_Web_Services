@@ -12,4 +12,10 @@ public interface IFarmRepository : IAsyncRepository<Farm>
     Task<IReadOnlyList<Farm>> ListByAssociationIdAsync(int associationId);
 
     Task<int> AssignOwnerToUnownedFarmsAsync(int associationId, int ownerUserId);
+
+    Task<bool> ExistsByAssociationAndNameAsync(
+        int associationId,
+        string name,
+        int? excludingFarmId = null,
+        CancellationToken cancellationToken = default);
 }

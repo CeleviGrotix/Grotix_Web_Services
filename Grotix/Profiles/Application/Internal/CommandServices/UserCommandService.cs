@@ -19,6 +19,12 @@ public class UserCommandService(
             throw new ArgumentException($"El rol {command.RoleId} no existe.");
 
         var email = UserEmail.Create(command.Email);
+        if (await userRepository.GetByIdentityIdAsync(command.IdentityId) != null)
+            throw new ArgumentException("Ya existe un perfil vinculado a esa identidad.");
+
+        if (await userRepository.GetByEmailAsync(email.Value) != null)
+            throw new ArgumentException("Ya existe un usuario con ese correo.");
+
         var user = new User(
             command.IdentityId,
             email,

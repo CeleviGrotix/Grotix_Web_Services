@@ -12,6 +12,12 @@ public class CropCommandService(
 {
     public async Task<Crop> Handle(CreateCropCommand command)
     {
+        if (await cropRepository.ExistsByCommonNameAsync(command.CommonName))
+            throw new ArgumentException("Ya existe un cultivo con ese nombre común.");
+
+        if (await cropRepository.ExistsByScientificNameAsync(command.ScientificName))
+            throw new ArgumentException("Ya existe un cultivo con ese nombre científico.");
+
         var crop = new Crop(
             command.CommonName,
             command.ScientificName,
@@ -31,6 +37,12 @@ public class CropCommandService(
         var crop = await cropRepository.GetByIdAsync(command.CropId);
         if (crop == null)
             throw new KeyNotFoundException($"No existe el cultivo {command.CropId}.");
+
+        if (await cropRepository.ExistsByCommonNameAsync(command.CommonName, excludingCropId: crop.Id))
+            throw new ArgumentException("Ya existe un cultivo con ese nombre común.");
+
+        if (await cropRepository.ExistsByScientificNameAsync(command.ScientificName, excludingCropId: crop.Id))
+            throw new ArgumentException("Ya existe un cultivo con ese nombre científico.");
 
         crop.UpdateNames(command.CommonName, command.ScientificName);
         crop.UpdateBiologicalProfile(

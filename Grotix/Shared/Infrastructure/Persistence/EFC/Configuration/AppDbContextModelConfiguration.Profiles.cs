@@ -76,6 +76,9 @@ public static partial class AppDbContextModelConfiguration
                 .OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Association>().WithMany().HasForeignKey(u => u.AssociationId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasIndex(u => u.Email).IsUnique();
+            e.HasIndex(u => u.IdentityId).IsUnique();
         });
 
         modelBuilder.Entity<UserNotification>(e =>
