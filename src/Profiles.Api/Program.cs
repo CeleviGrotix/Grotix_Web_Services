@@ -10,6 +10,7 @@ using GrotixBackend.IAM.Domain.Model.ValueObjects;
 using GrotixBackend.IAM.Domain.Repositories;
 using GrotixBackend.IAM.Infrastructure.Tokens.JWT.Configuration;
 using GrotixBackend.Profiles.Application.Internal.CommandServices;
+using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.DependencyInjection;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
@@ -30,7 +31,8 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(
         typeof(Program).Assembly,
         typeof(AdminIdentityRegistrationService).Assembly,
-        typeof(UserCommandService).Assembly));
+        typeof(UserCommandService).Assembly,
+        typeof(SearchQueryHandler).Assembly));
 
 builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));
