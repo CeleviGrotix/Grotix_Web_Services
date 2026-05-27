@@ -55,20 +55,46 @@ public class Contract
     }
 
     public void Update(
-        DateTime? endDate, 
-        ContractStatus? status, 
-        int? maxZones, 
-        int? maxMicrocontrollers, 
+        DateTime? endDate,
+        ContractStatus? status,
+        int? maxZones,
+        int? maxMicrocontrollers,
         bool? isSuspended,
         float? totalAmount,
+        ContractCurrency? currency,
         ContractPaymentFrequency? paymentFrequency)
     {
-        if (endDate.HasValue) EndDate = endDate.Value;
+        if (endDate.HasValue)
+        {
+            if (endDate.Value < StartDate)
+                throw new ArgumentException("EndDate no puede ser anterior a StartDate.");
+            EndDate = endDate.Value;
+        }
+
         if (status.HasValue) Status = status.Value;
-        if (maxZones.HasValue) MaxZones = maxZones.Value;
-        if (maxMicrocontrollers.HasValue) MaxMicrocontrollers = maxMicrocontrollers.Value;
+        if (maxZones.HasValue)
+        {
+            if (maxZones.Value < 0)
+                throw new ArgumentException("MaxZones no puede ser negativo.");
+            MaxZones = maxZones.Value;
+        }
+
+        if (maxMicrocontrollers.HasValue)
+        {
+            if (maxMicrocontrollers.Value < 0)
+                throw new ArgumentException("MaxMicrocontrollers no puede ser negativo.");
+            MaxMicrocontrollers = maxMicrocontrollers.Value;
+        }
+
         if (isSuspended.HasValue) IsSuspended = isSuspended.Value;
-        if (totalAmount.HasValue) TotalAmount = totalAmount.Value;
+        if (totalAmount.HasValue)
+        {
+            if (totalAmount.Value < 0)
+                throw new ArgumentException("TotalAmount no puede ser negativo.");
+            TotalAmount = totalAmount.Value;
+        }
+
+        if (currency.HasValue) Currency = currency.Value;
         if (paymentFrequency.HasValue) PaymentFrequency = paymentFrequency.Value;
     }
 }

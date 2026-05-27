@@ -1,6 +1,7 @@
 using GrotixBackend.Profiles.Domain.Model;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
+using GrotixBackend.Profiles.Domain.Model.Enums;
 using GrotixBackend.Profiles.Domain.Repositories;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories;
@@ -17,6 +18,16 @@ public class CoreDbUserRepository(ProfilesDbContext context)
         return await Context.Set<User>()
             .FirstOrDefaultAsync(u => u.IdentityId == identityId);
     }
+
+    public Task<User?> GetByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default) =>
+        Context.Set<User>()
+            .FirstOrDefaultAsync(u => u.Email.Value == normalizedEmail, cancellationToken);
+
+    public Task<User?> GetUserAdminByAssociationIdAsync(int associationId, CancellationToken cancellationToken = default) =>
+        Context.Set<User>()
+            .FirstOrDefaultAsync(
+                u => u.AssociationId == associationId && u.RoleId == (int)RoleType.user_admin,
+                cancellationToken);
 
     public async Task<IReadOnlyList<User>> ListFarmersOrderedByIdAsync(CancellationToken cancellationToken = default)
     {

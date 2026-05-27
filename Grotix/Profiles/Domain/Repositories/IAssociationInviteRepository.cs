@@ -10,6 +10,11 @@ public interface IAssociationInviteRepository : IAsyncRepository<AssociationInvi
     /// <summary>Invitación pendiente misma asociación y correo (correo ya normalizado VO).</summary>
     Task<bool> HasPendingInviteForEmailAsync(int associationId, string normalizedEmail, CancellationToken cancellationToken = default);
 
+    Task<AssociationInvite?> GetPendingInviteForEmailAsync(
+        int associationId,
+        string normalizedEmail,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Marca invitación usada si sigue libre (atomicidad).</summary>
     Task<bool> TryMarkUsedAsync(int inviteId, CancellationToken cancellationToken = default);
 }

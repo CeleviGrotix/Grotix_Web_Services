@@ -8,6 +8,10 @@ public interface IUserRepository : IAsyncRepository<User>
 {
     Task<User?> GetByIdentityIdAsync(int identityId);
 
+    Task<User?> GetByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default);
+
+    Task<User?> GetUserAdminByAssociationIdAsync(int associationId, CancellationToken cancellationToken = default);
+
     /// <summary>Solo roles agricultor (user_admin, user_basic, user_advanced).</summary>
     Task<IReadOnlyList<User>> ListFarmersOrderedByIdAsync(CancellationToken cancellationToken = default);
 

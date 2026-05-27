@@ -24,6 +24,15 @@ public sealed class AssociationInviteRepository(ProfilesDbContext context)
             i => i.AssociationId == associationId && i.InviteEmail == normalizedEmail && i.UsedAt == null,
             cancellationToken);
 
+    public Task<AssociationInvite?> GetPendingInviteForEmailAsync(
+        int associationId,
+        string normalizedEmail,
+        CancellationToken cancellationToken = default) =>
+        Context.Set<AssociationInvite>()
+            .FirstOrDefaultAsync(
+                i => i.AssociationId == associationId && i.InviteEmail == normalizedEmail && i.UsedAt == null,
+                cancellationToken);
+
     public async Task<bool> TryMarkUsedAsync(int inviteId, CancellationToken cancellationToken = default)
     {
         var rows = await Context.Database.ExecuteSqlInterpolatedAsync(

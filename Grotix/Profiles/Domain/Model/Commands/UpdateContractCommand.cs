@@ -10,5 +10,5 @@ public record UpdateContractCommand(
     int? MaxMicrocontrollers,
     bool? IsSuspended,
     float? TotalAmount,
-    ContractPaymentFrequency? PaymentFrequency
-);
+    ContractCurrency? Currency,
+    ContractPaymentFrequency? PaymentFrequency);

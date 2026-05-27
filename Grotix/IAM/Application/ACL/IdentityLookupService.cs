@@ -7,4 +7,10 @@ public sealed class IdentityLookupService(IIdentityRepository identityRepository
 {
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
         => identityRepository.ExistsByEmailAsync(email);
+
+    public async Task<int?> GetIdentityIdByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        var identity = await identityRepository.GetByEmailAsync(email);
+        return identity?.Id;
+    }
 }

@@ -77,9 +77,11 @@ public sealed class ContractsController(
 
     public record CreateContractResponse(
         ContractResource Contract,
-        int OrgAdminInviteId,
-        string OrgAdminInviteToken,
-        string OrganizationAdminEmail);
+        string OrganizationAdminEmail,
+        int? OrgAdminInviteId,
+        string? OrgAdminInviteToken,
+        int? AssignedOrgAdminUserId,
+        bool InviteSkipped);
 
     /// <summary>Crea el contrato y una invitación para que el correo indicado se registre como <c>user_admin</c>.</summary>
     [HttpPost]
@@ -103,9 +105,11 @@ public sealed class ContractsController(
 
             var response = new CreateContractResponse(
                 ToResource(result.Contract),
+                result.OrgAdminEmail.Trim(),
                 result.OrgAdminInviteId,
                 result.OrgAdminInvitePlaintextToken,
-                result.OrgAdminEmail.Trim());
+                result.AssignedOrgAdminUserId,
+                result.InviteSkipped);
 
             return CreatedAtAction(nameof(GetById), new { contractId = result.Contract.Id }, response);
         }
@@ -134,9 +138,10 @@ public sealed class ContractsController(
         ContractStatus? Status,
         int? MaxZones,
         int? MaxMicrocontrollers,
-        bool? IsSuspended,
-        float? TotalAmount, 
-        ContractPaymentFrequency? PaymentFrequency);
+        float? TotalAmount,
+        ContractCurrency? Currency,
+        ContractPaymentFrequency? PaymentFrequency,
+        bool? IsSuspended);
 
     /// <summary>Edita un contrato existente. Solo envía los campos que deseas cambiar.</summary>
     [HttpPatch("{contractId:int}")]
@@ -152,7 +157,8 @@ public sealed class ContractsController(
                 request.MaxZones,
                 request.MaxMicrocontrollers,
                 request.IsSuspended,
-                request.TotalAmount, 
+                request.TotalAmount,
+                request.Currency,
                 request.PaymentFrequency);
 
             var updatedContract = await contractCommandService.Handle(command);
