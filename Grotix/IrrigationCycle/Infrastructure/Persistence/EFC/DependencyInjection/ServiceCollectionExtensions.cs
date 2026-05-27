@@ -52,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IIrrigationCompletedPublisher, RabbitMqIrrigationCompletedPublisher>();
         services.AddHostedService<IrrigationDatabaseInitializer>();
         services.AddHostedService<IrrigationCycleCompletionHostedService>();
+        services.AddHostedService<IrrigationScheduleManagerHostedService>();
 
         return services;
     }
