@@ -1,4 +1,6 @@
 using GrotixBackend.BuildingBlocks.RabbitMq;
+using GrotixBackend.HardwareDevice.Application.Internal;
+using GrotixBackend.HardwareDevice.Infrastructure.Integration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +24,7 @@ public static class HardwareRabbitMqServiceCollectionExtensions
         services.AddSingleton<RabbitMqConnectionHolder>();
         services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
         services.AddHostedService<HardwareRabbitMqTopologyInitializer>();
+        services.AddScoped<IActuatorCommandOrchestrator, ActuatorCommandOrchestrator>();
         services.AddHostedService<RabbitMqActuatorCommandConsumerHostedService>();
         return services;
     }

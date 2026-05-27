@@ -34,6 +34,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMicrocontrollerRepository, MicrocontrollerRepository>();
         services.AddScoped<IDeviceSensorRepository, DeviceSensorRepository>();
         services.AddScoped<IDeviceActuatorRepository, DeviceActuatorRepository>();
+        services.AddScoped<IMaintenanceLogRepository, MaintenanceLogRepository>();
+        services.AddScoped<ITechnicalMaintenanceRepository, TechnicalMaintenanceRepository>();
+        services.AddScoped<IActionQueueRepository, ActionQueueRepository>();
         services.AddScoped<IDeviceStatusChangedPublisher, RabbitMqDeviceStatusChangedPublisher>();
         services.AddScoped<ITelemetryCatalogSyncService, TelemetryCatalogSyncService>();
         services.AddHostedService<HardwareDatabaseInitializer>();

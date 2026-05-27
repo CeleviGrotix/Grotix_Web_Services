@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDeviceQueryService, DeviceQueryService>();
         services.AddScoped<IDeviceCommandService, DeviceCommandService>();
         services.AddScoped<IDeviceDiagnosticService, DeviceDiagnosticService>();
+        services.AddScoped<IMaintenanceService, MaintenanceService>();
         return services;
     }
 }

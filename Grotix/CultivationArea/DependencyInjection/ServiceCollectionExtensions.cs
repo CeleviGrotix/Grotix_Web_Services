@@ -1,3 +1,4 @@
+using GrotixBackend.CultivationArea.Application.Internal;
 using GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IZoneQueryService, ZoneQueryService>();
         services.AddScoped<ICropCommandService, CropCommandService>();
         services.AddScoped<ICropQueryService, CropQueryService>();
+        services.AddScoped<IAnalysisReportService, AnalysisReportService>();
 
         return services;
     }

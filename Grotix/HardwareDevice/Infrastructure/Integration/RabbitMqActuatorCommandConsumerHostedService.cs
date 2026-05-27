@@ -2,7 +2,12 @@ using System.Text;
 using System.Text.Json;
 using GrotixBackend.BuildingBlocks.RabbitMq;
 using GrotixBackend.Contracts.Integration.Hardware;
+using GrotixBackend.HardwareDevice.Domain.Model.Entities;
+using GrotixBackend.HardwareDevice.Domain.Repositories;
 using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
+using GrotixBackend.Telemetry.Domain.Model.Entities;
+using GrotixBackend.Telemetry.Domain.Repositories;
+using GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -105,6 +110,9 @@ public sealed class RabbitMqActuatorCommandConsumerHostedService(
         {
             await using var scope = services.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<HardwareDeviceDbContext>();
+            var telemetryDb = scope.ServiceProvider.GetRequiredService<TelemetryDbContext>();
+            var actionQueueRepository = scope.ServiceProvider.GetRequiredService<IActionQueueRepository>();
+            var actuatorLogRepository = scope.ServiceProvider.GetRequiredService<IActuatorLogRepository>();
 
             var actuator = await db.Actuators
                 .FirstOrDefaultAsync(a => a.Id == evt.ActuatorId, cancellationToken);
@@ -118,9 +126,10 @@ public sealed class RabbitMqActuatorCommandConsumerHostedService(
                 return true;
             }
 
-            if (string.Equals(evt.Command, "OPEN", StringComparison.OrdinalIgnoreCase))
+            var normalizedCommand = evt.Command.Trim().ToUpperInvariant();
+            if (string.Equals(normalizedCommand, "OPEN", StringComparison.Ordinal))
                 actuator.SetOpen();
-            else if (string.Equals(evt.Command, "CLOSE", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(normalizedCommand, "CLOSE", StringComparison.Ordinal))
                 actuator.SetClosed();
             else
             {
@@ -128,7 +137,19 @@ public sealed class RabbitMqActuatorCommandConsumerHostedService(
                 return true;
             }
 
+            var queueItem = await actionQueueRepository.FindLatestPendingByActuatorAsync(
+                actuator.Id,
+                normalizedCommand,
+                cancellationToken);
+            queueItem?.MarkCompleted();
+
+            await actuatorLogRepository.AddAsync(
+                new ActuatorLogEntry(actuator.Id, normalizedCommand, evt.RequestedAtUtc),
+                cancellationToken);
+
             await db.SaveChangesAsync(cancellationToken);
+            await telemetryDb.SaveChangesAsync(cancellationToken);
+
             logger.LogInformation(
                 "Actuator command applied: actuatorId={ActuatorId}, command={Command}, zoneId={ZoneId}",
                 actuator.Id,

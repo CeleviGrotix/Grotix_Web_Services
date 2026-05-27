@@ -221,7 +221,8 @@ public sealed class DevicesController(
                 type = s.Type,
                 unit = s.Unit,
                 pin = s.Pin,
-                status = s.Status
+                status = s.Status,
+                lastSeen = s.LastSeen
             }),
             actuators = detail.Actuators.Select(a => new
             {

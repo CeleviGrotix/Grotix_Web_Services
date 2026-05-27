@@ -121,6 +121,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IZoneRepository, ZoneRepository>();
         services.AddScoped<ICropRepository, CropRepository>();
         services.AddScoped<IZoneMemberRepository, ZoneMemberRepository>();
+        services.AddScoped<IAnalysisReportRepository, AnalysisReportRepository>();
         services.AddScoped<IZoneMemberService, ZoneMemberService>();
         services.AddScoped<IAssociationFarmOwnerSyncService, AssociationFarmOwnerSyncService>();
         return services;

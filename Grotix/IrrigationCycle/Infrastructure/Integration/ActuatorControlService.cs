@@ -1,25 +1,19 @@
 using System.Text;
 using System.Text.Json;
-using GrotixBackend.BuildingBlocks.RabbitMq;
-using GrotixBackend.Contracts.Integration.Hardware;
+using GrotixBackend.HardwareDevice.Application.Internal;
 using GrotixBackend.HardwareDevice.Domain.Model.Aggregates;
 using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
 using GrotixBackend.IrrigationCycle.Application.ACL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace GrotixBackend.IrrigationCycle.Infrastructure.Integration;
 
 public sealed class ActuatorControlService(
     HardwareDeviceDbContext hardwareDb,
-    IRabbitMqPublisher publisher,
-    IOptions<RabbitMqOptions> options,
+    IActuatorCommandOrchestrator actuatorCommandOrchestrator,
     ILogger<ActuatorControlService> logger) : IActuatorControlService
 {
-    private static readonly string[] IrrigationActuatorTypes = ["VALVE", "PUMP", "IRRIGATION"];
-    private readonly RabbitMqOptions _options = options.Value;
-
     public async Task<bool> TryActivateIrrigationAsync(int zoneId, CancellationToken cancellationToken = default)
     {
         var actuator = await FindIrrigationActuatorAsync(zoneId, cancellationToken);
@@ -31,7 +25,7 @@ public sealed class ActuatorControlService(
 
         actuator.SetOpen();
         await hardwareDb.SaveChangesAsync(cancellationToken);
-        PublishActuatorCommand(zoneId, actuator, command: "OPEN");
+        await actuatorCommandOrchestrator.EnqueueAndPublishAsync(zoneId, actuator, "OPEN", cancellationToken);
         return true;
     }
 
@@ -43,7 +37,7 @@ public sealed class ActuatorControlService(
 
         actuator.SetClosed();
         await hardwareDb.SaveChangesAsync(cancellationToken);
-        PublishActuatorCommand(zoneId, actuator, command: "CLOSE");
+        await actuatorCommandOrchestrator.EnqueueAndPublishAsync(zoneId, actuator, "CLOSE", cancellationToken);
     }
 
     private async Task<DeviceActuator?> FindIrrigationActuatorAsync(
@@ -68,28 +62,4 @@ public sealed class ActuatorControlService(
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    private void PublishActuatorCommand(int zoneId, DeviceActuator actuator, string command)
-    {
-        if (!_options.Enabled)
-            return;
-
-        var evt = new ActuatorCommandIntegrationEvent(
-            zoneId,
-            actuator.Id,
-            actuator.MicrocontrollerId,
-            actuator.Type,
-            actuator.Pin,
-            command,
-            DateTime.UtcNow);
-
-        var json = JsonSerializer.Serialize(evt);
-        publisher.Publish(_options.ActuatorCommandRoutingKey, Encoding.UTF8.GetBytes(json));
-
-        logger.LogInformation(
-            "Actuator command published: zone={ZoneId}, actuator={ActuatorId}, command={Command}, routingKey={RoutingKey}",
-            zoneId,
-            actuator.Id,
-            command,
-            _options.ActuatorCommandRoutingKey);
-    }
 }

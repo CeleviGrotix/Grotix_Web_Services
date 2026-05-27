@@ -10,6 +10,7 @@ public class DeviceSensor
     public string Unit { get; private set; } = null!;
     public int Pin { get; private set; }
     public string Status { get; private set; } = "NORMAL";
+    public DateTime? LastSeen { get; private set; }
     public double? MinPhysical { get; private set; }
     public double? MaxPhysical { get; private set; }
 
@@ -41,4 +42,6 @@ public class DeviceSensor
     }
 
     public void AssignZone(int? zoneId) => ZoneId = zoneId;
+
+    public void TouchLastSeen(DateTime? at = null) => LastSeen = at ?? DateTime.UtcNow;
 }

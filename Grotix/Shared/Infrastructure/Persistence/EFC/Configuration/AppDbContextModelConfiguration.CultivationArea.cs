@@ -72,5 +72,19 @@ public static partial class AppDbContextModelConfiguration
             e.HasOne<Zone>().WithMany().HasForeignKey(m => m.ZoneId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<AnalysisReport>(e =>
+        {
+            e.ToTable("analysis_report");
+            e.HasKey(r => r.Id);
+            e.Property(r => r.Id).HasColumnName("ReportID").ValueGeneratedOnAdd();
+            e.Property(r => r.ZoneId).HasColumnName("ZoneID");
+            e.Property(r => r.DetectedPhase).HasMaxLength(80).IsRequired();
+            e.Property(r => r.HealthScore);
+            e.Property(r => r.CreatedAt);
+            e.HasIndex(r => r.ZoneId);
+            e.HasOne<Zone>().WithMany().HasForeignKey(r => r.ZoneId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

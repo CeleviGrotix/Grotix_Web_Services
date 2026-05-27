@@ -1,4 +1,8 @@
+using GrotixBackend.HardwareDevice.Application.Internal;
+using GrotixBackend.HardwareDevice.Domain.Repositories;
+using GrotixBackend.HardwareDevice.Infrastructure.Integration;
 using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
+using GrotixBackend.HardwareDevice.Infrastructure.Repositories;
 using GrotixBackend.IrrigationCycle.Application.ACL;
 using GrotixBackend.IrrigationCycle.Application.Internal;
 using GrotixBackend.IrrigationCycle.Domain.Repositories;
@@ -53,6 +57,8 @@ public static class ServiceCollectionExtensions
         {
             client.Timeout = TimeSpan.FromSeconds(8);
         });
+        services.AddScoped<IActionQueueRepository, ActionQueueRepository>();
+        services.AddScoped<IActuatorCommandOrchestrator, ActuatorCommandOrchestrator>();
         services.AddScoped<IActuatorControlService, ActuatorControlService>();
         services.AddScoped<IIrrigationCompletedPublisher, RabbitMqIrrigationCompletedPublisher>();
         services.AddHostedService<IrrigationDatabaseInitializer>();

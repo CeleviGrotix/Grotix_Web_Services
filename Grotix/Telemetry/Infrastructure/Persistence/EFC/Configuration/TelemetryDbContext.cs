@@ -10,6 +10,7 @@ public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : 
     public DbSet<ActiveThreshold> ActiveThresholds => Set<ActiveThreshold>();
     public DbSet<ThresholdBreachTracker> ThresholdBreachTrackers => Set<ThresholdBreachTracker>();
     public DbSet<AlertRecord> AlertRecords => Set<AlertRecord>();
+    public DbSet<ActuatorLogEntry> ActuatorLogs => Set<ActuatorLogEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +73,19 @@ public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : 
             entity.Property(e => e.BreachDirection).HasColumnName("breach_direction").HasMaxLength(16);
             entity.Property(e => e.TriggeredAt).HasColumnName("triggered_at").HasColumnType("timestamptz");
             entity.HasIndex(e => new { e.ZoneId, e.TriggeredAt });
+        });
+
+        modelBuilder.Entity<ActuatorLogEntry>(entity =>
+        {
+            entity.ToTable("actuator_log");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ActuatorId).HasColumnName("actuator_id");
+            entity.Property(e => e.Action).HasColumnName("action").HasMaxLength(32).IsRequired();
+            entity.Property(e => e.Duration).HasColumnName("duration");
+            entity.Property(e => e.Timestamp).HasColumnName("timestamp").HasColumnType("timestamptz");
+            entity.Property(e => e.FlowRate).HasColumnName("flow_rate");
+            entity.HasIndex(e => new { e.ActuatorId, e.Timestamp });
         });
     }
 }

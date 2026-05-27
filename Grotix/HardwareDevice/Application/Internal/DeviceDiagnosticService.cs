@@ -1,11 +1,14 @@
 using GrotixBackend.HardwareDevice.Domain.Model.ValueObjects;
+using GrotixBackend.HardwareDevice.Domain.Repositories;
 using GrotixBackend.Telemetry.Domain.Repositories;
 
 namespace GrotixBackend.HardwareDevice.Application.Internal;
 
 public sealed class DeviceDiagnosticService(
     IDeviceQueryService deviceQueryService,
-    ISensorReadingRepository sensorReadingRepository) : IDeviceDiagnosticService
+    ISensorReadingRepository sensorReadingRepository,
+    IDeviceSensorRepository deviceSensorRepository,
+    IHardwareDeviceUnitOfWork unitOfWork) : IDeviceDiagnosticService
 {
     public async Task<DeviceDiagnosticReport?> RunAsync(int deviceId, bool includeSensors, bool includeActuators)
     {
@@ -35,15 +38,29 @@ public sealed class DeviceDiagnosticService(
                     null,
                     1);
 
+                DateTime? lastSeen = sensor.LastSeen;
+                if (readings.Count > 0)
+                {
+                    var tracked = await deviceSensorRepository.GetByIdAsync(sensor.Id);
+                    if (tracked != null)
+                    {
+                        tracked.TouchLastSeen(readings[0].Timestamp);
+                        lastSeen = tracked.LastSeen;
+                    }
+                }
+
                 sensorChecks.Add(new
                 {
                     sensorId = sensor.Id,
                     type = sensor.Type,
                     status = readings.Count > 0 ? "PASS" : "WARN",
                     value = readings.FirstOrDefault()?.Value,
-                    unit = sensor.Unit
+                    unit = sensor.Unit,
+                    lastSeen
                 });
             }
+
+            await unitOfWork.CompleteAsync();
 
             checks["sensors"] = sensorChecks;
         }

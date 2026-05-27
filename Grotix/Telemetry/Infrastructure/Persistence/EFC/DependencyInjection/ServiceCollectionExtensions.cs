@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IActiveThresholdRepository, ActiveThresholdRepository>();
         services.AddScoped<IThresholdBreachTrackerRepository, ThresholdBreachTrackerRepository>();
         services.AddScoped<IAlertRecordRepository, AlertRecordRepository>();
+        services.AddScoped<IActuatorLogRepository, ActuatorLogRepository>();
 
         services.AddHealthChecks()
             .AddCheck<TimescaleTelemetryHealthCheck>("timescale", tags: ["timescale"]);
