@@ -20,6 +20,8 @@ public sealed class AdminUsersController(IUserCommandService userCommandService,
         string? TaxId,
         string? Phone,
         string? ProfilePicture,
+        int? RoleId,
+        int? AssociationId,
         bool? IsActive);
 
     public record AdminCreateUserRequest(
@@ -74,6 +76,8 @@ public sealed class AdminUsersController(IUserCommandService userCommandService,
                 request.TaxId,
                 request.Phone,
                 request.ProfilePicture,
+                request.RoleId,
+                request.AssociationId,
                 request.IsActive));
             return UserResourceFromEntityAssembler.ToResourceFromEntity(updated);
         }

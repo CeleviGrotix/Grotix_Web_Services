@@ -10,6 +10,7 @@ namespace GrotixBackend.Profiles.Application.Internal.CommandServices;
 public class UserCommandService(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
+    IAssociationRepository associationRepository,
     IUnitOfWork unitOfWork
 ) : IUserCommandService
 {
@@ -74,6 +75,20 @@ public class UserCommandService(
 
         if (command.IsActive.HasValue)
             user.SetActive(command.IsActive.Value);
+
+        if (command.RoleId.HasValue)
+        {
+            if (!await roleRepository.ExistsAsync(command.RoleId.Value))
+                throw new ArgumentException($"El rol {command.RoleId.Value} no existe.");
+            user.AssignRole(command.RoleId.Value);
+        }
+
+        if (command.AssociationId.HasValue)
+        {
+            if (!await associationRepository.ExistsAsync(command.AssociationId.Value))
+                throw new ArgumentException($"La asociación {command.AssociationId.Value} no existe.");
+            user.AssignAssociation(command.AssociationId.Value);
+        }
 
         await unitOfWork.CompleteAsync();
         return user;
