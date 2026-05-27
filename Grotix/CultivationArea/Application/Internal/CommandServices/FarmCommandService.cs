@@ -1,13 +1,12 @@
 using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
 using GrotixBackend.CultivationArea.Domain.Model.Commands;
 using GrotixBackend.CultivationArea.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 
 namespace GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 
 public class FarmCommandService(
     IFarmRepository farmRepository,
-    IUnitOfWork unitOfWork
+    ICultivationAreaUnitOfWork unitOfWork
 ) : IFarmCommandService
 {
     public async Task<Farm> Handle(CreateFarmCommand command)

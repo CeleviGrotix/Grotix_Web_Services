@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddGrotixAppPersistence(configuration);
         services.AddGrotixIamPersistence(configuration);
+        services.AddGrotixCultivationAreaPersistence(configuration);
         return services;
     }
 
@@ -36,7 +37,6 @@ public static class ServiceCollectionExtensions
             .AddCheck<MySqlReadinessHealthCheck>("mysql", tags: ["ready"]);
 
         services.AddProfilesPersistence();
-        services.AddCultivationAreaPersistence();
 
         return services;
     }
@@ -58,6 +58,23 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddGrotixCultivationAreaPersistence(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var mysqlServerVersion = ResolveMySqlServerVersion(configuration["MySql:ServerVersion"]);
+
+        services.AddDbContext<CultivationAreaDbContext>(options =>
+            options.UseMySql(
+                connectionString,
+                mysqlServerVersion,
+                mysql => mysql.MigrationsHistoryTable("__EFMigrationsHistory_CultivationArea")));
+
+        services.AddScoped<ICultivationAreaUnitOfWork, CultivationAreaUnitOfWork>();
+        services.AddCultivationAreaRepositories();
+
+        return services;
+    }
+
     private static IServiceCollection AddIamPersistence(this IServiceCollection services)
     {
         services.AddScoped<IIdentityRepository, IdentityRepository>();
@@ -75,7 +92,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddCultivationAreaPersistence(this IServiceCollection services)
+    private static IServiceCollection AddCultivationAreaRepositories(this IServiceCollection services)
     {
         services.AddScoped<IFarmRepository, FarmRepository>();
         services.AddScoped<IZoneRepository, ZoneRepository>();

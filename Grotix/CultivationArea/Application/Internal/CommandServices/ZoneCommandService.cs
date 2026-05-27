@@ -1,14 +1,13 @@
 using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
 using GrotixBackend.CultivationArea.Domain.Model.Commands;
 using GrotixBackend.CultivationArea.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 
 namespace GrotixBackend.CultivationArea.Application.Internal.CommandServices;
 
 public class ZoneCommandService(
     IZoneRepository zoneRepository,
     ICropRepository cropRepository,
-    IUnitOfWork unitOfWork
+    ICultivationAreaUnitOfWork unitOfWork
 ) : IZoneCommandService
 {
     public async Task<Zone> Handle(CreateZoneCommand command)

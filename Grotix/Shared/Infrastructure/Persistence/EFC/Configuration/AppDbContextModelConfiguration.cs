@@ -9,7 +9,6 @@ public static partial class AppDbContextModelConfiguration
     public static void ConfigureGrotixCoreSchema(this ModelBuilder modelBuilder)
     {
         modelBuilder.ConfigureProfilesCoreSchema();
-        modelBuilder.ConfigureCultivationAreaSchema();
     }
 
     public static void ConfigureGrotixSchema(this ModelBuilder modelBuilder)

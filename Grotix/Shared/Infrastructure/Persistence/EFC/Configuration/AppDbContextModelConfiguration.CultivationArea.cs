@@ -1,5 +1,4 @@
 using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
-using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -30,9 +29,6 @@ public static partial class AppDbContextModelConfiguration
             e.Property(f => f.UserId).HasColumnName("UserID");
             e.Property(f => f.Name).HasMaxLength(200).IsRequired();
             e.Property(f => f.Location).HasMaxLength(500).IsRequired();
-
-            e.HasOne<User>().WithMany().HasForeignKey(f => f.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Zone>(e =>

@@ -1,5 +1,4 @@
 ﻿using GrotixBackend.Shared.Domain.Repositories;
-using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,15 +13,15 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories
     public abstract class BaseRepository<TEntity> : IAsyncRepository<TEntity> where TEntity : class
     {
         /// <summary>
-        /// El contexto de la base de datos de la aplicación, utilizado para interactuar con la base de datos.
+        /// El contexto de la base de datos utilizado para interactuar con la base de datos.
         /// </summary>
-        protected readonly AppDbContext Context;
+        protected readonly DbContext Context;
 
         /// <summary>
         /// Inicializa una nueva instancia de la clase <see cref="BaseRepository{TEntity}"/>.
         /// </summary>
-        /// <param name="context">El contexto de la base de datos de la aplicación (<see cref="AppDbContext"/>).</param>
-        protected BaseRepository(AppDbContext context)
+        /// <param name="context">El contexto de la base de datos que respalda el repositorio.</param>
+        protected BaseRepository(DbContext context)
         {
             Context = context;
         }

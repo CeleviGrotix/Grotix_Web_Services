@@ -5,5 +5,5 @@ using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Repositories;
 
 namespace GrotixBackend.CultivationArea.Infrastructure.Repositories;
 
-public class CropRepository(AppDbContext context)
+public class CropRepository(CultivationAreaDbContext context)
     : BaseRepository<Crop>(context), ICropRepository;

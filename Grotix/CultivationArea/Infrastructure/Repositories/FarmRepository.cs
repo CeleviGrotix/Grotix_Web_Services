@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.CultivationArea.Infrastructure.Repositories;
 
-public class FarmRepository(AppDbContext context)
+public class FarmRepository(CultivationAreaDbContext context)
     : BaseRepository<Farm>(context), IFarmRepository
 {
     public async Task<IReadOnlyList<Farm>> ListByUserIdAsync(int userId)

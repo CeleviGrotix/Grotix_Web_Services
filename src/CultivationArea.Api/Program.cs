@@ -27,6 +27,7 @@ builder.Services.Configure<TokenSettings>(
 
 builder.Services.AddGrotixJwt(builder.Configuration);
 builder.Services.AddGrotixAppPersistence(builder.Configuration);
+builder.Services.AddGrotixCultivationAreaPersistence(builder.Configuration);
 builder.Services.AddGrotixProfilesAccessModule();
 builder.Services.AddGrotixCultivationAreaModule();
 builder.Services.AddGrotixRabbitMqConsumer(builder.Configuration);
