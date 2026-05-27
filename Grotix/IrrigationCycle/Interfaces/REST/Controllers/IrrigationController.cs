@@ -19,20 +19,23 @@ public sealed class IrrigationController(
     IIrrigationQueryService queryService,
     IIrrigationScheduleService scheduleService) : ControllerBase
 {
-    public sealed record StartIrrigationRequest(int ZoneId, double? VolumeLiters, int? DurationMinutes);
+    public sealed record StartIrrigationRequest(double? VolumeLiters, int? DurationMinutes);
 
-    [HttpPost("start")]
-    public async Task<IActionResult> Start([FromBody] StartIrrigationRequest request, CancellationToken cancellationToken)
+    [HttpPost("start/{zoneId:int}")]
+    public async Task<IActionResult> Start(
+        int zoneId,
+        [FromBody] StartIrrigationRequest? request,
+        CancellationToken cancellationToken)
     {
         if (!CanExecute()) return Forbid();
-        if (!await CanAccessZoneAsync(request.ZoneId, cancellationToken)) return Forbid();
+        if (!await CanAccessZoneAsync(zoneId, cancellationToken)) return Forbid();
 
         try
         {
             var cycle = await commandService.StartManualAsync(
-                request.ZoneId,
-                request.VolumeLiters,
-                request.DurationMinutes,
+                zoneId,
+                request?.VolumeLiters,
+                request?.DurationMinutes,
                 cancellationToken);
             return Ok(new { cycleId = cycle.Id });
         }
@@ -44,16 +47,6 @@ public sealed class IrrigationController(
         {
             return Conflict(new { message = ex.Message });
         }
-    }
-
-    [HttpPost("start/{zoneId:int}")]
-    public async Task<IActionResult> StartForZone(
-        int zoneId,
-        [FromBody] StartIrrigationRequest? request,
-        CancellationToken cancellationToken)
-    {
-        var body = request ?? new StartIrrigationRequest(zoneId, null, null);
-        return await Start(body with { ZoneId = zoneId }, cancellationToken);
     }
 
     [HttpGet("schedules")]
