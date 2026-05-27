@@ -1,5 +1,6 @@
 using GrotixBackend.CultivationArea.Domain.Repositories;
 using GrotixBackend.CultivationArea.Infrastructure.Repositories;
+using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
 using GrotixBackend.IAM.Domain.Repositories;
 using GrotixBackend.IAM.Infrastructure.Repositories;
 using GrotixBackend.Profiles.Domain.Repositories;
@@ -117,6 +118,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFarmRepository, FarmRepository>();
         services.AddScoped<IZoneRepository, ZoneRepository>();
         services.AddScoped<ICropRepository, CropRepository>();
+        services.AddScoped<IZoneMemberService, ZoneMemberService>();
         return services;
     }
 
