@@ -26,9 +26,11 @@ public static partial class AppDbContextModelConfiguration
             e.ToTable("farm");
             e.HasKey(f => f.Id);
             e.Property(f => f.Id).HasColumnName("FarmID").ValueGeneratedOnAdd();
-            e.Property(f => f.UserId).HasColumnName("UserID");
+            e.Property(f => f.UserId).HasColumnName("UserID").IsRequired(false);
+            e.Property(f => f.AssociationId).HasColumnName("AssociationID");
             e.Property(f => f.Name).HasMaxLength(200).IsRequired();
             e.Property(f => f.Location).HasMaxLength(500).IsRequired();
+            e.HasIndex(f => f.AssociationId);
         });
 
         modelBuilder.Entity<Zone>(e =>

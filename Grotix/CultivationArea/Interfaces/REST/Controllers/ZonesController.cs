@@ -136,20 +136,32 @@ public class ZonesController(
         return Ok(new { success = true });
     }
 
-    private async Task<int?> ResolveProfileUserIdAsync()
+    private async Task<UserAccessContext?> ResolveAccessContextAsync()
     {
         var identityId = User.GetIdentityId();
         if (identityId == null) return null;
-        var accessContext = await userAccessContextService.GetByIdentityIdAsync(identityId.Value);
+        return await userAccessContextService.GetByIdentityIdAsync(identityId.Value);
+    }
+
+    private async Task<int?> ResolveProfileUserIdAsync()
+    {
+        var accessContext = await ResolveAccessContextAsync();
         return accessContext?.UserId;
     }
 
     private async Task<bool> CanAccessZoneAsync(Zone zone)
     {
-        if (User.IsInRole("admin")) return true;
+        if (User.IsInRole("admin") || User.IsInRole("staff")) return true;
+
         var farm = await farmQueryService.Handle(new GetFarmByIdQuery(zone.FarmId));
         if (farm == null) return false;
-        var profileId = await ResolveProfileUserIdAsync();
-        return profileId.HasValue && farm.UserId == profileId.Value;
+
+        var accessContext = await ResolveAccessContextAsync();
+        if (accessContext == null) return false;
+
+        if (accessContext.AssociationId.HasValue && farm.AssociationId == accessContext.AssociationId.Value)
+            return true;
+
+        return farm.UserId.HasValue && accessContext.UserId == farm.UserId.Value;
     }
 }

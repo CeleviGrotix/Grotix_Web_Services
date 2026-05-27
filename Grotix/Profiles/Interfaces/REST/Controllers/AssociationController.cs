@@ -24,6 +24,7 @@ public class AssociationController(
     public record CreateAssociationRequest(string Name, string Email);
 
     [HttpPost]
+    [Authorize(Roles = "admin,staff")]
     public async Task<IActionResult> Create([FromBody] CreateAssociationRequest request)
     {
         var email = UserEmail.Create(request.Email);

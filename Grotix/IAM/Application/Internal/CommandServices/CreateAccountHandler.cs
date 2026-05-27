@@ -2,6 +2,7 @@ using MediatR;
 using GrotixBackend.Contracts.Auth.Identity;
 using GrotixBackend.Contracts.Auth.Notifications;
 using GrotixBackend.Contracts.Auth.Security;
+using GrotixBackend.Contracts.Profiles.Access;
 using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.Contracts.Profiles.Invites;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
@@ -18,9 +19,11 @@ public class CreateAccountHandler(
     IExternalProfileService profileService,
     IPasswordHasher passwordHasher,
     IMediator mediator,
-    IAssociationInviteAccessService inviteAccessService
+    IAssociationInviteAccessService inviteAccessService,
+    IAssociationFarmOwnerSyncService associationFarmOwnerSyncService
 ) : IRequestHandler<CreateAccountCommand, int>
 {
+    private const int UserAdminRoleId = 3;
     public async Task<int> Handle(CreateAccountCommand command, CancellationToken cancellationToken)
     {
         if (await identityRepository.ExistsByEmailAsync(command.Email))
@@ -44,6 +47,9 @@ public class CreateAccountHandler(
             identity.UserName,
             invite.RoleId,
             invite.AssociationId));
+
+        if (invite.RoleId == UserAdminRoleId)
+            await associationFarmOwnerSyncService.SyncUnownedFarmsAsync(invite.AssociationId, cancellationToken);
 
         var marked = await inviteAccessService.TryMarkUsedAsync(invite.InviteId, cancellationToken);
         if (!marked)

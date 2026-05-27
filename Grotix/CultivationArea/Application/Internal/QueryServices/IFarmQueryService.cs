@@ -7,4 +7,6 @@ public interface IFarmQueryService
 {
     Task<Farm?> Handle(GetFarmByIdQuery query);
     Task<IReadOnlyList<Farm>> Handle(ListFarmsForUserQuery query);
+    Task<IReadOnlyList<Farm>> Handle(ListFarmsForAssociationQuery query);
+    Task<IReadOnlyList<Farm>> Handle(ListAllFarmsQuery query);
 }

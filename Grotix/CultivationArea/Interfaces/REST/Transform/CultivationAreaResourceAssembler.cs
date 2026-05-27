@@ -6,7 +6,7 @@ namespace GrotixBackend.CultivationArea.Interfaces.REST.Transform;
 public static class CultivationAreaResourceAssembler
 {
     public static FarmResource ToFarmResource(Farm f) =>
-        new(f.Id, f.UserId, f.Name, f.Location);
+        new(f.Id, f.UserId, f.AssociationId, f.Name, f.Location);
 
     public static ZoneResource ToZoneResource(Zone z) =>
         new(z.Id, z.FarmId, z.CropId, z.CurrentPhase, z.PhaseStartDate, z.ImageUrl, z.Latitude, z.Longitude);

@@ -141,6 +141,12 @@ public sealed class ZoneMemberService(
         if (farm == null)
             return null;
 
+        if (farm.AssociationId > 0)
+            return farm.AssociationId;
+
+        if (farm.UserId == null)
+            return null;
+
         var owner = await profilesDb.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == farm.UserId, cancellationToken);

@@ -1,4 +1,5 @@
 using GrotixBackend.Contracts.Auth.Lookup;
+using GrotixBackend.Contracts.Profiles.Access;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Commands;
 using GrotixBackend.Profiles.Domain.Model.Enums;
@@ -14,6 +15,7 @@ public class ContractCommandService(
     IUserRepository userRepository,
     IAssociationInviteRepository inviteRepository,
     IAssociationInviteCommandService inviteCommandService,
+    IAssociationFarmOwnerSyncService associationFarmOwnerSyncService,
     IProfilesUnitOfWork unitOfWork
 ) : IContractCommandService
 {
@@ -47,6 +49,7 @@ public class ContractCommandService(
         if (existingOrgAdmin != null)
         {
             await unitOfWork.CompleteAsync();
+            await associationFarmOwnerSyncService.SyncUnownedFarmsAsync(command.AssociationId);
             return new CreateContractResult(
                 contract,
                 adminEmail,
@@ -82,6 +85,7 @@ public class ContractCommandService(
             orgAdmin.AssignAssociation(command.AssociationId);
 
             await unitOfWork.CompleteAsync();
+            await associationFarmOwnerSyncService.SyncUnownedFarmsAsync(command.AssociationId);
             return new CreateContractResult(
                 contract,
                 adminEmail,

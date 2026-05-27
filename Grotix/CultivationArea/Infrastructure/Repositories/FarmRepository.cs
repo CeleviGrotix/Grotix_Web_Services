@@ -9,11 +9,38 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Repositories;
 public class FarmRepository(CultivationAreaDbContext context)
     : BaseRepository<Farm>(context), IFarmRepository
 {
+    public async Task<IReadOnlyList<Farm>> ListAllAsync()
+    {
+        return await Context.Set<Farm>()
+            .OrderBy(f => f.Id)
+            .ToListAsync();
+    }
+
     public async Task<IReadOnlyList<Farm>> ListByUserIdAsync(int userId)
     {
         return await Context.Set<Farm>()
             .Where(f => f.UserId == userId)
             .OrderBy(f => f.Id)
             .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<Farm>> ListByAssociationIdAsync(int associationId)
+    {
+        return await Context.Set<Farm>()
+            .Where(f => f.AssociationId == associationId)
+            .OrderBy(f => f.Id)
+            .ToListAsync();
+    }
+
+    public async Task<int> AssignOwnerToUnownedFarmsAsync(int associationId, int ownerUserId)
+    {
+        var farms = await Context.Set<Farm>()
+            .Where(f => f.AssociationId == associationId && f.UserId == null)
+            .ToListAsync();
+
+        foreach (var farm in farms)
+            farm.AssignOwner(ownerUserId);
+
+        return farms.Count;
     }
 }

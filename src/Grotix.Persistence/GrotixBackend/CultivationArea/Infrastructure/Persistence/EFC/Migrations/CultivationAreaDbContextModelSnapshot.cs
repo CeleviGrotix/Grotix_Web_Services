@@ -72,6 +72,10 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AssociationId")
+                        .HasColumnType("int")
+                        .HasColumnName("AssociationID");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -82,7 +86,7 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserID");
 

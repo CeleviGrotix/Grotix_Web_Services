@@ -19,6 +19,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IUserQueryService, UserQueryService>();
         services.AddScoped<IUserAccessContextService, UserAccessContextService>();
+        services.AddScoped<IAssociationExistenceService, AssociationExistenceService>();
+        services.AddScoped<IAssociationOwnerLookupService, AssociationOwnerLookupService>();
         return services;
     }
 

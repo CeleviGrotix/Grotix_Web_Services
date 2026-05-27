@@ -39,6 +39,7 @@ builder.Services.Configure<TokenSettings>(
 
 builder.Services.AddGrotixJwt(builder.Configuration);
 builder.Services.AddGrotixProfilesPersistence(builder.Configuration);
+builder.Services.AddGrotixCultivationAreaPersistence(builder.Configuration);
 builder.Services.AddGrotixIamPersistence(builder.Configuration);
 builder.Services.AddGrotixIamModule();
 builder.Services.AddGrotixProfilesModule();

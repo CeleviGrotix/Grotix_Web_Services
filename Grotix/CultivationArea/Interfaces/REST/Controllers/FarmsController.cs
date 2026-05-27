@@ -18,27 +18,61 @@ public class FarmsController(
     IUserAccessContextService userAccessContextService,
     IFarmCommandService farmCommandService,
     IFarmQueryService farmQueryService,
+    IAssociationFarmOwnerSyncService associationFarmOwnerSyncService,
     IZoneCommandService zoneCommandService,
     IZoneQueryService zoneQueryService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> ListMine()
     {
-        var profileId = await ResolveProfileUserIdAsync();
-        if (profileId == null) return Unauthorized();
-        var farms = await farmQueryService.Handle(new ListFarmsForUserQuery(profileId.Value));
+        var accessContext = await ResolveAccessContextAsync();
+        if (accessContext == null) return Unauthorized();
+
+        IReadOnlyList<Farm> farms;
+        if (User.IsInRole("admin") || User.IsInRole("staff"))
+        {
+            farms = await farmQueryService.Handle(new ListAllFarmsQuery());
+        }
+        else if (accessContext.AssociationId is { } associationId)
+        {
+            farms = await farmQueryService.Handle(new ListFarmsForAssociationQuery(associationId));
+        }
+        else
+        {
+            farms = [];
+        }
+
         return Ok(farms.Select(CultivationAreaResourceAssembler.ToFarmResource).ToList());
     }
 
-    public record CreateFarmRequest(string Name, string Location);
+    public record CreateFarmRequest(string Name, string Location, int? AssociationId);
 
     [HttpPost]
+    [Authorize(Roles = "admin,staff,user_admin")]
     public async Task<IActionResult> Create([FromBody] CreateFarmRequest request)
     {
-        var profileId = await ResolveProfileUserIdAsync();
-        if (profileId == null) return Unauthorized();
-        var farm = await farmCommandService.Handle(new CreateFarmCommand(profileId.Value, request.Name, request.Location));
-        return CreatedAtAction(nameof(GetById), new { farmId = farm.Id }, CultivationAreaResourceAssembler.ToFarmResource(farm));
+        var accessContext = await ResolveAccessContextAsync();
+        if (accessContext == null) return Unauthorized();
+
+        try
+        {
+            var associationId = ResolveAssociationIdForCreate(accessContext, request.AssociationId);
+            if (associationId == null)
+                return BadRequest(new { message = "AssociationId es requerido o el usuario no pertenece a esa asociación." });
+
+            await associationFarmOwnerSyncService.SyncUnownedFarmsAsync(associationId.Value);
+
+            var farm = await farmCommandService.Handle(new CreateFarmCommand(
+                associationId.Value,
+                request.Name,
+                request.Location));
+
+            return CreatedAtAction(nameof(GetById), new { farmId = farm.Id }, CultivationAreaResourceAssembler.ToFarmResource(farm));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("{farmId:int}")]
@@ -104,18 +138,37 @@ public class FarmsController(
         }
     }
 
-    private async Task<int?> ResolveProfileUserIdAsync()
+    private async Task<UserAccessContext?> ResolveAccessContextAsync()
     {
         var identityId = User.GetIdentityId();
         if (identityId == null) return null;
-        var accessContext = await userAccessContextService.GetByIdentityIdAsync(identityId.Value);
-        return accessContext?.UserId;
+        return await userAccessContextService.GetByIdentityIdAsync(identityId.Value);
+    }
+
+    private int? ResolveAssociationIdForCreate(UserAccessContext accessContext, int? requestedAssociationId)
+    {
+        if (User.IsInRole("admin") || User.IsInRole("staff"))
+            return requestedAssociationId;
+
+        if (accessContext.AssociationId == null)
+            return null;
+
+        if (requestedAssociationId.HasValue && requestedAssociationId.Value != accessContext.AssociationId.Value)
+            return null;
+
+        return accessContext.AssociationId.Value;
     }
 
     private async Task<bool> CanAccessFarmAsync(Farm farm)
     {
-        if (User.IsInRole("admin")) return true;
-        var profileId = await ResolveProfileUserIdAsync();
-        return profileId.HasValue && farm.UserId == profileId.Value;
+        if (User.IsInRole("admin") || User.IsInRole("staff")) return true;
+
+        var accessContext = await ResolveAccessContextAsync();
+        if (accessContext == null) return false;
+
+        if (accessContext.AssociationId.HasValue && farm.AssociationId == accessContext.AssociationId.Value)
+            return true;
+
+        return farm.UserId.HasValue && accessContext.UserId == farm.UserId.Value;
     }
 }
