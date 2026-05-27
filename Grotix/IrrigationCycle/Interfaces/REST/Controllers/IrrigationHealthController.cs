@@ -6,7 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 namespace GrotixBackend.IrrigationCycle.Interfaces.REST.Controllers;
 
 [ApiController]
-[Route("health")]
+[Route("api/v1/irrigation/health")]
 [AllowAnonymous]
 public sealed class IrrigationHealthController(HealthCheckService healthChecks) : ControllerBase
 {

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 namespace GrotixBackend.Telemetry.Interfaces.REST.Controllers;
 
 [ApiController]
-[Route("health")]
+[Route("api/v1/telemetry/health")]
 [AllowAnonymous]
 public sealed class TelemetryHealthController(
     HealthCheckService healthChecks,

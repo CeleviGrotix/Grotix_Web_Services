@@ -6,7 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 namespace GrotixBackend.HardwareDevice.Interfaces.REST.Controllers;
 
 [ApiController]
-[Route("health")]
+[Route("api/v1/hardware/health")]
 [AllowAnonymous]
 public sealed class HardwareHealthController(HealthCheckService healthChecks) : ControllerBase
 {

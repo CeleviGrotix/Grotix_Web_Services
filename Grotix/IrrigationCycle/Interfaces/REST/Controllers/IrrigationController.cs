@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GrotixBackend.IrrigationCycle.Interfaces.REST.Controllers;
 
 [ApiController]
-[Route("irrigation")]
+[Route("api/v1/irrigation")]
 [Authorize]
 public sealed class IrrigationController(
     IUserAccessContextService userAccessContextService,

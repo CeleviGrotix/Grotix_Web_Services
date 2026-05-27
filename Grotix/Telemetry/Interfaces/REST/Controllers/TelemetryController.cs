@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GrotixBackend.Telemetry.Interfaces.REST.Controllers;
 
 [ApiController]
-[Route("telemetry/zones")]
+[Route("api/v1/telemetry/zones")]
 [Authorize]
 public sealed class TelemetryController(
     IUserAccessContextService userAccessContextService,

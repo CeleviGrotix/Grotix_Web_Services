@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GrotixBackend.HardwareDevice.Interfaces.REST.Controllers;
 
 [ApiController]
-[Route("hardware")]
+[Route("api/v1/hardware")]
 [Authorize]
 public sealed class DevicesController(
     IUserAccessContextService userAccessContextService,
