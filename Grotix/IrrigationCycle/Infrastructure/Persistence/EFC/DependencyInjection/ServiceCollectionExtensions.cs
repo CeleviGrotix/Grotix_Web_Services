@@ -48,6 +48,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IIrrigationCycleRepository, IrrigationCycleRepository>();
         services.AddScoped<IIrrigationScheduleRepository, IrrigationScheduleRepository>();
         services.AddScoped<IIrrigationContextService, IrrigationContextService>();
+        services.Configure<WeatherForecastOptions>(configuration.GetSection("WeatherForecast"));
+        services.AddHttpClient<IWeatherForecastAdapter, OpenMeteoWeatherForecastAdapter>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(8);
+        });
         services.AddScoped<IActuatorControlService, ActuatorControlService>();
         services.AddScoped<IIrrigationCompletedPublisher, RabbitMqIrrigationCompletedPublisher>();
         services.AddHostedService<IrrigationDatabaseInitializer>();

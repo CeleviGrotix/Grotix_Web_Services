@@ -1,9 +1,11 @@
 using GrotixBackend.IrrigationCycle.Application.Internal;
+using GrotixBackend.IrrigationCycle.Application.ACL;
 using GrotixBackend.IrrigationCycle.Domain.Model.Aggregates;
 using GrotixBackend.IrrigationCycle.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GrotixBackend.IrrigationCycle.Infrastructure.Integration;
 
@@ -13,11 +15,13 @@ namespace GrotixBackend.IrrigationCycle.Infrastructure.Integration;
 /// </summary>
 public sealed class IrrigationScheduleManagerHostedService(
     IServiceProvider services,
+    IOptions<WeatherForecastOptions> weatherOptions,
     ILogger<IrrigationScheduleManagerHostedService> logger) : BackgroundService
 {
     // Ventana de tolerancia para disparar un riego respecto a la hora exacta del programa.
     // Si el servicio estuvo caído y se levanta dentro de esta ventana, aún se dispara.
     private static readonly TimeSpan TriggerTolerance = TimeSpan.FromMinutes(10);
+    private readonly WeatherForecastOptions _weatherOptions = weatherOptions.Value;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -44,6 +48,8 @@ public sealed class IrrigationScheduleManagerHostedService(
         var scheduleRepository = scope.ServiceProvider.GetRequiredService<IIrrigationScheduleRepository>();
         var cycleRepository = scope.ServiceProvider.GetRequiredService<IIrrigationCycleRepository>();
         var commandService = scope.ServiceProvider.GetRequiredService<IIrrigationCommandService>();
+        var irrigationContextService = scope.ServiceProvider.GetRequiredService<IIrrigationContextService>();
+        var weatherForecastAdapter = scope.ServiceProvider.GetRequiredService<IWeatherForecastAdapter>();
 
         var nowUtc = DateTime.UtcNow;
         var today = nowUtc.Date;
@@ -51,6 +57,17 @@ public sealed class IrrigationScheduleManagerHostedService(
         var todayToken = GetDayToken(nowUtc.DayOfWeek);
 
         IReadOnlyList<IrrigationSchedule> schedules;
+        var rainForecast = await weatherForecastAdapter.GetTodayRainForecastAsync(stoppingToken);
+        if (rainForecast.WillRainToday)
+        {
+            logger.LogInformation(
+                "Rain predicted today for configured location ({Lat},{Lon}). precipitation={PrecipitationMm}mm probability={Probability}%",
+                _weatherOptions.Latitude,
+                _weatherOptions.Longitude,
+                rainForecast.PrecipitationMm,
+                rainForecast.PrecipitationProbabilityPercent);
+        }
+
         try
         {
             schedules = await scheduleRepository.ListAsync(zoneId: null);
@@ -98,6 +115,16 @@ public sealed class IrrigationScheduleManagerHostedService(
             if (history.Count > 0)
                 continue;
 
+            if (rainForecast.WillRainToday)
+            {
+                var shouldSkip = await ShouldSkipByWeatherAndHumidityAsync(
+                    schedule.ZoneId,
+                    irrigationContextService,
+                    stoppingToken);
+                if (shouldSkip)
+                    continue;
+            }
+
             try
             {
                 logger.LogInformation(
@@ -121,6 +148,47 @@ public sealed class IrrigationScheduleManagerHostedService(
                     schedule.Id);
             }
         }
+    }
+
+    private async Task<bool> ShouldSkipByWeatherAndHumidityAsync(
+        int zoneId,
+        IIrrigationContextService irrigationContextService,
+        CancellationToken cancellationToken)
+    {
+        var context = await irrigationContextService.GetZoneContextAsync(zoneId, cancellationToken);
+        if (context == null)
+        {
+            logger.LogInformation(
+                "Skipping scheduled irrigation for zone {ZoneId}: rain expected and no context available.",
+                zoneId);
+            return true;
+        }
+
+        if (!context.CurrentHumidityPercent.HasValue)
+        {
+            logger.LogInformation(
+                "Skipping scheduled irrigation for zone {ZoneId}: rain expected and no current humidity.",
+                zoneId);
+            return true;
+        }
+
+        var humidityDeficit = context.OptimalHumidity - context.CurrentHumidityPercent.Value;
+        if (humidityDeficit <= _weatherOptions.HumidityDeficitThresholdPercent)
+        {
+            logger.LogInformation(
+                "Skipping scheduled irrigation for zone {ZoneId}: rain expected and humidity deficit {Deficit:F2}% is below threshold {Threshold:F2}%.",
+                zoneId,
+                humidityDeficit,
+                _weatherOptions.HumidityDeficitThresholdPercent);
+            return true;
+        }
+
+        logger.LogInformation(
+            "Rain expected but irrigation kept for zone {ZoneId}: humidity deficit {Deficit:F2}% exceeds threshold {Threshold:F2}%.",
+            zoneId,
+            humidityDeficit,
+            _weatherOptions.HumidityDeficitThresholdPercent);
+        return false;
     }
 
     private static bool IsDayIncluded(string daysOfTheWeek, string todayToken)
