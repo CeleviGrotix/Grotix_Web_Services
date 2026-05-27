@@ -137,26 +137,6 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("zone", (string)null);
                 });
 
-            modelBuilder.Entity("GrotixBackend.IAM.Domain.Model.Aggregates.Identity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("IdentityID");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("Username");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("identity", (string)null);
-                });
-
             modelBuilder.Entity("GrotixBackend.Profiles.Domain.Model.Aggregates.Association", b =>
                 {
                     b.Property<int>("Id")
@@ -491,30 +471,6 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Migrations
                         .WithMany()
                         .HasForeignKey("FarmId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GrotixBackend.IAM.Domain.Model.Aggregates.Identity", b =>
-                {
-                    b.OwnsOne("GrotixBackend.IAM.Domain.Model.ValueObjects.PasswordHash", "HashedPassword", b1 =>
-                        {
-                            b1.Property<int>("IdentityId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("HashedValue")
-                                .IsRequired()
-                                .HasColumnType("longtext")
-                                .HasColumnName("PasswordHash");
-
-                            b1.HasKey("IdentityId");
-
-                            b1.ToTable("identity");
-
-                            b1.WithOwner()
-                                .HasForeignKey("IdentityId");
-                        });
-
-                    b.Navigation("HashedPassword")
                         .IsRequired();
                 });
 

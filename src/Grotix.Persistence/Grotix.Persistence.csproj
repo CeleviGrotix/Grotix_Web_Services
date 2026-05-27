@@ -38,6 +38,7 @@
     <Compile Include="..\..\Grotix\CultivationArea\Infrastructure\Repositories\**\*.cs" />
     <Compile Include="..\..\Grotix\Profiles\Application\Internal\QueryServices\SearchQueryService.cs" />
     <Compile Include="GrotixBackend\Shared\Infrastructure\Persistence\EFC\Migrations\**\*.cs" />
+    <Compile Include="GrotixBackend\IAM\Infrastructure\Persistence\EFC\Migrations\**\*.cs" />
   </ItemGroup>
 
 </Project>

@@ -8,14 +8,13 @@ using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Domain.Model.Commands;
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
 using GrotixBackend.IAM.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 
 namespace GrotixBackend.IAM.Application.Internal.CommandServices;
 
 /// <summary>Orquesta alta de cuenta (informe: CreateAccountHandler).</summary>
 public class CreateAccountHandler(
     IIdentityRepository identityRepository,
-    IUnitOfWork unitOfWork,
+    IIamUnitOfWork unitOfWork,
     IExternalProfileService profileService,
     IPasswordHasher passwordHasher,
     IMediator mediator,

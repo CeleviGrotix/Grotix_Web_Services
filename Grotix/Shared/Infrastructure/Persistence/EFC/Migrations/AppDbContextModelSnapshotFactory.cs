@@ -13,7 +13,9 @@ internal static class AppDbContextModelSnapshotFactory
             .HasAnnotation("ProductVersion", "9.0.0")
             .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-        modelBuilder.ConfigureGrotixCoreSchema();
+        modelBuilder.ConfigureIamSchema();
+        modelBuilder.ConfigureProfilesCoreSchema();
+        modelBuilder.ConfigureCultivationAreaSchema();
     }
 
     internal static void Apply(ModelBuilder modelBuilder)

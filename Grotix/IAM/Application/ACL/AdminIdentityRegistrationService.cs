@@ -6,14 +6,13 @@ using GrotixBackend.Contracts.Profiles.Provisioning;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Domain.Model.ValueObjects;
 using GrotixBackend.IAM.Domain.Repositories;
-using GrotixBackend.Shared.Domain.Repositories;
 using MediatR;
 
 namespace GrotixBackend.IAM.Application.ACL;
 
 public sealed class AdminIdentityRegistrationService(
     IIdentityRepository identityRepository,
-    IUnitOfWork unitOfWork,
+    IIamUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher,
     IAdminProfileRegistrationService adminProfileRegistrationService,
     IMediator mediator) : IAdminIdentityRegistrationService

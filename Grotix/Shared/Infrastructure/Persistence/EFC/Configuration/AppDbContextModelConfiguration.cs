@@ -8,7 +8,6 @@ public static partial class AppDbContextModelConfiguration
     /// <summary>Modelo hasta la migración inicial (sin <c>contract</c>).</summary>
     public static void ConfigureGrotixCoreSchema(this ModelBuilder modelBuilder)
     {
-        modelBuilder.ConfigureIamSchema();
         modelBuilder.ConfigureProfilesCoreSchema();
         modelBuilder.ConfigureCultivationAreaSchema();
     }

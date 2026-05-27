@@ -37,7 +37,8 @@ builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));
 
 builder.Services.AddGrotixJwt(builder.Configuration);
-builder.Services.AddGrotixPersistence(builder.Configuration);
+builder.Services.AddGrotixAppPersistence(builder.Configuration);
+builder.Services.AddGrotixIamPersistence(builder.Configuration);
 builder.Services.AddGrotixIamModule();
 builder.Services.AddGrotixProfilesModule();
 builder.Services.AddGrotixRabbitMqPublisher(builder.Configuration);
@@ -87,6 +88,7 @@ try
     var identityRepository = scope.ServiceProvider.GetRequiredService<IIdentityRepository>();
     var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
     var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+    var iamUnitOfWork = scope.ServiceProvider.GetRequiredService<IIamUnitOfWork>();
     var aclService = scope.ServiceProvider.GetRequiredService<IExternalProfileService>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 
@@ -101,7 +103,7 @@ try
         var adminIdentity = new Identity(adminEmail, PasswordHash.FromHash(hash));
 
         await identityRepository.AddAsync(adminIdentity);
-        await unitOfWork.CompleteAsync();
+        await iamUnitOfWork.CompleteAsync();
 
         await aclService.CreateUserAndReturnId(new CreateProfileUserRequest(
             adminIdentity.Id,

@@ -1,5 +1,4 @@
 ﻿using GrotixBackend.CultivationArea.Domain.Model.Aggregates;
-using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +6,6 @@ namespace GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<Identity> Identities { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<User> Users { get; set; }

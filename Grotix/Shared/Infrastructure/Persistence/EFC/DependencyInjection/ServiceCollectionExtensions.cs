@@ -19,9 +19,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGrotixPersistence(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddGrotixAppPersistence(configuration);
+        services.AddGrotixIamPersistence(configuration);
+        return services;
+    }
+
+    public static IServiceCollection AddGrotixAppPersistence(this IServiceCollection services, IConfiguration configuration)
+    {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         var mysqlServerVersion = ResolveMySqlServerVersion(configuration["MySql:ServerVersion"]);
-
         services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(connectionString, mysqlServerVersion));
 
@@ -29,9 +35,25 @@ public static class ServiceCollectionExtensions
         services.AddHealthChecks()
             .AddCheck<MySqlReadinessHealthCheck>("mysql", tags: ["ready"]);
 
-        services.AddIamPersistence();
         services.AddProfilesPersistence();
         services.AddCultivationAreaPersistence();
+
+        return services;
+    }
+
+    public static IServiceCollection AddGrotixIamPersistence(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var mysqlServerVersion = ResolveMySqlServerVersion(configuration["MySql:ServerVersion"]);
+
+        services.AddDbContext<IamDbContext>(options =>
+            options.UseMySql(
+                connectionString,
+                mysqlServerVersion,
+                mysql => mysql.MigrationsHistoryTable("__EFMigrationsHistory_Iam")));
+
+        services.AddScoped<IIamUnitOfWork, IamUnitOfWork>();
+        services.AddIamPersistence();
 
         return services;
     }

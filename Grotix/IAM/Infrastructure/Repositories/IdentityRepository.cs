@@ -2,16 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using GrotixBackend.IAM.Domain.Model.Aggregates;
 using GrotixBackend.IAM.Domain.Repositories;
-// Quita el using de IAM.Infrastructure.Persistence.Contexts si lo tenías
 using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
 
 namespace GrotixBackend.IAM.Infrastructure.Repositories
 {
     public class IdentityRepository : IIdentityRepository
     {
-        private readonly AppDbContext _context; 
+        private readonly IamDbContext _context; 
 
-        public IdentityRepository(AppDbContext context) 
+        public IdentityRepository(IamDbContext context) 
         {
             _context = context;
         }
