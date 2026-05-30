@@ -22,6 +22,122 @@ namespace GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("GrotixBackend.HardwareDevice.Domain.Model.Entities.ActionQueueItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ActionID");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActuatorId")
+                        .HasColumnType("int")
+                        .HasColumnName("ActuatorID");
+
+                    b.Property<string>("Command")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActuatorId", "Status")
+                        .HasDatabaseName("IX_action_queue_ActuatorID_Status");
+
+                    b.ToTable("action_queue", (string)null);
+                });
+
+            modelBuilder.Entity("GrotixBackend.HardwareDevice.Domain.Model.Entities.MaintenanceLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("LogID");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<int>("DeviceId")
+                        .HasColumnType("int")
+                        .HasColumnName("DeviceID");
+
+                    b.Property<string>("StatusAfter")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("maintenance_log", (string)null);
+                });
+
+            modelBuilder.Entity("GrotixBackend.HardwareDevice.Domain.Model.Entities.TechnicalMaintenance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("MaintenanceID");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<int>("DeviceId")
+                        .HasColumnType("int")
+                        .HasColumnName("DeviceID");
+
+                    b.Property<string>("Results")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<int>("StaffId")
+                        .HasColumnType("int")
+                        .HasColumnName("StaffID");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("technical_maintenance", (string)null);
+                });
+
             modelBuilder.Entity("GrotixBackend.HardwareDevice.Domain.Model.Aggregates.DeviceActuator", b =>
                 {
                     b.Property<int>("Id")
@@ -69,6 +185,9 @@ namespace GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("SensorID");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("LastSeen")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double?>("MaxPhysical")
                         .HasColumnType("double");

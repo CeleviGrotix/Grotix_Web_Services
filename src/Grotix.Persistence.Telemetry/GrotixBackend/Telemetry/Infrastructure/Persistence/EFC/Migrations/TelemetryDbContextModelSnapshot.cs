@@ -3,6 +3,7 @@ using System;
 using GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -44,6 +45,102 @@ namespace GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Migrations
                     b.HasKey("ZoneId", "SensorType");
 
                     b.ToTable("active_thresholds", (string)null);
+                });
+
+            modelBuilder.Entity("GrotixBackend.Telemetry.Domain.Model.Entities.ActuatorLogEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("action");
+
+                    b.Property<int>("ActuatorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("actuator_id");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("integer")
+                        .HasColumnName("duration");
+
+                    b.Property<float?>("FlowRate")
+                        .HasColumnType("real")
+                        .HasColumnName("flow_rate");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActuatorId", "Timestamp")
+                        .HasDatabaseName("IX_actuator_log_actuator_id_timestamp");
+
+                    b.ToTable("actuator_log", (string)null);
+                });
+
+            modelBuilder.Entity("GrotixBackend.Telemetry.Domain.Model.Entities.AlertRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BreachDirection")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("breach_direction");
+
+                    b.Property<double>("BreachedThreshold")
+                        .HasColumnType("double precision")
+                        .HasColumnName("breached_threshold");
+
+                    b.Property<double>("MaxThreshold")
+                        .HasColumnType("double precision")
+                        .HasColumnName("max_threshold");
+
+                    b.Property<double>("MinThreshold")
+                        .HasColumnType("double precision")
+                        .HasColumnName("min_threshold");
+
+                    b.Property<int>("SensorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sensor_id");
+
+                    b.Property<string>("SensorType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("sensor_type");
+
+                    b.Property<DateTime>("TriggeredAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("triggered_at");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double precision")
+                        .HasColumnName("value");
+
+                    b.Property<int>("ZoneId")
+                        .HasColumnType("integer")
+                        .HasColumnName("zone_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZoneId", "TriggeredAt")
+                        .HasDatabaseName("IX_alert_log_zone_id_triggered_at");
+
+                    b.ToTable("alert_log", (string)null);
                 });
 
             modelBuilder.Entity("GrotixBackend.Telemetry.Domain.Model.Entities.Sensor", b =>
