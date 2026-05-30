@@ -1,3 +1,4 @@
+using GrotixBackend.BuildingBlocks.Configuration;
 using GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -8,9 +9,11 @@ public sealed class TelemetryDbContextFactory : IDesignTimeDbContextFactory<Tele
 {
     public TelemetryDbContext CreateDbContext(string[] args)
     {
+        DotEnvBootstrap.LoadFromCurrentDirectory();
+
         var optionsBuilder = new DbContextOptionsBuilder<TelemetryDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__TelemetryTimescale")
-            ?? "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=Grotix2026!";
+            ?? "Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=CHANGE_ME;";
 
         optionsBuilder.UseNpgsql(
             connectionString,
