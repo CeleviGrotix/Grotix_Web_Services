@@ -1,3 +1,5 @@
+using GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Configuration;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -5,6 +7,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Migrations;
 
+[DbContext(typeof(TelemetryDbContext))]
+[Migration("20260528120000_AddAlertLog")]
 public partial class AddAlertLog : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
