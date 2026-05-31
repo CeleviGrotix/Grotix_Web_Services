@@ -6,12 +6,12 @@ public interface ISensorReadingRepository
 {
     Task AddAsync(SensorReading reading, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SensorReading>> ListBySensorAsync(
-        int sensorId,
+    Task<IReadOnlyList<SensorReading>> ListByZoneAsync(
+        int zoneId,
         DateTime? start,
         DateTime? end,
         int limit,
         CancellationToken cancellationToken = default);
 
-    Task<double?> GetLatestSmoothedValueAsync(int sensorId, CancellationToken cancellationToken = default);
+    Task<SensorReading?> GetLatestByDeviceAsync(int deviceId, CancellationToken cancellationToken = default);
 }

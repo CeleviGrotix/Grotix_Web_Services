@@ -6,7 +6,6 @@ public interface ITelemetryQueryService
         int zoneId,
         DateTime? startTime,
         DateTime? endTime,
-        IReadOnlyList<string>? sensorTypes,
         int limit,
         CancellationToken cancellationToken = default);
 }
@@ -15,12 +14,12 @@ public sealed record ZoneTelemetryHistory(
     int ZoneId,
     DateTime Start,
     DateTime End,
-    IReadOnlyList<SensorTelemetrySeries> Sensors);
+    IReadOnlyList<DeviceReadingPoint> Readings);
 
-public sealed record SensorTelemetrySeries(
-    int SensorId,
-    string Type,
-    string Unit,
-    IReadOnlyList<SensorReadingPoint> Readings);
-
-public sealed record SensorReadingPoint(double Value, DateTime Timestamp);
+public sealed record DeviceReadingPoint(
+    int DeviceId,
+    DateTime Timestamp,
+    double Temperature,
+    double HumidityAir,
+    double HumiditySoil,
+    double LightIntensity);

@@ -12,13 +12,17 @@ namespace GrotixBackend.Telemetry.Interfaces.REST.Controllers;
 [Authorize]
 public sealed class TelemetryIngestController(ITelemetryIngestService ingestService) : ControllerBase
 {
+    /// <summary>Paquete de telemetría completo del ESP32.</summary>
     public sealed record IngestReadingRequest(
-        int SensorId,
-        double Value,
-        int? DeviceId,
+        int DeviceId,
+        int ZoneId,
+        double Temperature,
+        double HumidityAir,
+        double HumiditySoil,
+        double LightIntensity,
         DateTime? Timestamp);
 
-    /// <summary>Ingesta una lectura (misma lógica que <c>telemetry.received</c> por RabbitMQ).</summary>
+    /// <summary>Ingesta un paquete de telemetría del ESP32 (misma lógica que <c>telemetry.received</c> por RabbitMQ).</summary>
     [HttpPost("ingest")]
     public async Task<IActionResult> Ingest(
         [FromBody] IngestReadingRequest request,
@@ -26,17 +30,22 @@ public sealed class TelemetryIngestController(ITelemetryIngestService ingestServ
     {
         if (!CanIngest()) return Forbid();
 
-        if (request.SensorId <= 0)
-            return BadRequest(new { message = "SensorId inválido." });
+        if (request.DeviceId <= 0)
+            return BadRequest(new { message = "DeviceId inválido." });
+        if (request.ZoneId <= 0)
+            return BadRequest(new { message = "ZoneId inválido." });
 
         var evt = new TelemetryReceivedIntegrationEvent(
-            request.DeviceId ?? 0,
-            request.SensorId,
-            request.Value,
+            request.DeviceId,
+            request.ZoneId,
+            request.Temperature,
+            request.HumidityAir,
+            request.HumiditySoil,
+            request.LightIntensity,
             request.Timestamp?.ToUniversalTime() ?? DateTime.UtcNow);
 
         await ingestService.IngestAsync(evt, cancellationToken);
-        return Accepted(new { sensorId = request.SensorId, ingested = true });
+        return Accepted(new { deviceId = request.DeviceId, zoneId = request.ZoneId, ingested = true });
     }
 
     private bool CanIngest() =>

@@ -31,10 +31,16 @@ public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : 
         modelBuilder.Entity<SensorReading>(entity =>
         {
             entity.ToTable("sensor_reading");
-            entity.HasKey(e => new { e.SensorId, e.Timestamp });
-            entity.Property(e => e.SensorId).HasColumnName("sensor_id");
+            entity.HasKey(e => new { e.DeviceId, e.Timestamp });
+            entity.Property(e => e.DeviceId).HasColumnName("device_id");
+            entity.Property(e => e.ZoneId).HasColumnName("zone_id");
             entity.Property(e => e.Timestamp).HasColumnName("timestamp").HasColumnType("timestamptz");
-            entity.Property(e => e.Value).HasColumnName("value");
+            entity.Property(e => e.Temperature).HasColumnName("temperature");
+            entity.Property(e => e.HumidityAir).HasColumnName("humidity_air");
+            entity.Property(e => e.HumiditySoil).HasColumnName("humidity_soil");
+            entity.Property(e => e.LightIntensity).HasColumnName("light_intensity");
+            entity.HasIndex(e => new { e.ZoneId, e.Timestamp })
+                  .HasDatabaseName("IX_sensor_reading_zone_id_timestamp");
         });
 
         modelBuilder.Entity<ActiveThreshold>(entity =>

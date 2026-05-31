@@ -23,7 +23,6 @@ public sealed class TelemetryController(
         int zoneId,
         [FromQuery] DateTime? startTime,
         [FromQuery] DateTime? endTime,
-        [FromQuery] string[]? sensorTypes,
         [FromQuery] int limit = 1000,
         CancellationToken cancellationToken = default)
     {
@@ -37,7 +36,6 @@ public sealed class TelemetryController(
             zoneId,
             startTime,
             endTime,
-            sensorTypes,
             Math.Clamp(limit, 1, 10_000),
             cancellationToken);
 
@@ -48,12 +46,14 @@ public sealed class TelemetryController(
         {
             zoneId = history.ZoneId,
             period = new { start = history.Start, end = history.End },
-            sensors = history.Sensors.Select(s => new
+            readings = history.Readings.Select(r => new
             {
-                sensorId = s.SensorId,
-                type = s.Type,
-                unit = s.Unit,
-                readings = s.Readings.Select(r => new { value = r.Value, timestamp = r.Timestamp })
+                deviceId = r.DeviceId,
+                timestamp = r.Timestamp,
+                temperature = r.Temperature,
+                humidityAir = r.HumidityAir,
+                humiditySoil = r.HumiditySoil,
+                lightIntensity = r.LightIntensity
             })
         });
     }

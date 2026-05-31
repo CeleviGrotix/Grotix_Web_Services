@@ -13,14 +13,14 @@ public sealed class SensorReadingRepository(TelemetryDbContext db) : ISensorRead
         await db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<SensorReading>> ListBySensorAsync(
-        int sensorId,
+    public async Task<IReadOnlyList<SensorReading>> ListByZoneAsync(
+        int zoneId,
         DateTime? start,
         DateTime? end,
         int limit,
         CancellationToken cancellationToken = default)
     {
-        var query = db.SensorReadings.AsNoTracking().Where(r => r.SensorId == sensorId);
+        var query = db.SensorReadings.AsNoTracking().Where(r => r.ZoneId == zoneId);
         if (start.HasValue)
             query = query.Where(r => r.Timestamp >= start.Value);
         if (end.HasValue)
@@ -32,14 +32,9 @@ public sealed class SensorReadingRepository(TelemetryDbContext db) : ISensorRead
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<double?> GetLatestSmoothedValueAsync(int sensorId, CancellationToken cancellationToken = default)
-    {
-        var reading = await db.SensorReadings.AsNoTracking()
-            .Where(r => r.SensorId == sensorId)
+    public Task<SensorReading?> GetLatestByDeviceAsync(int deviceId, CancellationToken cancellationToken = default) =>
+        db.SensorReadings.AsNoTracking()
+            .Where(r => r.DeviceId == deviceId)
             .OrderByDescending(r => r.Timestamp)
-            .Select(r => (double?)r.Value)
             .FirstOrDefaultAsync(cancellationToken);
-
-        return reading;
-    }
 }

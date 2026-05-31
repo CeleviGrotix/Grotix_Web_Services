@@ -1,8 +1,8 @@
 using GrotixBackend.Contracts.Integration.Telemetry;
 using GrotixBackend.Telemetry.Application.Internal.Alerting;
 using GrotixBackend.Telemetry.Domain.Model.Entities;
+using GrotixBackend.Telemetry.Domain.Model.ValueObjects;
 using GrotixBackend.Telemetry.Domain.Repositories;
-using GrotixBackend.Telemetry.Domain.Services;
 
 namespace GrotixBackend.Telemetry.Application.Internal;
 
@@ -13,32 +13,35 @@ public sealed class TelemetryIngestService(
 {
     public async Task IngestAsync(TelemetryReceivedIntegrationEvent evt, CancellationToken cancellationToken = default)
     {
-        var sensor = await sensorRepository.GetByIdAsync(evt.SensorId, cancellationToken);
-        if (sensor == null)
-            return;
-
-        if (!ReadingRangeValidator.IsPhysicallyValid(sensor, evt.Value))
-            return;
-
-        var recent = await sensorReadingRepository.ListBySensorAsync(
-            evt.SensorId,
-            start: DateTime.UtcNow.AddHours(-1),
-            end: null,
-            limit: 5,
-            cancellationToken);
-
-        var recentValues = recent.Select(r => r.Value).ToList();
-        var smoothed = MovingAverageFilter.Smooth(recentValues, evt.Value);
-
         var reading = new SensorReading
         {
-            SensorId = evt.SensorId,
-            Value = smoothed,
+            DeviceId = evt.DeviceId,
+            ZoneId = evt.ZoneId,
+            Temperature = evt.Temperature,
+            HumidityAir = evt.HumidityAir,
+            HumiditySoil = evt.HumiditySoil,
+            LightIntensity = evt.LightIntensity,
             Timestamp = evt.Timestamp.ToUniversalTime()
         };
 
         await sensorReadingRepository.AddAsync(reading, cancellationToken);
 
-        await alertEvaluationService.EvaluateAsync(sensor, smoothed, reading.Timestamp, cancellationToken);
+        var sensors = await sensorRepository.ListByZoneAsync(evt.ZoneId, cancellationToken);
+        foreach (var sensor in sensors)
+        {
+            var value = ResolveFieldForSensor(sensor.Type, evt);
+            if (value is null) continue;
+            await alertEvaluationService.EvaluateAsync(sensor, value.Value, reading.Timestamp, cancellationToken);
+        }
     }
+
+    private static double? ResolveFieldForSensor(string sensorType, TelemetryReceivedIntegrationEvent evt) =>
+        sensorType.ToUpperInvariant() switch
+        {
+            SensorTypes.AirTemperature => evt.Temperature,
+            SensorTypes.AirHumidity    => evt.HumidityAir,
+            SensorTypes.SoilMoisture   => evt.HumiditySoil,
+            SensorTypes.LightIntensity => evt.LightIntensity,
+            _ => null
+        };
 }

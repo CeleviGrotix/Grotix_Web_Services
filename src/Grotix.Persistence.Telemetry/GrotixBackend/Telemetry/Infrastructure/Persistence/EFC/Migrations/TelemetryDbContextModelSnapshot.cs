@@ -189,19 +189,38 @@ namespace GrotixBackend.Telemetry.Infrastructure.Persistence.EFC.Migrations
 
             modelBuilder.Entity("GrotixBackend.Telemetry.Domain.Model.Entities.SensorReading", b =>
                 {
-                    b.Property<int>("SensorId")
+                    b.Property<int>("DeviceId")
                         .HasColumnType("integer")
-                        .HasColumnName("sensor_id");
+                        .HasColumnName("device_id");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamptz")
                         .HasColumnName("timestamp");
 
-                    b.Property<double>("Value")
-                        .HasColumnType("double precision")
-                        .HasColumnName("value");
+                    b.Property<int>("ZoneId")
+                        .HasColumnType("integer")
+                        .HasColumnName("zone_id");
 
-                    b.HasKey("SensorId", "Timestamp");
+                    b.Property<double>("Temperature")
+                        .HasColumnType("double precision")
+                        .HasColumnName("temperature");
+
+                    b.Property<double>("HumidityAir")
+                        .HasColumnType("double precision")
+                        .HasColumnName("humidity_air");
+
+                    b.Property<double>("HumiditySoil")
+                        .HasColumnType("double precision")
+                        .HasColumnName("humidity_soil");
+
+                    b.Property<double>("LightIntensity")
+                        .HasColumnType("double precision")
+                        .HasColumnName("light_intensity");
+
+                    b.HasKey("DeviceId", "Timestamp");
+
+                    b.HasIndex("ZoneId", "Timestamp")
+                        .HasDatabaseName("IX_sensor_reading_zone_id_timestamp");
 
                     b.ToTable("sensor_reading", (string)null);
                 });

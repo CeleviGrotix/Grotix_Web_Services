@@ -1,8 +1,11 @@
 namespace GrotixBackend.Contracts.Integration.Telemetry;
 
-/// <summary>Lectura capturada en el Edge y publicada al broker.</summary>
+/// <summary>Paquete de telemetría completo capturado en el Edge y publicado al broker.</summary>
 public sealed record TelemetryReceivedIntegrationEvent(
     int DeviceId,
-    int SensorId,
-    double Value,
+    int ZoneId,
+    double Temperature,
+    double HumidityAir,
+    double HumiditySoil,
+    double LightIntensity,
     DateTime Timestamp);
