@@ -21,6 +21,14 @@ public class AssociationController(
         return Ok(list.Select(a => new AssociationResource(a.Id, a.Name, a.ContactEmail.Value)).ToList());
     }
 
+    [HttpGet("{associationId:int}")]
+    public async Task<IActionResult> GetById(int associationId)
+    {
+        var entity = await associationRepository.GetByIdAsync(associationId);
+        if (entity == null) return NotFound();
+        return Ok(new AssociationResource(entity.Id, entity.Name, entity.ContactEmail.Value));
+    }
+
     public record CreateAssociationRequest(string Name, string Email);
 
     [HttpPost]
