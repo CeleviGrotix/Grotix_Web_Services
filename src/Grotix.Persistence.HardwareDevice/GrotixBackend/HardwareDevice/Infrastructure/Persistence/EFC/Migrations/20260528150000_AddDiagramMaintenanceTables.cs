@@ -1,3 +1,5 @@
+using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -5,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Migrations;
 
-/// <inheritdoc />
+[DbContext(typeof(HardwareDeviceDbContext))]
 [Migration("20260528150000_AddDiagramMaintenanceTables")]
 public partial class AddDiagramMaintenanceTables : Migration
 {

@@ -1,9 +1,12 @@
+using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migrations;
 
+[DbContext(typeof(CultivationAreaDbContext))]
 [Migration("20260531190000_SplitCropHumidityFields")]
 public partial class SplitCropHumidityFields : Migration
 {

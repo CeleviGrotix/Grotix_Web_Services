@@ -1,3 +1,5 @@
+using GrotixBackend.Shared.Infrastructure.Persistence.EFC.Configuration;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -5,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migrations;
 
-/// <inheritdoc />
+[DbContext(typeof(CultivationAreaDbContext))]
 [Migration("20260528150000_AddAnalysisReport")]
 public partial class AddAnalysisReport : Migration
 {

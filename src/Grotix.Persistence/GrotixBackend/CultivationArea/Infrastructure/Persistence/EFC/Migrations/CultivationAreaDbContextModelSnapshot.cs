@@ -45,12 +45,10 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                         .HasColumnType("int");
 
                     b.Property<double>("OptimalHumidityAir")
-                        .HasColumnType("double")
-                        .HasColumnName("OptimalHumidityAir");
+                        .HasColumnType("double");
 
                     b.Property<double>("OptimalHumiditySoil")
-                        .HasColumnType("double")
-                        .HasColumnName("OptimalHumiditySoil");
+                        .HasColumnType("double");
 
                     b.Property<double>("OptimalLight")
                         .HasColumnType("double");
