@@ -44,8 +44,13 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                     b.Property<int>("MaxStressTime")
                         .HasColumnType("int");
 
-                    b.Property<double>("OptimalHumidity")
-                        .HasColumnType("double");
+                    b.Property<double>("OptimalHumidityAir")
+                        .HasColumnType("double")
+                        .HasColumnName("OptimalHumidityAir");
+
+                    b.Property<double>("OptimalHumiditySoil")
+                        .HasColumnType("double")
+                        .HasColumnName("OptimalHumiditySoil");
 
                     b.Property<double>("OptimalLight")
                         .HasColumnType("double");

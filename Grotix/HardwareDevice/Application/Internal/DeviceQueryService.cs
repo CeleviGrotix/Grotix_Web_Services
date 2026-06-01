@@ -88,24 +88,19 @@ public sealed class DeviceQueryService(
             sensors = sensors.Where(s => normalized.Contains(s.Type)).ToList();
         }
 
-        var readings = new List<SensorReadingSnapshot>();
-        foreach (var sensor in sensors)
-        {
-            var latest = await sensorReadingRepository.ListBySensorAsync(
-                sensor.Id,
-                start: DateTime.UtcNow.AddDays(-7),
-                end: null,
-                limit: 1);
+        var latestReading = await sensorReadingRepository.GetLatestByDeviceAsync(deviceId);
 
-            if (latest.Count == 0)
-                continue;
-
-            readings.Add(new SensorReadingSnapshot(
-                sensor.Id,
-                sensor.Type,
-                latest[0].Value,
-                sensor.Unit));
-        }
+        var readings = sensors
+            .Select(sensor =>
+            {
+                var value = MapSensorValue(latestReading, sensor.Type);
+                return value.HasValue
+                    ? new SensorReadingSnapshot(sensor.Id, sensor.Type, value.Value, sensor.Unit)
+                    : null;
+            })
+            .Where(r => r != null)
+            .Select(r => r!)
+            .ToList();
 
         return new DeviceTelemetrySnapshot(
             device.Id,
@@ -114,4 +109,15 @@ public sealed class DeviceQueryService(
             device.BatteryLevel,
             device.SignalStrength);
     }
+
+    private static double? MapSensorValue(
+        Telemetry.Domain.Model.Entities.SensorReading? reading, string sensorType) =>
+        reading == null ? null : sensorType.ToUpperInvariant() switch
+        {
+            Telemetry.Domain.Model.ValueObjects.SensorTypes.AirTemperature => reading.Temperature,
+            Telemetry.Domain.Model.ValueObjects.SensorTypes.AirHumidity    => reading.HumidityAir,
+            Telemetry.Domain.Model.ValueObjects.SensorTypes.SoilMoisture   => reading.HumiditySoil,
+            Telemetry.Domain.Model.ValueObjects.SensorTypes.LightIntensity => reading.LightIntensity,
+            _ => null
+        };
 }

@@ -165,7 +165,7 @@ public sealed class IrrigationScheduleManagerHostedService(
             return true;
         }
 
-        if (!context.CurrentHumidityPercent.HasValue)
+        if (!context.CurrentHumiditySoilPercent.HasValue)
         {
             logger.LogInformation(
                 "Skipping scheduled irrigation for zone {ZoneId}: rain expected and no current humidity.",
@@ -173,7 +173,7 @@ public sealed class IrrigationScheduleManagerHostedService(
             return true;
         }
 
-        var humidityDeficit = context.OptimalHumidity - context.CurrentHumidityPercent.Value;
+        var humidityDeficit = context.OptimalHumiditySoil - context.CurrentHumiditySoilPercent.Value;
         if (humidityDeficit <= _weatherOptions.HumidityDeficitThresholdPercent)
         {
             logger.LogInformation(

@@ -1,16 +1,13 @@
 using GrotixBackend.CultivationArea.Application.Internal.QueryServices;
 using GrotixBackend.CultivationArea.Domain.Model.Queries;
-using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
 using GrotixBackend.IrrigationCycle.Application.ACL;
 using GrotixBackend.Telemetry.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace GrotixBackend.IrrigationCycle.Infrastructure.Integration;
 
 public sealed class IrrigationContextService(
     IZoneQueryService zoneQueryService,
     ICropQueryService cropQueryService,
-    HardwareDeviceDbContext hardwareDb,
     ISensorReadingRepository sensorReadingRepository) : IIrrigationContextService
 {
     public async Task<IrrigationZoneContext?> GetZoneContextAsync(
@@ -25,22 +22,17 @@ public sealed class IrrigationContextService(
         if (crop == null)
             return null;
 
-        var humiditySensor = await hardwareDb.Sensors.AsNoTracking()
-            .Where(s => s.ZoneId == zoneId)
-            .Where(s => s.Type.Contains("HUMID") || s.Type.Contains("MOIST"))
-            .OrderBy(s => s.Id)
-            .FirstOrDefaultAsync(cancellationToken);
+        var latestReadings = await sensorReadingRepository.ListByZoneAsync(
+            zoneId, start: null, end: null, limit: 1, cancellationToken);
 
-        double? currentHumidity = null;
-        if (humiditySensor != null)
-            currentHumidity = await sensorReadingRepository.GetLatestSmoothedValueAsync(
-                humiditySensor.Id,
-                cancellationToken);
+        double? currentHumiditySoil = latestReadings.Count > 0
+            ? latestReadings[0].HumiditySoil
+            : null;
 
         return new IrrigationZoneContext(
             zoneId,
             zone.CropId,
-            crop.OptimalHumidity,
-            currentHumidity);
+            crop.OptimalHumiditySoil,
+            currentHumiditySoil);
     }
 }

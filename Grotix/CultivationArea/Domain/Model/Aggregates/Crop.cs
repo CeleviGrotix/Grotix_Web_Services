@@ -7,7 +7,8 @@ public class Crop
     public string CommonName { get; private set; } = null!;
     public string ScientificName { get; private set; } = null!;
     public double OptimalTemperature { get; private set; }
-    public double OptimalHumidity { get; private set; }
+    public double OptimalHumidityAir { get; private set; }
+    public double OptimalHumiditySoil { get; private set; }
     public double OptimalLight { get; private set; }
     public int MaxStressTime { get; private set; }
     public string? ImageUrl { get; private set; }
@@ -18,7 +19,8 @@ public class Crop
         string commonName,
         string scientificName,
         double optimalTemperature,
-        double optimalHumidity,
+        double optimalHumidityAir,
+        double optimalHumiditySoil,
         double optimalLight,
         int maxStressTime,
         string? imageUrl = null)
@@ -33,7 +35,8 @@ public class Crop
         CommonName = commonName.Trim();
         ScientificName = scientificName.Trim();
         OptimalTemperature = optimalTemperature;
-        OptimalHumidity = optimalHumidity;
+        OptimalHumidityAir = optimalHumidityAir;
+        OptimalHumiditySoil = optimalHumiditySoil;
         OptimalLight = optimalLight;
         MaxStressTime = maxStressTime;
         ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
@@ -41,14 +44,16 @@ public class Crop
 
     public void UpdateBiologicalProfile(
         double optimalTemperature,
-        double optimalHumidity,
+        double optimalHumidityAir,
+        double optimalHumiditySoil,
         double optimalLight,
         int maxStressTime)
     {
         if (maxStressTime < 0)
             throw new ArgumentException("MaxStressTime debe ser >= 0.");
         OptimalTemperature = optimalTemperature;
-        OptimalHumidity = optimalHumidity;
+        OptimalHumidityAir = optimalHumidityAir;
+        OptimalHumiditySoil = optimalHumiditySoil;
         OptimalLight = optimalLight;
         MaxStressTime = maxStressTime;
     }

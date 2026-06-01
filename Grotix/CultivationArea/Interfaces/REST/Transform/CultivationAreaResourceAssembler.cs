@@ -12,6 +12,7 @@ public static class CultivationAreaResourceAssembler
         new(z.Id, z.FarmId, z.CropId, z.CurrentPhase, z.PhaseStartDate, z.ImageUrl, z.Latitude, z.Longitude);
 
     public static CropResource ToCropResource(Crop c) =>
-        new(c.Id, c.CommonName, c.ScientificName, c.OptimalTemperature, c.OptimalHumidity, c.OptimalLight,
+        new(c.Id, c.CommonName, c.ScientificName, c.OptimalTemperature,
+            c.OptimalHumidityAir, c.OptimalHumiditySoil, c.OptimalLight,
             c.MaxStressTime, c.ImageUrl);
 }

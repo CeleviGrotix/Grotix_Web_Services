@@ -8,5 +8,5 @@ public interface IIrrigationContextService
 public sealed record IrrigationZoneContext(
     int ZoneId,
     int CropId,
-    double OptimalHumidity,
-    double? CurrentHumidityPercent);
+    double OptimalHumiditySoil,
+    double? CurrentHumiditySoilPercent);

@@ -35,7 +35,8 @@ public class CatalogController(
         string CommonName,
         string ScientificName,
         double OptimalTemperature,
-        double OptimalHumidity,
+        double OptimalHumidityAir,
+        double OptimalHumiditySoil,
         double OptimalLight,
         int MaxStressTime,
         string? ImageUrl = null);
@@ -50,7 +51,8 @@ public class CatalogController(
                 request.CommonName,
                 request.ScientificName,
                 request.OptimalTemperature,
-                request.OptimalHumidity,
+                request.OptimalHumidityAir,
+                request.OptimalHumiditySoil,
                 request.OptimalLight,
                 request.MaxStressTime,
                 request.ImageUrl));
@@ -67,7 +69,8 @@ public class CatalogController(
         string CommonName,
         string ScientificName,
         double OptimalTemperature,
-        double OptimalHumidity,
+        double OptimalHumidityAir,
+        double OptimalHumiditySoil,
         double OptimalLight,
         int MaxStressTime,
         string? ImageUrl = null);
@@ -84,7 +87,8 @@ public class CatalogController(
                 request.CommonName,
                 request.ScientificName,
                 request.OptimalTemperature,
-                request.OptimalHumidity,
+                request.OptimalHumidityAir,
+                request.OptimalHumiditySoil,
                 request.OptimalLight,
                 request.MaxStressTime,
                 request.ImageUrl));

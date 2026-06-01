@@ -28,8 +28,8 @@ public sealed class IrrigationCommandService(
 
         var context = await irrigationContextService.GetZoneContextAsync(zoneId, cancellationToken);
         var volume = volumeLiters ?? IrrigationCalculator.CalculateVolumeLiters(
-            context?.CurrentHumidityPercent,
-            context?.OptimalHumidity);
+            context?.CurrentHumiditySoilPercent,
+            context?.OptimalHumiditySoil);
         var duration = IrrigationCalculator.ResolveDurationMinutes(volume, durationMinutes);
 
         var cycle = new IrrigationCycleRecord(zoneId, volume, duration);

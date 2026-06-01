@@ -22,7 +22,8 @@ public class CropCommandService(
             command.CommonName,
             command.ScientificName,
             command.OptimalTemperature,
-            command.OptimalHumidity,
+            command.OptimalHumidityAir,
+            command.OptimalHumiditySoil,
             command.OptimalLight,
             command.MaxStressTime,
             command.ImageUrl);
@@ -47,7 +48,8 @@ public class CropCommandService(
         crop.UpdateNames(command.CommonName, command.ScientificName);
         crop.UpdateBiologicalProfile(
             command.OptimalTemperature,
-            command.OptimalHumidity,
+            command.OptimalHumidityAir,
+            command.OptimalHumiditySoil,
             command.OptimalLight,
             command.MaxStressTime);
         crop.UpdateImageUrl(command.ImageUrl);

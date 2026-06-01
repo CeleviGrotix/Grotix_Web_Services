@@ -15,7 +15,8 @@ public static partial class AppDbContextModelConfiguration
             e.Property(c => c.CommonName).HasMaxLength(120).IsRequired();
             e.Property(c => c.ScientificName).HasMaxLength(180).IsRequired();
             e.Property(c => c.OptimalTemperature);
-            e.Property(c => c.OptimalHumidity);
+            e.Property(c => c.OptimalHumidityAir).HasColumnName("OptimalHumidityAir");
+            e.Property(c => c.OptimalHumiditySoil).HasColumnName("OptimalHumiditySoil");
             e.Property(c => c.OptimalLight);
             e.Property(c => c.MaxStressTime);
             e.Property(c => c.ImageUrl).HasColumnName("ImageURL").HasMaxLength(512);
