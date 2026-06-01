@@ -1,4 +1,4 @@
-# ============================================================
+	# ============================================================
 # Grotix — Aplicar todas las migraciones
 # Uso: .\migrate.ps1
 # ============================================================
@@ -17,17 +17,17 @@ function Run-Migration {
     Write-Host ""
     Write-Host "[$Label]" -ForegroundColor Cyan
 
-    $connString = "Server=127.0.0.1;Port=3306;Database=grotix_core;Uid=root;Pwd=root;"
-
-    if ($Label -like "*Telemetry*") {
-        $connString = "Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=Grotix2026!;"
-    }
+    # --- NUEVAS LÍNEAS PARA FORZAR LA CONFIGURACIÓN ---
+    $env:TokenSettings__Secret="EstaEsUnaClaveSuperSecretaParaGrotix2024"
+    $env:ConnectionStrings__DefaultConnection="Server=127.0.0.1;Port=3306;Database=grotix_core;Uid=root;Pwd=root;"
+    $env:ConnectionStrings__TelemetryTimescale="Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=Grotix2026!;"
+    # --------------------------------------------------
 
     $args = @(
         "ef", "database", "update",
         "--context", $Context,
         "--project", $Project,
-        "--connection", $connString
+        "--connection", ($Label -like "*Telemetry*" ? "Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=Grotix2026!;" : "Server=127.0.0.1;Port=3306;Database=grotix_core;Uid=root;Pwd=root;")
     )
     
     if ($StartupProject) {
