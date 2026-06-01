@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Compile Remove="**\*.cs" />
+    <Compile Include="IrrigationCycleDbContextFactory.cs" />
     <Compile Include="..\..\Grotix\IrrigationCycle\Infrastructure\Persistence\**\*.cs" />
     <Compile Include="..\..\Grotix\IrrigationCycle\Infrastructure\Repositories\**\*.cs" />
     <Compile Include="..\..\Grotix\IrrigationCycle\Infrastructure\Integration\**\*.cs" />
