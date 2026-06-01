@@ -17,11 +17,19 @@ function Run-Migration {
     Write-Host ""
     Write-Host "[$Label]" -ForegroundColor Cyan
 
+    $connString = "Server=127.0.0.1;Port=3306;Database=grotix_core;Uid=root;Pwd=root;"
+
+    if ($Label -like "*Telemetry*") {
+        $connString = "Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=Grotix2026!;"
+    }
+
     $args = @(
         "ef", "database", "update",
         "--context", $Context,
-        "--project", $Project
+        "--project", $Project,
+        "--connection", $connString
     )
+    
     if ($StartupProject) {
         $args += "--startup-project", $StartupProject
     }
