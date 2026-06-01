@@ -17,24 +17,32 @@ function Run-Migration {
     Write-Host ""
     Write-Host "[$Label]" -ForegroundColor Cyan
 
-    # --- NUEVAS LÍNEAS PARA FORZAR LA CONFIGURACIÓN ---
+    # 1. Forzamos las variables de entorno en la sesión actual
     $env:TokenSettings__Secret="EstaEsUnaClaveSuperSecretaParaGrotix2024"
     $env:ConnectionStrings__DefaultConnection="Server=127.0.0.1;Port=3306;Database=grotix_core;Uid=root;Pwd=root;"
     $env:ConnectionStrings__TelemetryTimescale="Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=Grotix2026!;"
-    # --------------------------------------------------
 
-    $args = @(
+    # 2. Elegimos la cadena de conexión según el Label
+    $selectedConn = "Server=127.0.0.1;Port=3306;Database=grotix_core;Uid=root;Pwd=root;"
+    if ($Label -like "*Telemetry*") {
+        $selectedConn = "Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=Grotix2026!;"
+    }
+
+    # 3. Armamos los argumentos
+    $cmdArgs = @(
         "ef", "database", "update",
         "--context", $Context,
         "--project", $Project,
-        "--connection", ($Label -like "*Telemetry*" ? "Host=localhost;Port=5432;Database=grotix_telemetry;Username=postgres;Password=Grotix2026!;" : "Server=127.0.0.1;Port=3306;Database=grotix_core;Uid=root;Pwd=root;")
+        "--connection", $selectedConn
     )
-    
+
     if ($StartupProject) {
-        $args += "--startup-project", $StartupProject
+        $cmdArgs += "--startup-project"
+        $cmdArgs += $StartupProject
     }
 
-    & dotnet @args
+    # 4. Ejecutamos
+    & dotnet @cmdArgs
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "  FALLO: $Label" -ForegroundColor Red
