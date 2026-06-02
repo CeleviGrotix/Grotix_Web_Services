@@ -45,6 +45,7 @@ public static partial class AppDbContextModelConfiguration
             e.Property(z => z.Id).HasColumnName("ZoneID").ValueGeneratedOnAdd();
             e.Property(z => z.FarmId).HasColumnName("FarmID");
             e.Property(z => z.CropId).HasColumnName("CropID");
+            e.Property(z => z.Name).HasMaxLength(120).IsRequired();
             e.Property(z => z.CurrentPhase).HasMaxLength(80);
             e.Property(z => z.PhaseStartDate);
             e.Property(z => z.ImageUrl).HasColumnName("ImageURL").HasMaxLength(512);

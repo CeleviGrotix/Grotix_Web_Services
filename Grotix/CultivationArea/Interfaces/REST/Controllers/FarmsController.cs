@@ -139,6 +139,7 @@ public class FarmsController(
     }
 
     public record CreateZoneRequest(
+        string Name,
         int CropId,
         double Latitude,
         double Longitude,
@@ -157,6 +158,7 @@ public class FarmsController(
             var zone = await zoneCommandService.Handle(new CreateZoneCommand(
                 farmId,
                 request.CropId,
+                request.Name,
                 request.Latitude,
                 request.Longitude,
                 request.CurrentPhase,

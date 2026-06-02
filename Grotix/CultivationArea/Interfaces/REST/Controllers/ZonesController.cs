@@ -32,6 +32,7 @@ public class ZonesController(
     }
 
     public record PatchZoneRequest(
+        string? Name,
         int? CropId,
         double? Latitude,
         double? Longitude,
@@ -49,6 +50,7 @@ public class ZonesController(
         {
             var updated = await zoneCommandService.Handle(new UpdateZoneCommand(
                 zoneId,
+                request.Name,
                 request.CropId,
                 request.Latitude,
                 request.Longitude,

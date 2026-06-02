@@ -141,6 +141,11 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                     b.Property<double>("Longitude")
                         .HasColumnType("double");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
                     b.Property<DateTime?>("PhaseStartDate")
                         .HasColumnType("datetime(6)");
 

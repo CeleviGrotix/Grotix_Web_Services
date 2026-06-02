@@ -18,6 +18,7 @@ public class ZoneCommandService(
         var zone = new Zone(
             command.FarmId,
             command.CropId,
+            command.Name,
             command.Latitude,
             command.Longitude,
             command.CurrentPhase,
@@ -46,6 +47,9 @@ public class ZoneCommandService(
 
         if (command.Latitude.HasValue && command.Longitude.HasValue)
             zone.UpdateCoordinates(command.Latitude.Value, command.Longitude.Value);
+
+        if (command.Name != null)
+            zone.UpdateName(command.Name);
 
         if (command.CurrentPhase != null || command.PhaseStartDate.HasValue)
             zone.UpdatePhase(command.CurrentPhase ?? zone.CurrentPhase, command.PhaseStartDate ?? zone.PhaseStartDate);

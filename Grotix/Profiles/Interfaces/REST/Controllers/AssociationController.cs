@@ -1,4 +1,7 @@
+using GrotixBackend.Contracts.Auth.Claims;
+using GrotixBackend.Profiles.Application.Internal.QueryServices;
 using GrotixBackend.Profiles.Domain.Model.Aggregates;
+using GrotixBackend.Profiles.Domain.Model.Queries;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +15,7 @@ namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 [Authorize(Roles = "admin,staff")]
 public class AssociationController(
     IAssociationRepository associationRepository,
+    IUserQueryService userQueryService,
     IProfilesUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet]
@@ -26,6 +30,24 @@ public class AssociationController(
     {
         var entity = await associationRepository.GetByIdAsync(associationId);
         if (entity == null) return NotFound();
+        return Ok(new AssociationResource(entity.Id, entity.Name, entity.ContactEmail.Value));
+    }
+
+    /// <summary>Devuelve la asociación a la que pertenece el usuario autenticado.</summary>
+    [HttpGet("mine")]
+    [Authorize]
+    public async Task<IActionResult> GetMine()
+    {
+        var identityId = User.GetIdentityId();
+        if (identityId == null) return Unauthorized();
+
+        var user = await userQueryService.Handle(new GetUserByIdentityQuery(identityId.Value));
+        if (user?.AssociationId == null)
+            return NotFound(new { message = "No perteneces a ninguna asociación." });
+
+        var entity = await associationRepository.GetByIdAsync(user.AssociationId.Value);
+        if (entity == null) return NotFound();
+
         return Ok(new AssociationResource(entity.Id, entity.Name, entity.ContactEmail.Value));
     }
 

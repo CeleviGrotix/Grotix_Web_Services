@@ -6,6 +6,7 @@ public class Zone
     public int Id { get; private set; }
     public int FarmId { get; private set; }
     public int CropId { get; private set; }
+    public string Name { get; private set; } = null!;
     public string? CurrentPhase { get; private set; }
     public DateTime? PhaseStartDate { get; private set; }
     public string? ImageUrl { get; private set; }
@@ -17,6 +18,7 @@ public class Zone
     public Zone(
         int farmId,
         int cropId,
+        string name,
         double latitude,
         double longitude,
         string? currentPhase = null,
@@ -25,13 +27,23 @@ public class Zone
     {
         if (farmId <= 0 || cropId <= 0)
             throw new ArgumentException("FarmId y CropId deben ser válidos.");
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("El nombre de la zona no puede estar vacío.");
         FarmId = farmId;
         CropId = cropId;
+        Name = name.Trim();
         Latitude = latitude;
         Longitude = longitude;
         CurrentPhase = string.IsNullOrWhiteSpace(currentPhase) ? null : currentPhase.Trim();
         PhaseStartDate = phaseStartDate;
         ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
+    }
+
+    public void UpdateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("El nombre de la zona no puede estar vacío.");
+        Name = name.Trim();
     }
 
     public void ReassignCrop(int cropId)
