@@ -15,6 +15,8 @@ public interface IDeviceQueryService
     Task<DeviceStatusInfo?> GetStatusAsync(int deviceId);
 
     Task<DeviceTelemetrySnapshot?> GetTelemetryAsync(int deviceId, IReadOnlyList<string>? sensorTypes);
+
+    Task<ZoneHealthResult> GetZoneHealthAsync(int zoneId);
 }
 
 public sealed record DeviceDetail(
@@ -43,3 +45,16 @@ public sealed record DeviceTelemetrySnapshot(
     int? SignalStrength);
 
 public sealed record SensorReadingSnapshot(int SensorId, string Type, double Value, string Unit);
+
+public sealed record ZoneHealthResult(
+    int ZoneId,
+    bool AllActive,
+    int TotalDevices,
+    IReadOnlyList<ZoneDeviceHealth> Devices);
+
+public sealed record ZoneDeviceHealth(
+    int DeviceId,
+    string Model,
+    string Status,
+    DateTime? LastSeen,
+    bool IsActive);

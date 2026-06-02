@@ -110,6 +110,24 @@ public sealed class DeviceQueryService(
             device.SignalStrength);
     }
 
+    public async Task<ZoneHealthResult> GetZoneHealthAsync(int zoneId)
+    {
+        var devices = await deviceRepository.ListByZoneAsync(zoneId);
+
+        var deviceHealthList = devices
+            .Select(d => new ZoneDeviceHealth(
+                d.Id,
+                d.Model,
+                d.Status,
+                d.LastSeen,
+                d.Status == Domain.Model.ValueObjects.DeviceStatuses.Online))
+            .ToList();
+
+        var allActive = deviceHealthList.Count > 0 && deviceHealthList.All(d => d.IsActive);
+
+        return new ZoneHealthResult(zoneId, allActive, deviceHealthList.Count, deviceHealthList);
+    }
+
     private static double? MapSensorValue(
         Telemetry.Domain.Model.Entities.SensorReading? reading, string sensorType) =>
         reading == null ? null : sensorType.ToUpperInvariant() switch

@@ -337,6 +337,29 @@ public sealed class DevicesController(
         return Ok(new { zoneId = link.ZoneId, zoneName = link.ZoneName, cropName = link.CropName });
     }
 
+    [HttpGet("zones/{zoneId:int}/health")]
+    public async Task<IActionResult> GetZoneHealth(int zoneId, CancellationToken cancellationToken)
+    {
+        if (!CanRead()) return Forbid();
+        if (!await CanAccessZoneAsync(zoneId, cancellationToken)) return Forbid();
+
+        var result = await deviceQueryService.GetZoneHealthAsync(zoneId);
+        return Ok(new
+        {
+            zoneId = result.ZoneId,
+            allActive = result.AllActive,
+            totalDevices = result.TotalDevices,
+            devices = result.Devices.Select(d => new
+            {
+                deviceId = d.DeviceId,
+                model = d.Model,
+                status = d.Status,
+                lastSeen = d.LastSeen,
+                isActive = d.IsActive
+            })
+        });
+    }
+
     [HttpGet("zones/{zoneId:int}/devices")]
     public async Task<IActionResult> ListByZone(int zoneId, CancellationToken cancellationToken)
     {
