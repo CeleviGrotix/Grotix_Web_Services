@@ -12,13 +12,14 @@ namespace GrotixBackend.Profiles.Interfaces.REST.Controllers;
 /// <summary>Informe Profile: registro de asociaciones agrarias (Staff/Admin).</summary>
 [ApiController]
 [Route("api/v1/associations")]
-[Authorize(Roles = "admin,staff")]
+[Authorize]
 public class AssociationController(
     IAssociationRepository associationRepository,
     IUserQueryService userQueryService,
     IProfilesUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = "admin,staff")]
     public async Task<IActionResult> GetAll()
     {
         var list = await associationRepository.ListAsync();
@@ -26,6 +27,7 @@ public class AssociationController(
     }
 
     [HttpGet("{associationId:int}")]
+    [Authorize(Roles = "admin,staff")]
     public async Task<IActionResult> GetById(int associationId)
     {
         var entity = await associationRepository.GetByIdAsync(associationId);
@@ -35,7 +37,6 @@ public class AssociationController(
 
     /// <summary>Devuelve la asociación a la que pertenece el usuario autenticado.</summary>
     [HttpGet("mine")]
-    [Authorize]
     public async Task<IActionResult> GetMine()
     {
         var identityId = User.GetIdentityId();
