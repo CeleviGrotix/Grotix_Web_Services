@@ -26,13 +26,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IrrigationCycle.Api\IrrigationCycle.Api.csproj" />
-    <ProjectReference Include="..\..\Grotix\IrrigationCycle.Grotix.IrrigationCycle.csproj" /> </ItemGroup>
+    <ProjectReference Include="..\Profiles.Api\Profiles.Api.csproj" />
+    <ProjectReference Include="..\Grotix.Profiles\Grotix.Profiles.csproj" /> 
+    <ProjectReference Include="..\Grotix.Contracts.Auth\Grotix.Contracts.Auth.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
-    <None Update="Acceptance\Features\Irrigation.feature">
+    <None Update="Acceptance\Features\Profiles.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>Irrigation.feature.cs</LastGenOutput>
+      <LastGenOutput>Profiles.feature.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
