@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grotix.Persistence.Irrigati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrrigationCycle.Api", "src\IrrigationCycle.Api\IrrigationCycle.Api.csproj", "{0BE8CC94-259D-4983-A45E-DF8A96A44D67}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telemetry.Api.Tests", "src\Telemetry.Api.Tests\Telemetry.Api.Tests.csproj", "{6B47338A-AEDB-4754-8320-E4A142348207}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -309,6 +311,18 @@ Global
 		{0BE8CC94-259D-4983-A45E-DF8A96A44D67}.Release|x64.Build.0 = Release|Any CPU
 		{0BE8CC94-259D-4983-A45E-DF8A96A44D67}.Release|x86.ActiveCfg = Release|Any CPU
 		{0BE8CC94-259D-4983-A45E-DF8A96A44D67}.Release|x86.Build.0 = Release|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Debug|x64.Build.0 = Debug|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Debug|x86.Build.0 = Debug|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Release|x64.ActiveCfg = Release|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Release|x64.Build.0 = Release|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Release|x86.ActiveCfg = Release|Any CPU
+		{6B47338A-AEDB-4754-8320-E4A142348207}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -323,6 +337,7 @@ Global
 		{44788D4E-C74C-4C65-9832-11625721434E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{3623861A-C3A1-4BA6-B93E-FDC0FBA3AEBD} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{0BE8CC94-259D-4983-A45E-DF8A96A44D67} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{6B47338A-AEDB-4754-8320-E4A142348207} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9648BC11-DBE7-475A-A9E0-1E1D28BE2466}
