@@ -67,14 +67,14 @@ public class ZonesController(
 
     public sealed record AssignZoneMemberRequest(int UserId);
 
-    /// <summary>Lista personal asignado a la zona (permiso de visibilidad).</summary>
+    /// <summary>Lista personal asignado a la zona. Cualquier miembro de la zona puede ver la lista.</summary>
     [HttpGet("{zoneId:int}/members")]
     public async Task<IActionResult> ListMembers(int zoneId, CancellationToken cancellationToken = default)
     {
         var zone = await zoneQueryService.Handle(new GetZoneByIdQuery(zoneId));
         if (zone == null) return NotFound();
-        if (!await CanManageZoneMembersAsync(zone))
-            return StatusCode(StatusCodes.Status403Forbidden, new { message = "No tienes permiso para gestionar miembros de esta zona." });
+        if (!await CanAccessZoneAsync(zone))
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "No tienes acceso a esta zona." });
 
         var members = await zoneMemberService.ListAsync(zoneId, cancellationToken);
         return Ok(members.Select(m => new
