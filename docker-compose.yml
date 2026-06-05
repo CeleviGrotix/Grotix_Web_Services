@@ -1,0 +1,128 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────
+# Variables comunes reutilizables
+# ─────────────────────────────────────────────────────────────────
+x-common-env: &common-env
+  ASPNETCORE_ENVIRONMENT: Production
+  ASPNETCORE_URLS: http://+:8080
+  TokenSettings__Secret: ${JWT_SECRET:-EstaEsUnaClaveSuperSecretaParaGrotix2024}
+  # MySQL principal (Profiles, IAM, CultivationArea, Hardware, Irrigation)
+  ConnectionStrings__DefaultConnection: >-
+    Server=${MYSQL_HOST};Port=3306;Database=${MYSQL_DB:-grotix};
+    User=${MYSQL_USER:-grotix};Password=${MYSQL_PASSWORD};
+    SslMode=Required;
+  # TimescaleDB (Telemetry)
+  ConnectionStrings__TelemetryTimescale: >-
+    Host=${POSTGRES_HOST};Port=5432;Database=${POSTGRES_DB:-grotix_telemetry};
+    Username=${POSTGRES_USER:-grotix};Password=${POSTGRES_PASSWORD};
+    SSL Mode=Require;Trust Server Certificate=true;
+  # RabbitMQ (desactivado por defecto; activar si se despliega broker)
+  RabbitMq__Enabled: "false"
+  RabbitMq__HostName: ${RABBITMQ_HOST:-localhost}
+  RabbitMq__UserName: ${RABBITMQ_USER:-guest}
+  RabbitMq__Password: ${RABBITMQ_PASS:-guest}
+  Swagger__Enabled: "true"
+
+services:
+
+  # ── API Gateway (único punto público) ────────────────────────────
+  gateway:
+    build:
+      context: .
+      dockerfile: src/Gateway.Api/Dockerfile
+    image: grotix-gateway:local
+    ports:
+      - "5100:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      TokenSettings__Secret: ${JWT_SECRET:-EstaEsUnaClaveSuperSecretaParaGrotix2024}
+      # YARP clusters apuntan a los nombres de servicio Docker internos
+      ReverseProxy__Clusters__profiles-cluster__Destinations__d1__Address: http://profiles:8080/
+      ReverseProxy__Clusters__cultivation-cluster__Destinations__d1__Address: http://cultivation:8080/
+      ReverseProxy__Clusters__telemetry-cluster__Destinations__d1__Address: http://telemetry:8080/
+      ReverseProxy__Clusters__hardware-cluster__Destinations__d1__Address: http://hardware:8080/
+      ReverseProxy__Clusters__irrigation-cluster__Destinations__d1__Address: http://irrigation:8080/
+      ReverseProxy__Clusters__crop-analysis-cluster__Destinations__d1__Address: http://crop-analysis:8000/
+    depends_on:
+      - profiles
+      - cultivation
+      - telemetry
+      - hardware
+      - irrigation
+      - crop-analysis
+    restart: unless-stopped
+
+  # ── Profiles.Api ─────────────────────────────────────────────────
+  profiles:
+    build:
+      context: .
+      dockerfile: src/Profiles.Api/Dockerfile
+    image: grotix-profiles:local
+    environment:
+      <<: *common-env
+    restart: unless-stopped
+
+  # ── CultivationArea.Api ──────────────────────────────────────────
+  cultivation:
+    build:
+      context: .
+      dockerfile: src/CultivationArea.Api/Dockerfile
+    image: grotix-cultivation:local
+    environment:
+      <<: *common-env
+    restart: unless-stopped
+
+  # ── Telemetry.Api ────────────────────────────────────────────────
+  telemetry:
+    build:
+      context: .
+      dockerfile: src/Telemetry.Api/Dockerfile
+    image: grotix-telemetry:local
+    environment:
+      <<: *common-env
+    restart: unless-stopped
+
+  # ── HardwareDevice.Api ───────────────────────────────────────────
+  hardware:
+    build:
+      context: .
+      dockerfile: src/HardwareDevice.Api/Dockerfile
+    image: grotix-hardware:local
+    environment:
+      <<: *common-env
+    restart: unless-stopped
+
+  # ── IrrigationCycle.Api ──────────────────────────────────────────
+  irrigation:
+    build:
+      context: .
+      dockerfile: src/IrrigationCycle.Api/Dockerfile
+    image: grotix-irrigation:local
+    environment:
+      <<: *common-env
+    restart: unless-stopped
+
+  # ── CropAnalysis.Api (Python/FastAPI) ────────────────────────────
+  crop-analysis:
+    build:
+      context: ../crop-analysis/crop-analysis-service-base
+      dockerfile: Dockerfile
+    image: grotix-crop-analysis:local
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: "3306"
+      MYSQL_DB: ${CROP_MYSQL_DB:-grotix_crop_analysis}
+      MYSQL_USER: ${MYSQL_USER:-grotix}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-EstaEsUnaClaveSuperSecretaParaGrotix2024}
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://localhost:8002}
+      BASE_URL: http://localhost:5100
+    volumes:
+      # Montar storage para persistir imágenes (en Azure usar Azure File Share)
+      - crop_images:/app/storage/images
+    restart: unless-stopped
+
+volumes:
+  crop_images:

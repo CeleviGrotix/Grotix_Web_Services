@@ -32,14 +32,27 @@ public sealed class RabbitMqConnectionHolder(IOptions<RabbitMqOptions> options, 
 
             try
             {
-                var factory = new ConnectionFactory
+                ConnectionFactory factory;
+                if (!string.IsNullOrWhiteSpace(opt.Uri))
                 {
-                    HostName = opt.HostName,
-                    Port = opt.Port,
-                    UserName = opt.UserName,
-                    Password = opt.Password,
-                    VirtualHost = string.IsNullOrEmpty(opt.VirtualHost) ? "/" : opt.VirtualHost
-                };
+                    factory = new ConnectionFactory
+                    {
+                        Uri = new Uri(opt.Uri),
+                        AutomaticRecoveryEnabled = true
+                    };
+                }
+                else
+                {
+                    factory = new ConnectionFactory
+                    {
+                        HostName = opt.HostName,
+                        Port = opt.Port,
+                        UserName = opt.UserName,
+                        Password = opt.Password,
+                        VirtualHost = string.IsNullOrEmpty(opt.VirtualHost) ? "/" : opt.VirtualHost,
+                        AutomaticRecoveryEnabled = true
+                    };
+                }
                 _connection = factory.CreateConnection();
                 logger.LogInformation(
                     "RabbitMQ connected ({Host}:{Port}, vhost={VHost}).",

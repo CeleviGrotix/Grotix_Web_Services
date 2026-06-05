@@ -4,6 +4,12 @@ public sealed class RabbitMqOptions
 {
     public bool Enabled { get; set; } = true;
 
+    /// <summary>
+    /// URI completa del broker (p.ej. amqps://user:pass@host/vhost).
+    /// Cuando está configurada tiene prioridad sobre HostName/Port/UserName/Password/VirtualHost.
+    /// </summary>
+    public string? Uri { get; set; }
+
     public string HostName { get; set; } = "localhost";
 
     public int Port { get; set; } = 5672;

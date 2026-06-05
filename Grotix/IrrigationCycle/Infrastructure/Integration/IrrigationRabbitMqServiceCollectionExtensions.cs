@@ -1,4 +1,5 @@
 using GrotixBackend.BuildingBlocks.RabbitMq;
+using GrotixBackend.IrrigationCycle.Application.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,15 +13,19 @@ public static class IrrigationRabbitMqServiceCollectionExtensions
     {
         services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
 
+        services.AddHostedService<IrrigationCycleCompletionHostedService>();
+
         var enabled = configuration.GetValue("RabbitMq:Enabled", true);
         if (!enabled)
         {
             services.AddSingleton<IRabbitMqPublisher, NoOpRabbitMqPublisher>();
+            services.AddSingleton<IIrrigationCompletedPublisher, NoOpIrrigationCompletedPublisher>();
             return services;
         }
 
         services.AddSingleton<RabbitMqConnectionHolder>();
         services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
+        services.AddScoped<IIrrigationCompletedPublisher, RabbitMqIrrigationCompletedPublisher>();
         services.AddHostedService<IrrigationRabbitMqTopologyInitializer>();
         services.AddHostedService<RabbitMqAlertTriggeredConsumerHostedService>();
         services.AddHostedService<RabbitMqDeviceStatusChangedConsumerHostedService>();

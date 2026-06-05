@@ -18,11 +18,13 @@ public static class HardwareRabbitMqServiceCollectionExtensions
         if (!enabled)
         {
             services.AddSingleton<IRabbitMqPublisher, NoOpRabbitMqPublisher>();
+            services.AddSingleton<IDeviceStatusChangedPublisher, NoOpDeviceStatusChangedPublisher>();
             return services;
         }
 
         services.AddSingleton<RabbitMqConnectionHolder>();
         services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
+        services.AddSingleton<IDeviceStatusChangedPublisher, RabbitMqDeviceStatusChangedPublisher>();
         services.AddHostedService<HardwareRabbitMqTopologyInitializer>();
         services.AddScoped<IActuatorCommandOrchestrator, ActuatorCommandOrchestrator>();
         services.AddHostedService<RabbitMqActuatorCommandConsumerHostedService>();
