@@ -55,7 +55,8 @@ public sealed class AssociationMembersController(
                 name = m.Name,
                 email = m.Email.Value,
                 roleId = m.RoleId,
-                roleName = roles.TryGetValue(m.RoleId, out var roleName) ? roleName : "unknown"
+                roleName = roles.TryGetValue(m.RoleId, out var roleName) ? roleName : "unknown",
+                profilePicture = m.ProfilePicture
             })
             .ToList());
     }
