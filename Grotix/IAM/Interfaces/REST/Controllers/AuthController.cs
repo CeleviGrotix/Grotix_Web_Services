@@ -17,8 +17,23 @@ public class AuthController(IMediator mediator) : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var id = await mediator.Send(new CreateAccountCommand(request.Email, request.Password, request.InviteToken));
-        return StatusCode(201, new { message = "Registro exitoso.", identityId = id });
+        try
+        {
+            var id = await mediator.Send(new CreateAccountCommand(request.Email, request.Password, request.InviteToken));
+            return StatusCode(201, new { message = "Registro exitoso.", identityId = id });
+        }
+        catch (ApplicationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>Iniciar sesión.</summary>
