@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGrotixHardwareDeviceModule(this IServiceCollection services)
     {
         services.AddScoped<IZoneAccessService, ZoneAccessService>();
+        services.AddScoped<IStaffExistenceService, StaffExistenceService>();
         services.AddScoped<IDeviceQueryService, DeviceQueryService>();
         services.AddScoped<IDeviceCommandService, DeviceCommandService>();
         services.AddScoped<IDeviceDiagnosticService, DeviceDiagnosticService>();

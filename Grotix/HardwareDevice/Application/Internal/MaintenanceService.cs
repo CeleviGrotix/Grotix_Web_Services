@@ -1,3 +1,4 @@
+using GrotixBackend.HardwareDevice.Application.ACL;
 using GrotixBackend.HardwareDevice.Domain.Model.Entities;
 using GrotixBackend.HardwareDevice.Domain.Repositories;
 
@@ -7,6 +8,7 @@ public sealed class MaintenanceService(
     IMicrocontrollerRepository deviceRepository,
     IMaintenanceLogRepository maintenanceLogRepository,
     ITechnicalMaintenanceRepository technicalMaintenanceRepository,
+    IStaffExistenceService staffExistenceService,
     IHardwareDeviceUnitOfWork unitOfWork) : IMaintenanceService
 {
     public async Task<MaintenanceLog> RecordMaintenanceLogAsync(
@@ -35,6 +37,9 @@ public sealed class MaintenanceService(
     {
         if (await deviceRepository.GetByIdAsync(deviceId) == null)
             throw new KeyNotFoundException($"Device {deviceId} not found.");
+
+        if (!await staffExistenceService.ExistsAsync(staffId, cancellationToken))
+            throw new KeyNotFoundException($"Staff {staffId} no encontrado.");
 
         var record = new TechnicalMaintenance(staffId, deviceId, type, description, results: results);
         await technicalMaintenanceRepository.AddAsync(record, cancellationToken);
