@@ -1,3 +1,5 @@
+using GrotixBackend.HardwareDevice.Domain.Model.ValueObjects;
+
 namespace GrotixBackend.HardwareDevice.Domain.Model.Aggregates;
 
 /// <summary>Actuador asociado a un microcontrolador (tabla <c>actuator</c>).</summary>
@@ -20,8 +22,13 @@ public class DeviceActuator
         if (string.IsNullOrWhiteSpace(type))
             throw new ArgumentException("Type requerido.");
 
+        var normalizedType = ActuatorTypes.Normalize(type);
+        if (!ActuatorTypes.IsValid(normalizedType))
+            throw new ArgumentException(
+                $"Tipo de actuador no válido. Valores permitidos: {ActuatorTypes.AllowedValuesLabel()}.");
+
         MicrocontrollerId = microcontrollerId;
-        Type = type.Trim().ToUpperInvariant();
+        Type = normalizedType;
         Pin = pin;
     }
 

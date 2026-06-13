@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using GrotixBackend.HardwareDevice.Application.Internal;
 using GrotixBackend.HardwareDevice.Domain.Model.Aggregates;
+using GrotixBackend.HardwareDevice.Domain.Model.ValueObjects;
 using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
 using GrotixBackend.IrrigationCycle.Application.ACL;
 using Microsoft.EntityFrameworkCore;
@@ -52,12 +53,11 @@ public sealed class ActuatorControlService(
         if (deviceIds.Count == 0)
             return null;
 
+        var allowedTypes = ActuatorTypes.All.ToArray();
+
         return await hardwareDb.Actuators
             .Where(a => deviceIds.Contains(a.MicrocontrollerId))
-            .Where(a =>
-                a.Type.Contains("VALVE") ||
-                a.Type.Contains("PUMP") ||
-                a.Type.Contains("IRRIGATION"))
+            .Where(a => allowedTypes.Contains(a.Type))
             .OrderBy(a => a.Id)
             .FirstOrDefaultAsync(cancellationToken);
     }
