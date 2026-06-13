@@ -32,6 +32,7 @@ public static class HardwareDeviceSchemaConfiguration
             e.Property(s => s.Id).HasColumnName("SensorID").ValueGeneratedOnAdd();
             e.Property(s => s.MicrocontrollerId).HasColumnName("MicrocontrollerID");
             e.Property(s => s.ZoneId).HasColumnName("ZoneID");
+            e.Property(s => s.Model).HasMaxLength(64).IsRequired();
             e.Property(s => s.Type).HasMaxLength(64).IsRequired();
             e.Property(s => s.Unit).HasMaxLength(16).IsRequired();
             e.Property(s => s.Pin);

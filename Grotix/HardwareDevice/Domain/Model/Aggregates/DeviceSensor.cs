@@ -1,3 +1,6 @@
+using GrotixBackend.HardwareDevice.Domain.Model.ValueObjects;
+using GrotixBackend.Telemetry.Domain.Model.ValueObjects;
+
 namespace GrotixBackend.HardwareDevice.Domain.Model.Aggregates;
 
 /// <summary>Sensor físico asociado a un microcontrolador (tabla <c>sensor</c> en Core DB).</summary>
@@ -6,6 +9,7 @@ public class DeviceSensor
     public int Id { get; private set; }
     public int MicrocontrollerId { get; private set; }
     public int? ZoneId { get; private set; }
+    public string Model { get; private set; } = null!;
     public string Type { get; private set; } = null!;
     public string Unit { get; private set; } = null!;
     public int Pin { get; private set; }
@@ -18,6 +22,7 @@ public class DeviceSensor
 
     public DeviceSensor(
         int microcontrollerId,
+        string model,
         string type,
         string unit,
         int pin,
@@ -32,8 +37,18 @@ public class DeviceSensor
         if (string.IsNullOrWhiteSpace(unit))
             throw new ArgumentException("Unit requerido.");
 
+        Model = SensorModels.Normalize(model);
+        if (!SensorModels.IsKnown(Model))
+            throw new ArgumentException($"Model de sensor inválido. Valores: {SensorModels.AllowedModelsLabel()}.");
+
+        Type = SensorTypes.Normalize(type);
+        if (!SensorTypes.All.Contains(Type))
+            throw new ArgumentException(
+                $"Type de sensor inválido. Valores: {string.Join(", ", SensorTypes.All.OrderBy(t => t))}.");
+        if (!SensorModels.IsTypeAllowed(Model, Type))
+            throw new ArgumentException($"El modelo {Model} no soporta el type {Type}.");
+
         MicrocontrollerId = microcontrollerId;
-        Type = type.Trim().ToUpperInvariant();
         Unit = unit.Trim();
         Pin = pin;
         ZoneId = zoneId;

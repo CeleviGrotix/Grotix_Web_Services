@@ -2,6 +2,7 @@ using GrotixBackend.Contracts.Auth.Claims;
 using GrotixBackend.Contracts.Profiles.Access;
 using GrotixBackend.HardwareDevice.Application.ACL;
 using GrotixBackend.HardwareDevice.Application.Internal;
+using GrotixBackend.HardwareDevice.Domain.Model.ValueObjects;
 using GrotixBackend.Profiles.Domain.Model.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,22 @@ public sealed class DevicesController(
         }));
     }
 
+    [HttpGet("sensors/catalog")]
+    public IActionResult GetSensorCatalog()
+    {
+        if (!CanRead()) return Forbid();
+
+        return Ok(new
+        {
+            models = SensorModels.ListOptions().Select(o => new
+            {
+                model = o.Model,
+                types = o.Types,
+                allowsMultipleTypesOnSamePin = o.AllowsMultipleTypesOnSamePin
+            })
+        });
+    }
+
     public sealed record CreateDeviceRequest(
         int? ZoneId,
         string Model,
@@ -49,6 +66,7 @@ public sealed class DevicesController(
         CreateActuatorRequest[]? Actuators);
 
     public sealed record CreateSensorRequest(
+        string Model,
         string Type,
         string Unit,
         int Pin,
@@ -67,7 +85,8 @@ public sealed class DevicesController(
         try
         {
             IReadOnlyList<RegisterSensorRequest>? sensors = request.Sensors?
-                .Select(s => new RegisterSensorRequest(s.Type, s.Unit, s.Pin, s.MinPhysical, s.MaxPhysical))
+                .Select(s => new RegisterSensorRequest(
+                    s.Model, s.Type, s.Unit, s.Pin, s.MinPhysical, s.MaxPhysical))
                 .ToList();
             IReadOnlyList<RegisterActuatorRequest>? actuators = request.Actuators?
                 .Select(a => new RegisterActuatorRequest(a.Type, a.Pin))
@@ -101,11 +120,13 @@ public sealed class DevicesController(
         {
             var sensor = await deviceCommandService.AddSensorAsync(
                 id,
-                new RegisterSensorRequest(request.Type, request.Unit, request.Pin, request.MinPhysical, request.MaxPhysical),
+                new RegisterSensorRequest(
+                    request.Model, request.Type, request.Unit, request.Pin, request.MinPhysical, request.MaxPhysical),
                 cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id }, new
             {
                 sensorId = sensor.Id,
+                model = sensor.Model,
                 type = sensor.Type,
                 unit = sensor.Unit,
                 pin = sensor.Pin,
@@ -218,6 +239,7 @@ public sealed class DevicesController(
             sensors = detail.Sensors.Select(s => new
             {
                 sensorId = s.Id,
+                model = s.Model,
                 type = s.Type,
                 unit = s.Unit,
                 pin = s.Pin,

@@ -42,6 +42,7 @@ public sealed record RegisterDeviceRequest(
     IReadOnlyList<RegisterActuatorRequest>? Actuators = null);
 
 public sealed record RegisterSensorRequest(
+    string Model,
     string Type,
     string Unit,
     int Pin,

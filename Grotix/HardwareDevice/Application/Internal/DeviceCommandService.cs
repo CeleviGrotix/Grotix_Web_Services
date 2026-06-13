@@ -1,6 +1,8 @@
 using GrotixBackend.HardwareDevice.Application.ACL;
 using GrotixBackend.HardwareDevice.Domain.Model.Aggregates;
+using GrotixBackend.HardwareDevice.Domain.Model.ValueObjects;
 using GrotixBackend.HardwareDevice.Domain.Repositories;
+using GrotixBackend.Telemetry.Domain.Model.ValueObjects;
 
 namespace GrotixBackend.HardwareDevice.Application.Internal;
 
@@ -182,7 +184,42 @@ public sealed class DeviceCommandService(
         await deviceRepository.GetByIdAsync(deviceId)
         ?? throw new KeyNotFoundException($"Dispositivo {deviceId} no encontrado.");
 
-    private async Task EnsurePinAvailableAsync(int deviceId, int pin, CancellationToken cancellationToken)
+    private async Task EnsureSensorPinAvailableAsync(
+        int deviceId,
+        int pin,
+        string model,
+        string type,
+        CancellationToken cancellationToken)
+    {
+        var actuators = await actuatorRepository.ListByDeviceAsync(deviceId);
+        if (actuators.Any(a => a.Pin == pin))
+            throw new ArgumentException($"El pin {pin} ya está en uso por un actuador de este dispositivo.");
+
+        var normalizedModel = SensorModels.Normalize(model);
+        var normalizedType = SensorTypes.Normalize(type);
+        var sensorsOnPin = (await sensorRepository.ListByDeviceAsync(deviceId))
+            .Where(s => s.Pin == pin)
+            .ToList();
+
+        if (sensorsOnPin.Count == 0)
+            return;
+
+        if (!SensorModels.AllowsMultipleTypesOnSamePin(normalizedModel))
+            throw new ArgumentException($"El pin {pin} ya está en uso por un sensor de este dispositivo.");
+
+        foreach (var existing in sensorsOnPin)
+        {
+            if (!string.Equals(existing.Model, normalizedModel, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException(
+                    $"El pin {pin} ya está en uso por un sensor de modelo distinto ({existing.Model}).");
+
+            if (string.Equals(existing.Type, normalizedType, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException(
+                    $"Ya existe un sensor {normalizedType} en el pin {pin} para el modelo {normalizedModel}.");
+        }
+    }
+
+    private async Task EnsureActuatorPinAvailableAsync(int deviceId, int pin, CancellationToken cancellationToken)
     {
         var sensors = await sensorRepository.ListByDeviceAsync(deviceId);
         if (sensors.Any(s => s.Pin == pin))
@@ -198,10 +235,16 @@ public sealed class DeviceCommandService(
         RegisterSensorRequest sensorReq,
         CancellationToken cancellationToken)
     {
-        await EnsurePinAvailableAsync(device.Id, sensorReq.Pin, cancellationToken);
+        await EnsureSensorPinAvailableAsync(
+            device.Id,
+            sensorReq.Pin,
+            sensorReq.Model,
+            sensorReq.Type,
+            cancellationToken);
 
         var sensor = new DeviceSensor(
             device.Id,
+            sensorReq.Model,
             sensorReq.Type,
             sensorReq.Unit,
             sensorReq.Pin,
@@ -219,7 +262,7 @@ public sealed class DeviceCommandService(
         RegisterActuatorRequest actuatorReq,
         CancellationToken cancellationToken)
     {
-        await EnsurePinAvailableAsync(device.Id, actuatorReq.Pin, cancellationToken);
+        await EnsureActuatorPinAvailableAsync(device.Id, actuatorReq.Pin, cancellationToken);
 
         var actuator = new DeviceActuator(device.Id, actuatorReq.Type, actuatorReq.Pin);
         await actuatorRepository.AddAsync(actuator);
