@@ -1,4 +1,5 @@
 using GrotixBackend.BuildingBlocks.RabbitMq;
+using GrotixBackend.Telemetry.Application.Internal;
 using GrotixBackend.Telemetry.Application.Internal.Alerting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ public static class TelemetryRabbitMqServiceCollectionExtensions
         services.AddSingleton<RabbitMqConnectionHolder>();
         services.AddHostedService<RabbitMqTopologyInitializer>();
         services.AddHostedService<RabbitMqTelemetryReceivedConsumerHostedService>();
+        services.AddSingleton<IDeviceHeartbeatPublisher, RabbitMqDeviceHeartbeatPublisher>();
         return services;
     }
 }

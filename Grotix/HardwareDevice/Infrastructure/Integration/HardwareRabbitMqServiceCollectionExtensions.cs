@@ -14,6 +14,8 @@ public static class HardwareRabbitMqServiceCollectionExtensions
     {
         services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
 
+        services.AddHostedService<DevicePresenceOfflineHostedService>();
+
         var enabled = configuration.GetValue("RabbitMq:Enabled", true);
         if (!enabled)
         {
@@ -28,6 +30,7 @@ public static class HardwareRabbitMqServiceCollectionExtensions
         services.AddHostedService<HardwareRabbitMqTopologyInitializer>();
         services.AddScoped<IActuatorCommandOrchestrator, ActuatorCommandOrchestrator>();
         services.AddHostedService<RabbitMqActuatorCommandConsumerHostedService>();
+        services.AddHostedService<RabbitMqDeviceHeartbeatConsumerHostedService>();
         return services;
     }
 }

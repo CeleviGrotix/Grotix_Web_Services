@@ -1,4 +1,5 @@
 using GrotixBackend.Contracts.Integration.Telemetry;
+using GrotixBackend.Contracts.Integration.Hardware;
 using GrotixBackend.Telemetry.Application.Internal.Alerting;
 using GrotixBackend.Telemetry.Domain.Model.Entities;
 using GrotixBackend.Telemetry.Domain.Model.ValueObjects;
@@ -9,7 +10,8 @@ namespace GrotixBackend.Telemetry.Application.Internal;
 public sealed class TelemetryIngestService(
     ISensorRepository sensorRepository,
     ISensorReadingRepository sensorReadingRepository,
-    IAlertEvaluationService alertEvaluationService) : ITelemetryIngestService
+    IAlertEvaluationService alertEvaluationService,
+    IDeviceHeartbeatPublisher deviceHeartbeatPublisher) : ITelemetryIngestService
 {
     public async Task IngestAsync(TelemetryReceivedIntegrationEvent evt, CancellationToken cancellationToken = default)
     {
@@ -33,6 +35,8 @@ public sealed class TelemetryIngestService(
             if (value is null) continue;
             await alertEvaluationService.EvaluateAsync(sensor, value.Value, reading.Timestamp, cancellationToken);
         }
+
+        deviceHeartbeatPublisher.Publish(new DeviceHeartbeatIntegrationEvent(evt.DeviceId, reading.Timestamp));
     }
 
     private static double? ResolveFieldForSensor(string sensorType, TelemetryReceivedIntegrationEvent evt) =>

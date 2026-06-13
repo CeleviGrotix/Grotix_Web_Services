@@ -55,6 +55,16 @@ public class Microcontroller
             LastSeen = lastSeen;
     }
 
+    /// <summary>Marca actividad reciente por telemetría. No altera MAINTENANCE ni ERROR.</summary>
+    public void RecordTelemetryHeartbeat(DateTime timestamp)
+    {
+        LastSeen = timestamp.ToUniversalTime();
+        if (Status is ValueObjects.DeviceStatuses.Maintenance or ValueObjects.DeviceStatuses.Error)
+            return;
+
+        Status = ValueObjects.DeviceStatuses.Online;
+    }
+
     public void UpdateTelemetryMeta(int? batteryLevel, int? signalStrength)
     {
         BatteryLevel = batteryLevel;

@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IZoneThresholdService, ZoneThresholdService>();
         services.AddScoped<IAlertEvaluationService, AlertEvaluationService>();
         services.AddScoped<IAlertQueryService, AlertQueryService>();
+        services.AddSingleton<IDeviceHeartbeatPublisher, NoOpDeviceHeartbeatPublisher>();
         return services;
     }
 }

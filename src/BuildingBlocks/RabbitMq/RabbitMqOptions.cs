@@ -52,4 +52,10 @@ public sealed class RabbitMqOptions
 
     /// <summary>Cola consumida por Irrigation para reaccionar a cambios de estado del hardware.</summary>
     public string DeviceStatusChangedQueueName { get; set; } = "irrigation.hardware.device.status.changed";
+
+    /// <summary>Routing key publicada por Telemetry tras ingerir telemetría.</summary>
+    public string DeviceHeartbeatRoutingKey { get; set; } = "device.heartbeat";
+
+    /// <summary>Cola consumida por Hardware para marcar dispositivos ONLINE.</summary>
+    public string DeviceHeartbeatQueueName { get; set; } = "hardware.device.heartbeat";
 }

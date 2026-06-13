@@ -26,7 +26,7 @@ builder.Services.AddGrotixCultivationAreaPersistence(builder.Configuration);
 builder.Services.AddGrotixProfilesAccessModule();
 builder.Services.AddGrotixCultivationAreaModule();
 builder.Services.AddGrotixHardwareDevicePersistence(builder.Configuration);
-builder.Services.AddGrotixHardwareDeviceModule();
+builder.Services.AddGrotixHardwareDeviceModule(builder.Configuration);
 builder.Services.AddGrotixHardwareRabbitMq(builder.Configuration);
 builder.Services.AddGrotixTelemetryPersistence(builder.Configuration);
 

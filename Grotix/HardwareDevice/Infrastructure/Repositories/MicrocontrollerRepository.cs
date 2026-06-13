@@ -35,6 +35,20 @@ public sealed class MicrocontrollerRepository(HardwareDeviceDbContext db) : IMic
     public Task<IReadOnlyList<Microcontroller>> ListByZoneAsync(int zoneId) =>
         ListAsync(status: null, zoneId: zoneId);
 
+    public async Task<IReadOnlyList<Microcontroller>> ListOnlineStaleAsync(
+        DateTime lastSeenBefore,
+        CancellationToken cancellationToken = default)
+    {
+        var devices = await db.Microcontrollers
+            .Where(d =>
+                d.Status == DeviceStatuses.Online &&
+                d.LastSeen != null &&
+                d.LastSeen < lastSeenBefore)
+            .ToListAsync(cancellationToken);
+
+        return devices;
+    }
+
     public async Task AddAsync(Microcontroller device)
     {
         await db.Microcontrollers.AddAsync(device);
