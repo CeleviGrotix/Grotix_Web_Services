@@ -23,12 +23,13 @@ Remove-Item $zipPath -ErrorAction SilentlyContinue
 Compress-Archive -Path (Get-ChildItem "$publishDir\*" | ForEach-Object { $_.FullName }) `
     -DestinationPath $zipPath -Force
 
-Write-Host "[$AppName] Deploying to Azure..." -ForegroundColor Cyan
+Write-Host "[$AppName] Deploying to Azure (clean)..." -ForegroundColor Cyan
 az webapp deploy `
     --resource-group $ResourceGroup `
     --name $AppName `
     --src-path $zipPath `
-    --type zip
+    --type zip `
+    --clean true
 
 if ($LASTEXITCODE -ne 0) { Write-Host "Deploy failed." -ForegroundColor Red; exit 1 }
 

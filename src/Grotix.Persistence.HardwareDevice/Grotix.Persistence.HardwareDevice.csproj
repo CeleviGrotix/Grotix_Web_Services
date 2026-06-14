@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Compile Remove="**\*.cs" />
+    <Compile Include="HardwareDeviceDbContextFactory.cs" />
     <Compile Include="..\..\Grotix\HardwareDevice\Infrastructure\Persistence\**\*.cs" />
     <Compile Include="..\..\Grotix\HardwareDevice\Infrastructure\Repositories\**\*.cs" />
     <Compile Include="..\..\Grotix\HardwareDevice\Infrastructure\Integration\**\*.cs" />

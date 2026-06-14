@@ -13,8 +13,6 @@ public static class IrrigationRabbitMqServiceCollectionExtensions
     {
         services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
 
-        services.AddHostedService<IrrigationCycleCompletionHostedService>();
-
         var enabled = configuration.GetValue("RabbitMq:Enabled", true);
         if (!enabled)
         {

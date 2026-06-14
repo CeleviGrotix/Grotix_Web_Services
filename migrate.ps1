@@ -76,16 +76,14 @@ if ($failed) { exit 1 }
 Run-Migration `
     -Label "4/6 HardwareDevice" `
     -Context "HardwareDeviceDbContext" `
-    -Project "src/Grotix.Persistence.HardwareDevice/Grotix.Persistence.HardwareDevice.csproj" `
-    -StartupProject "src/HardwareDevice.Api/HardwareDevice.Api.csproj"
+    -Project "src/Grotix.Persistence.HardwareDevice/Grotix.Persistence.HardwareDevice.csproj"
 
 if ($failed) { exit 1 }
 
 Run-Migration `
     -Label "5/6 IrrigationCycle" `
     -Context "IrrigationCycleDbContext" `
-    -Project "src/Grotix.Persistence.IrrigationCycle/Grotix.Persistence.IrrigationCycle.csproj" `
-    -StartupProject "src/IrrigationCycle.Api/IrrigationCycle.Api.csproj"
+    -Project "src/Grotix.Persistence.IrrigationCycle/Grotix.Persistence.IrrigationCycle.csproj"
 
 if ($failed) { exit 1 }
 
