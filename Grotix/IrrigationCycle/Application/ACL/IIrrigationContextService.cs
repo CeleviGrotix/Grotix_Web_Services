@@ -9,4 +9,5 @@ public sealed record IrrigationZoneContext(
     int ZoneId,
     int CropId,
     double OptimalHumiditySoil,
-    double? CurrentHumiditySoilPercent);
+    double? CurrentHumiditySoilPercent,
+    string IrrigationMode);

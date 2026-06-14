@@ -9,7 +9,7 @@ public static class CultivationAreaResourceAssembler
         new(f.Id, f.UserId, f.AssociationId, f.Name, f.Location);
 
     public static ZoneResource ToZoneResource(Zone z) =>
-        new(z.Id, z.FarmId, z.CropId, z.Name, z.CurrentPhase, z.PhaseStartDate, z.ImageUrl, z.Latitude, z.Longitude);
+        new(z.Id, z.FarmId, z.CropId, z.Name, z.IrrigationMode, z.CurrentPhase, z.PhaseStartDate, z.ImageUrl, z.Latitude, z.Longitude);
 
     public static CropResource ToCropResource(Crop c) =>
         new(c.Id, c.CommonName, c.ScientificName, c.OptimalTemperature,

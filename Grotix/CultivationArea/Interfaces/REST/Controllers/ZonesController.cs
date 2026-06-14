@@ -38,7 +38,8 @@ public class ZonesController(
         double? Longitude,
         string? CurrentPhase,
         DateTime? PhaseStartDate,
-        string? ImageUrl);
+        string? ImageUrl,
+        string? IrrigationMode);
 
     [HttpPatch("{zoneId:int}")]
     public async Task<IActionResult> Patch(int zoneId, [FromBody] PatchZoneRequest request)
@@ -56,7 +57,8 @@ public class ZonesController(
                 request.Longitude,
                 request.CurrentPhase,
                 request.PhaseStartDate,
-                request.ImageUrl));
+                request.ImageUrl,
+                request.IrrigationMode));
             return Ok(CultivationAreaResourceAssembler.ToZoneResource(updated));
         }
         catch (ArgumentException ex)

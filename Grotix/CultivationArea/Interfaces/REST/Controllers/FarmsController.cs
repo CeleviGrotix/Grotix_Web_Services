@@ -145,7 +145,8 @@ public class FarmsController(
         double Longitude,
         string? CurrentPhase,
         DateTime? PhaseStartDate,
-        string? ImageUrl);
+        string? ImageUrl,
+        string? IrrigationMode);
 
     [HttpPost("{farmId:int}/zones")]
     public async Task<IActionResult> CreateZone(int farmId, [FromBody] CreateZoneRequest request)
@@ -163,7 +164,8 @@ public class FarmsController(
                 request.Longitude,
                 request.CurrentPhase,
                 request.PhaseStartDate,
-                request.ImageUrl));
+                request.ImageUrl,
+                request.IrrigationMode));
             return Created($"/api/v1/zones/{zone.Id}", CultivationAreaResourceAssembler.ToZoneResource(zone));
         }
         catch (ArgumentException ex)

@@ -5,6 +5,7 @@ public record ZoneResource(
     int FarmId,
     int CropId,
     string Name,
+    string IrrigationMode,
     string? CurrentPhase,
     DateTime? PhaseStartDate,
     string? ImageUrl,

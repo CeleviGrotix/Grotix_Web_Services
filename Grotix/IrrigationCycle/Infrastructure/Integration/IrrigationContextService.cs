@@ -33,6 +33,7 @@ public sealed class IrrigationContextService(
             zoneId,
             zone.CropId,
             crop.OptimalHumiditySoil,
-            currentHumiditySoil);
+            currentHumiditySoil,
+            zone.IrrigationMode);
     }
 }

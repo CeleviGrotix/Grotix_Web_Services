@@ -23,7 +23,8 @@ public class ZoneCommandService(
             command.Longitude,
             command.CurrentPhase,
             command.PhaseStartDate,
-            command.ImageUrl);
+            command.ImageUrl,
+            command.IrrigationMode);
 
         await zoneRepository.AddAsync(zone);
         await unitOfWork.CompleteAsync();
@@ -56,6 +57,9 @@ public class ZoneCommandService(
 
         if (command.ImageUrl is not null)
             zone.UpdateImageUrl(string.IsNullOrWhiteSpace(command.ImageUrl) ? null : command.ImageUrl);
+
+        if (command.IrrigationMode is not null)
+            zone.UpdateIrrigationMode(command.IrrigationMode);
 
         await unitOfWork.CompleteAsync();
         return zone;

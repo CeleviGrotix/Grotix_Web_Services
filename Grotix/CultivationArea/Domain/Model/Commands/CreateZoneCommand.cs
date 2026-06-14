@@ -8,4 +8,5 @@ public record CreateZoneCommand(
     double Longitude,
     string? CurrentPhase,
     DateTime? PhaseStartDate,
-    string? ImageUrl);
+    string? ImageUrl,
+    string? IrrigationMode = null);

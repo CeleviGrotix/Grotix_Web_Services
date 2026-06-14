@@ -1,4 +1,5 @@
 using System.Globalization;
+using GrotixBackend.CultivationArea.Domain.Model.ValueObjects;
 using GrotixBackend.IrrigationCycle.Application.Internal;
 using GrotixBackend.IrrigationCycle.Application.ACL;
 using GrotixBackend.IrrigationCycle.Domain.Model.Aggregates;
@@ -115,6 +116,16 @@ public sealed class IrrigationScheduleManagerHostedService(
 
             if (history.Count > 0)
                 continue;
+
+            var zoneContext = await irrigationContextService.GetZoneContextAsync(schedule.ZoneId, stoppingToken);
+            if (zoneContext == null || !IrrigationModes.IsAutomatic(zoneContext.IrrigationMode))
+            {
+                logger.LogDebug(
+                    "Skipping scheduled irrigation for zone {ZoneId}: irrigation mode is {Mode}.",
+                    schedule.ZoneId,
+                    zoneContext?.IrrigationMode ?? "UNKNOWN");
+                continue;
+            }
 
             if (rainForecast.WillRainToday)
             {

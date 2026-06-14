@@ -135,6 +135,11 @@ namespace GrotixBackend.CultivationArea.Infrastructure.Persistence.EFC.Migration
                         .HasColumnType("varchar(512)")
                         .HasColumnName("ImageURL");
 
+                    b.Property<string>("IrrigationMode")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
+
                     b.Property<double>("Latitude")
                         .HasColumnType("double");
 

@@ -1,3 +1,5 @@
+using GrotixBackend.CultivationArea.Domain.Model.ValueObjects;
+
 namespace GrotixBackend.CultivationArea.Domain.Model.Aggregates;
 
 /// <summary>Zona de cultivo dentro de una granja (tabla <c>zone</c>).</summary>
@@ -7,6 +9,7 @@ public class Zone
     public int FarmId { get; private set; }
     public int CropId { get; private set; }
     public string Name { get; private set; } = null!;
+    public string IrrigationMode { get; private set; } = IrrigationModes.Automatic;
     public string? CurrentPhase { get; private set; }
     public DateTime? PhaseStartDate { get; private set; }
     public string? ImageUrl { get; private set; }
@@ -23,15 +26,23 @@ public class Zone
         double longitude,
         string? currentPhase = null,
         DateTime? phaseStartDate = null,
-        string? imageUrl = null)
+        string? imageUrl = null,
+        string? irrigationMode = null)
     {
         if (farmId <= 0 || cropId <= 0)
             throw new ArgumentException("FarmId y CropId deben ser válidos.");
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("El nombre de la zona no puede estar vacío.");
+
+        var normalizedMode = IrrigationModes.Normalize(irrigationMode);
+        if (!IrrigationModes.IsValid(normalizedMode))
+            throw new ArgumentException(
+                $"Modo de riego inválido. Valores: {IrrigationModes.AllowedValuesLabel()}.");
+
         FarmId = farmId;
         CropId = cropId;
         Name = name.Trim();
+        IrrigationMode = normalizedMode;
         Latitude = latitude;
         Longitude = longitude;
         CurrentPhase = string.IsNullOrWhiteSpace(currentPhase) ? null : currentPhase.Trim();
@@ -67,4 +78,13 @@ public class Zone
 
     public void UpdateImageUrl(string? imageUrl) =>
         ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
+
+    public void UpdateIrrigationMode(string irrigationMode)
+    {
+        var normalizedMode = IrrigationModes.Normalize(irrigationMode);
+        if (!IrrigationModes.IsValid(normalizedMode))
+            throw new ArgumentException(
+                $"Modo de riego inválido. Valores: {IrrigationModes.AllowedValuesLabel()}.");
+        IrrigationMode = normalizedMode;
+    }
 }

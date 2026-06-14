@@ -2,6 +2,8 @@ using System.Text;
 using System.Text.Json;
 using GrotixBackend.BuildingBlocks.RabbitMq;
 using GrotixBackend.Contracts.Integration.Telemetry;
+using GrotixBackend.CultivationArea.Domain.Model.ValueObjects;
+using GrotixBackend.IrrigationCycle.Application.ACL;
 using GrotixBackend.IrrigationCycle.Application.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,6 +52,17 @@ public sealed class RabbitMqAlertTriggeredConsumerHostedService(
                 if (evt != null && ShouldAutoIrrigate(evt))
                 {
                     await using var scope = services.CreateAsyncScope();
+                    var contextService = scope.ServiceProvider.GetRequiredService<IIrrigationContextService>();
+                    var context = await contextService.GetZoneContextAsync(evt.ZoneId, stoppingToken);
+                    if (context == null || !IrrigationModes.IsAutomatic(context.IrrigationMode))
+                    {
+                        logger.LogDebug(
+                            "Skipping auto-irrigation for zone {ZoneId}: irrigation mode is {Mode}.",
+                            evt.ZoneId,
+                            context?.IrrigationMode ?? "UNKNOWN");
+                        return;
+                    }
+
                     var command = scope.ServiceProvider.GetRequiredService<IIrrigationCommandService>();
                     try
                     {
