@@ -224,6 +224,7 @@ public sealed class IrrigationController(
         startTime = c.StartTime,
         endTime = c.EndTime,
         volumeLiters = c.VolumeLiters,
+        durationMinutes = c.DurationMinutes,
         status = CycleStatuses.ToApiStatus(c.Status),
         abortReason = c.AbortReason
     };
