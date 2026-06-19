@@ -22,7 +22,7 @@ public sealed class HardwareDatabaseInitializer(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Hardware DB initialization failed.");
+            logger.LogError(ex, "Hardware DB migration failed. Maintenance endpoints may be unavailable until migrations succeed.");
         }
     }
 

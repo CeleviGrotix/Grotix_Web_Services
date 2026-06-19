@@ -22,6 +22,30 @@ function Resolve-ToolPath {
     throw "No se encontró '$Name'. Instálalo o agrégalo al PATH."
 }
 
+function New-LinuxZip {
+    param(
+        [Parameter(Mandatory)][string]$SourceDir,
+        [Parameter(Mandatory)][string]$DestinationPath
+    )
+
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+    $sourceFull = (Resolve-Path $SourceDir).Path.TrimEnd('\')
+    if (Test-Path $DestinationPath) { Remove-Item $DestinationPath -Force }
+
+    $zip = [System.IO.Compression.ZipFile]::Open($DestinationPath, [System.IO.Compression.ZipArchiveMode]::Create)
+    try {
+        Get-ChildItem $sourceFull -Recurse -File | ForEach-Object {
+            $entryName = $_.FullName.Substring($sourceFull.Length + 1).Replace('\', '/')
+            [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $entryName)
+        }
+    }
+    finally {
+        $zip.Dispose()
+    }
+}
+
 $dotnet = Resolve-ToolPath -Name "dotnet" -Candidates @(
     "$env:ProgramFiles\dotnet\dotnet.exe",
     "${env:ProgramFiles(x86)}\dotnet\dotnet.exe",
@@ -45,10 +69,8 @@ if ($LASTEXITCODE -ne 0) { Write-Host "Build failed." -ForegroundColor Red; exit
 $browserPath = Join-Path $publishDir "runtimes\browser"
 if (Test-Path $browserPath) { Remove-Item $browserPath -Recurse -Force }
 
-Write-Host "[$AppName] Compressing..." -ForegroundColor Cyan
-Remove-Item $zipPath -ErrorAction SilentlyContinue
-Compress-Archive -Path (Get-ChildItem "$publishDir\*" | ForEach-Object { $_.FullName }) `
-    -DestinationPath $zipPath -Force
+Write-Host "[$AppName] Compressing (unix paths)..." -ForegroundColor Cyan
+New-LinuxZip -SourceDir $publishDir -DestinationPath $zipPath
 
 Write-Host "[$AppName] Deploying to Azure (clean)..." -ForegroundColor Cyan
 & $az webapp deploy `

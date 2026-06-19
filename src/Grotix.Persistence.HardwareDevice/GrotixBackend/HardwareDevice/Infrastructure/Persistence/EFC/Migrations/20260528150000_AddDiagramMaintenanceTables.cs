@@ -1,6 +1,5 @@
 using GrotixBackend.HardwareDevice.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -13,78 +12,67 @@ public partial class AddDiagramMaintenanceTables : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.AddColumn<DateTime>(
-            name: "LastSeen",
-            table: "sensor",
-            type: "datetime(6)",
-            nullable: true);
+        migrationBuilder.Sql(
+            """
+            SET @last_seen_exists := (
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'sensor'
+                  AND COLUMN_NAME = 'LastSeen'
+            );
+            SET @add_last_seen := IF(
+                @last_seen_exists = 0,
+                'ALTER TABLE `sensor` ADD `LastSeen` datetime(6) NULL',
+                'SELECT 1');
+            PREPARE stmt FROM @add_last_seen;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+            """);
 
-        migrationBuilder.CreateTable(
-            name: "maintenance_log",
-            columns: table => new
-            {
-                LogID = table.Column<int>(type: "int", nullable: false)
-                    .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                DeviceID = table.Column<int>(type: "int", nullable: false),
-                UserID = table.Column<int>(type: "int", nullable: false),
-                Action = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false),
-                StatusAfter = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
-                Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-            },
-            constraints: table => table.PrimaryKey("PK_maintenance_log", x => x.LogID));
+        migrationBuilder.Sql(
+            """
+            CREATE TABLE IF NOT EXISTS `maintenance_log` (
+                `LogID` int NOT NULL AUTO_INCREMENT,
+                `DeviceID` int NOT NULL,
+                `UserID` int NOT NULL,
+                `Action` varchar(256) CHARACTER SET utf8mb4 NOT NULL,
+                `StatusAfter` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
+                `Timestamp` datetime(6) NOT NULL,
+                PRIMARY KEY (`LogID`),
+                KEY `IX_maintenance_log_DeviceID` (`DeviceID`),
+                KEY `IX_maintenance_log_UserID` (`UserID`)
+            ) CHARACTER SET=utf8mb4;
+            """);
 
-        migrationBuilder.CreateTable(
-            name: "technical_maintenance",
-            columns: table => new
-            {
-                MaintenanceID = table.Column<int>(type: "int", nullable: false)
-                    .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                StaffID = table.Column<int>(type: "int", nullable: false),
-                DeviceID = table.Column<int>(type: "int", nullable: false),
-                Type = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false),
-                Description = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: false),
-                Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                Results = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
-            },
-            constraints: table => table.PrimaryKey("PK_technical_maintenance", x => x.MaintenanceID));
+        migrationBuilder.Sql(
+            """
+            CREATE TABLE IF NOT EXISTS `technical_maintenance` (
+                `MaintenanceID` int NOT NULL AUTO_INCREMENT,
+                `StaffID` int NOT NULL,
+                `DeviceID` int NOT NULL,
+                `Type` varchar(64) CHARACTER SET utf8mb4 NOT NULL,
+                `Description` varchar(2000) CHARACTER SET utf8mb4 NOT NULL,
+                `Date` datetime(6) NOT NULL,
+                `Results` varchar(2000) CHARACTER SET utf8mb4 NULL,
+                PRIMARY KEY (`MaintenanceID`),
+                KEY `IX_technical_maintenance_DeviceID` (`DeviceID`),
+                KEY `IX_technical_maintenance_StaffID` (`StaffID`)
+            ) CHARACTER SET=utf8mb4;
+            """);
 
-        migrationBuilder.CreateTable(
-            name: "action_queue",
-            columns: table => new
-            {
-                ActionID = table.Column<int>(type: "int", nullable: false)
-                    .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                ActuatorID = table.Column<int>(type: "int", nullable: false),
-                Command = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
-                Status = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
-                CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-            },
-            constraints: table => table.PrimaryKey("PK_action_queue", x => x.ActionID));
-
-        migrationBuilder.CreateIndex(
-            name: "IX_maintenance_log_DeviceID",
-            table: "maintenance_log",
-            column: "DeviceID");
-
-        migrationBuilder.CreateIndex(
-            name: "IX_maintenance_log_UserID",
-            table: "maintenance_log",
-            column: "UserID");
-
-        migrationBuilder.CreateIndex(
-            name: "IX_technical_maintenance_DeviceID",
-            table: "technical_maintenance",
-            column: "DeviceID");
-
-        migrationBuilder.CreateIndex(
-            name: "IX_technical_maintenance_StaffID",
-            table: "technical_maintenance",
-            column: "StaffID");
-
-        migrationBuilder.CreateIndex(
-            name: "IX_action_queue_ActuatorID_Status",
-            table: "action_queue",
-            columns: new[] { "ActuatorID", "Status" });
+        migrationBuilder.Sql(
+            """
+            CREATE TABLE IF NOT EXISTS `action_queue` (
+                `ActionID` int NOT NULL AUTO_INCREMENT,
+                `ActuatorID` int NOT NULL,
+                `Command` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
+                `Status` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
+                `CreatedAt` datetime(6) NOT NULL,
+                PRIMARY KEY (`ActionID`),
+                KEY `IX_action_queue_ActuatorID_Status` (`ActuatorID`, `Status`)
+            ) CHARACTER SET=utf8mb4;
+            """);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

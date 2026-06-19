@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2024.12.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="**\*.cs" />
     <Compile Include="..\..\Grotix\CultivationArea\**\*.cs"
              Exclude="..\..\Grotix\CultivationArea\Infrastructure\Repositories\**\*.cs" />

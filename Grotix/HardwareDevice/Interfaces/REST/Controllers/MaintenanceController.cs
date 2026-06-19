@@ -83,16 +83,31 @@ public sealed class MaintenanceController(
         if (detail == null) return NotFound();
         if (!await CanAccessDeviceAsync(detail.Device, cancellationToken)) return Forbid();
 
-        var logs = await maintenanceService.ListMaintenanceLogsAsync(deviceId, Math.Clamp(limit, 1, 200), cancellationToken);
-        return Ok(logs.Select(l => new
+        try
         {
-            logId = l.Id,
-            deviceId = l.DeviceId,
-            userId = l.UserId,
-            action = l.Action,
-            statusAfter = l.StatusAfter,
-            timestamp = l.Timestamp
-        }));
+            var logs = await maintenanceService.ListMaintenanceLogsAsync(
+                deviceId,
+                Math.Clamp(limit, 1, 200),
+                cancellationToken);
+
+            return Ok(logs.Select(l => new
+            {
+                logId = l.Id,
+                deviceId = l.DeviceId,
+                userId = l.UserId,
+                action = l.Action,
+                statusAfter = l.StatusAfter,
+                timestamp = l.Timestamp
+            }));
+        }
+        catch (Exception ex) when (IsMaintenanceStorageFailure(ex))
+        {
+            return StatusCode(503, new
+            {
+                message = "Maintenance log storage is unavailable. Apply pending Hardware DB migrations.",
+                detail = ex.GetBaseException().Message
+            });
+        }
     }
 
     [HttpPost("devices/{deviceId:int}/technical-maintenance")]
@@ -218,5 +233,22 @@ public sealed class MaintenanceController(
         if (identityId == null) return null;
         var ctx = await userAccessContextService.GetByIdentityIdAsync(identityId.Value, cancellationToken);
         return ctx?.UserId;
+    }
+
+    private static bool IsMaintenanceStorageFailure(Exception ex)
+    {
+        for (var current = ex; current != null; current = current.InnerException)
+        {
+            var message = current.Message;
+            if (message.Contains("maintenance_log", StringComparison.OrdinalIgnoreCase)
+                || message.Contains("doesn't exist", StringComparison.OrdinalIgnoreCase)
+                || message.Contains("does not exist", StringComparison.OrdinalIgnoreCase)
+                || message.Contains("Unknown table", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

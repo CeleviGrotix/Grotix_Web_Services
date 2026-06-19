@@ -29,7 +29,7 @@ builder.Services.AddGrotixJwt(builder.Configuration);
 builder.Services.AddGrotixAppPersistence(builder.Configuration);
 builder.Services.AddGrotixCultivationAreaPersistence(builder.Configuration);
 builder.Services.AddGrotixProfilesAccessModule();
-builder.Services.AddGrotixCultivationAreaModule();
+builder.Services.AddGrotixCultivationAreaModule(builder.Configuration);
 builder.Services.AddGrotixRabbitMqConsumer(builder.Configuration);
 
 // El mismo ensamblado incluye handlers de Profiles (p. ej. RabbitMqUserRegisteredPublishHandler); este API no publica a RabbitMQ.
