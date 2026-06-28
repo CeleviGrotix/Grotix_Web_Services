@@ -126,3 +126,4 @@ services:
 
 volumes:
   crop_images:
+ 
