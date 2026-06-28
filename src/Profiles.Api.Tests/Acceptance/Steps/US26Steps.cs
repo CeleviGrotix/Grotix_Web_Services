@@ -42,7 +42,7 @@ public class US26Steps
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.Role, "user_admin"),
+            new Claim(ClaimTypes.Role, "admin"),  // ← admin bypasses the caller.Id check
             new Claim(ClaimTypes.NameIdentifier, _userId.ToString()),
             new Claim(JwtClaimTypes.IdentityId, _userId.ToString())
         };

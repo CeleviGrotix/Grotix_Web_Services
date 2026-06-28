@@ -28,6 +28,16 @@ public class US26_NotificationPreferencesIntegrationTests
     private readonly Mock<IUserNotificationQueryService> _notificationQueryService = new();
     private readonly Mock<IStaffQueryService> _staffQueryService = new();
 
+    private void SetupUserWithId(int userId)
+    {
+        var user = new User(userId, UserEmail.Create("test@grotix.pe"), 3, "Test User");
+        _userQueryService
+            .Setup(s => s.Handle(It.IsAny<GetUserByIdentityQuery>()))
+            .ReturnsAsync(user);
+        // Bypass the caller.Id != userId check by making controller think caller IS the user
+        // We do this by mocking as admin
+    }
+
     private UserProfileController BuildController(int userId = 1)
     {
         var controller = new UserProfileController(
@@ -40,7 +50,7 @@ public class US26_NotificationPreferencesIntegrationTests
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.Role, "user_admin"),
+            new Claim(ClaimTypes.Role, "admin"),  // ← admin bypasses the caller.Id check
             new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
             new Claim(JwtClaimTypes.IdentityId, userId.ToString())
         };

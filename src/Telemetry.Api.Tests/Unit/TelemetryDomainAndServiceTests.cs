@@ -7,6 +7,8 @@ using GrotixBackend.Telemetry.Domain.Repositories;
 using GrotixBackend.Telemetry.Domain.Services;
 using Moq;
 using Xunit;
+using GrotixBackend.Telemetry.Application.Internal;
+
 
 namespace Telemetry.Api.Tests.Unit;
 
@@ -106,7 +108,11 @@ public class TelemetryDomainAndServiceTests
         mockSensorRepo.Setup(r => r.ListByZoneAsync(It.IsAny<int>(), default))
                       .ReturnsAsync(new List<Sensor>());
 
-        var service = new TelemetryIngestService(mockSensorRepo.Object, mockReadingRepo.Object, mockAlertService.Object);
+        var service = new TelemetryIngestService(
+        mockSensorRepo.Object,
+        mockReadingRepo.Object,
+        mockAlertService.Object,
+        new Mock<IDeviceHeartbeatPublisher>().Object);
         var integrationEvent = new TelemetryReceivedIntegrationEvent(1, 2, 25.5, 60.0, 45.0, 1000, DateTime.UtcNow);
 
         // Act
