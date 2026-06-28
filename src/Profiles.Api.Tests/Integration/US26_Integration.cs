@@ -144,19 +144,22 @@ public class US26_NotificationPreferencesIntegrationTests
 
     // Escenario 3 — Notificaciones
 
-    [Fact]
-    public async Task GetMyNotifications_Returns200WithList()
-    {
-        var user = BuildUser();
-        _userQueryService.Setup(s => s.Handle(It.IsAny<GetUserByIdentityQuery>())).ReturnsAsync(user);
-        _notificationQueryService.Setup(s => s.ListByUserAsync(1, false, 50))
-            .ReturnsAsync(new List<UserNotification>
-            {
-                new UserNotification(1, "Alerta Crítica", "Humedad baja", "alert")
-            });
+        [Fact]
+        public async Task GetMyNotifications_Returns200WithList()
+        {
+            var user = BuildUser();
+            _userQueryService
+                .Setup(s => s.Handle(It.IsAny<GetUserByIdentityQuery>()))
+                .ReturnsAsync(user);
+            _notificationQueryService
+                .Setup(s => s.ListByUserAsync(It.IsAny<int>(), false, 50))
+                .ReturnsAsync(new List<UserNotification>
+                {
+                    new UserNotification(1, "Alerta Crítica", "Humedad baja", "alert")
+                });
 
-        var result = await BuildController().GetMyNotifications();
+            var result = await BuildController().GetMyNotifications();
 
-        result.Should().BeOfType<OkObjectResult>();
-    }
+            result.Should().BeOfType<OkObjectResult>();
+        }
 }
