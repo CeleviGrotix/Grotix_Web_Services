@@ -11,9 +11,8 @@ namespace CultivationArea.Api.Tests.Unit;
 
 public class CultivationDomainAndServiceTests
 {
-    // ==========================================
-    // TDD: Farm Aggregate (3 Tests)
-    // ==========================================
+    // ── Farm Aggregate ────────────────────────────────────────────────────────
+
     [Fact]
     public void FarmConstructor_InvalidAssociation_ThrowsArgumentException()
     {
@@ -33,34 +32,30 @@ public class CultivationDomainAndServiceTests
     {
         var farm = new Farm(1, 10, "Granja Norte", "Ubicacion 1");
         farm.Update("Granja Sur", "Ubicacion 2");
-
         farm.Name.Should().Be("Granja Sur");
         farm.Location.Should().Be("Ubicacion 2");
     }
 
-    // ==========================================
-    // TDD: Zone Aggregate (2 Tests)
-    // ==========================================
+    // ── Zone Aggregate ────────────────────────────────────────────────────────
+
     [Fact]
     public void ZoneConstructor_InvalidFarmOrCrop_ThrowsArgumentException()
     {
-        Action act = () => new Zone(0, 5, 12.34, -56.78);
+        Action act = () => new Zone(0, 5, "Zona Test", 12.34, -56.78);
         act.Should().Throw<ArgumentException>().WithMessage("FarmId y CropId deben ser válidos.");
     }
 
     [Fact]
     public void ZoneUpdateCoordinates_ValidData_UpdatesLatAndLng()
     {
-        var zone = new Zone(1, 1, 10.0, 10.0);
+        var zone = new Zone(1, 1, "Zona Test", 10.0, 10.0);
         zone.UpdateCoordinates(20.5, -30.5);
-
         zone.Latitude.Should().Be(20.5);
         zone.Longitude.Should().Be(-30.5);
     }
 
-    // ==========================================
-    // TDD: FarmCommandService (3 Tests)
-    // ==========================================
+    // ── FarmCommandService ────────────────────────────────────────────────────
+
     [Fact]
     public async Task CreateFarm_AssociationDoesNotExist_ThrowsArgumentException()
     {
@@ -113,18 +108,21 @@ public class CultivationDomainAndServiceTests
         result.Name.Should().Be("Granja Nueva");
     }
 
-    // ==========================================
-    // TDD: ZoneCommandService (2 Tests)
-    // ==========================================
+    // ── ZoneCommandService ────────────────────────────────────────────────────
+
     [Fact]
     public async Task CreateZone_CropDoesNotExist_ThrowsArgumentException()
     {
         var mockCropRepo = new Mock<ICropRepository>();
         mockCropRepo.Setup(r => r.ExistsAsync(It.IsAny<int>())).ReturnsAsync(false);
 
-        var service = new ZoneCommandService(new Mock<IZoneRepository>().Object, mockCropRepo.Object, new Mock<ICultivationAreaUnitOfWork>().Object);
+        var service = new ZoneCommandService(
+            new Mock<IZoneRepository>().Object,
+            mockCropRepo.Object,
+            new Mock<ICultivationAreaUnitOfWork>().Object);
 
-        Func<Task> act = async () => await service.Handle(new CreateZoneCommand(1, 99, 10.0, 10.0, null, null, null));
+        Func<Task> act = async () => await service.Handle(
+            new CreateZoneCommand(1, 99, "Zona Test", 10.0, 10.0, null, null, null));
         await act.Should().ThrowAsync<ArgumentException>().WithMessage("El cultivo 99 no existe.");
     }
 
@@ -132,14 +130,19 @@ public class CultivationDomainAndServiceTests
     public async Task UpdateZone_CropDoesNotExist_ThrowsArgumentException()
     {
         var mockZoneRepo = new Mock<IZoneRepository>();
-        mockZoneRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new Zone(1, 2, 10.0, 10.0)); // Zona existente
+        mockZoneRepo.Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(new Zone(1, 2, "Zona Test", 10.0, 10.0));
 
         var mockCropRepo = new Mock<ICropRepository>();
-        mockCropRepo.Setup(r => r.ExistsAsync(99)).ReturnsAsync(false); // Cultivo nuevo NO existe
+        mockCropRepo.Setup(r => r.ExistsAsync(99)).ReturnsAsync(false);
 
-        var service = new ZoneCommandService(mockZoneRepo.Object, mockCropRepo.Object, new Mock<ICultivationAreaUnitOfWork>().Object);
+        var service = new ZoneCommandService(
+            mockZoneRepo.Object,
+            mockCropRepo.Object,
+            new Mock<ICultivationAreaUnitOfWork>().Object);
 
-        Func<Task> act = async () => await service.Handle(new UpdateZoneCommand(1, 99, null, null, null, null, null));
+        Func<Task> act = async () => await service.Handle(
+            new UpdateZoneCommand(1, null, 99, null, null, null, null, null));
         await act.Should().ThrowAsync<ArgumentException>().WithMessage("El cultivo 99 no existe.");
     }
 }

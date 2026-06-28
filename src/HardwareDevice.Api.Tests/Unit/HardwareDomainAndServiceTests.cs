@@ -5,6 +5,7 @@ using GrotixBackend.HardwareDevice.Domain.Model.Entities;
 using GrotixBackend.HardwareDevice.Domain.Repositories;
 using Moq;
 using Xunit;
+using GrotixBackend.HardwareDevice.Application.ACL;
 
 namespace HardwareDevice.Api.Tests.Unit;
 
@@ -86,6 +87,7 @@ public class HardwareDomainAndServiceTests
             mockRepo.Object, 
             new Mock<IMaintenanceLogRepository>().Object, 
             new Mock<ITechnicalMaintenanceRepository>().Object, 
+            new Mock<IStaffExistenceService>().Object,
             new Mock<IHardwareDeviceUnitOfWork>().Object);
 
         Func<Task> act = async () => await service.RecordMaintenanceLogAsync(1, 10, "Reinicio", "ONLINE");
@@ -101,7 +103,8 @@ public class HardwareDomainAndServiceTests
         var service = new MaintenanceService(
             mockRepo.Object, 
             new Mock<IMaintenanceLogRepository>().Object, 
-            new Mock<ITechnicalMaintenanceRepository>().Object, 
+            new Mock<ITechnicalMaintenanceRepository>().Object,
+            new Mock<IStaffExistenceService>().Object, 
             new Mock<IHardwareDeviceUnitOfWork>().Object);
 
         var result = await service.RecordTechnicalMaintenanceAsync(10, 1, "Correctivo", "Cambio bateria", "Exito");
@@ -119,6 +122,7 @@ public class HardwareDomainAndServiceTests
             new Mock<IMicrocontrollerRepository>().Object, 
             mockLogRepo.Object, 
             new Mock<ITechnicalMaintenanceRepository>().Object, 
+            new Mock<IStaffExistenceService>().Object,
             new Mock<IHardwareDeviceUnitOfWork>().Object);
 
         await service.ListMaintenanceLogsAsync(1, 10);

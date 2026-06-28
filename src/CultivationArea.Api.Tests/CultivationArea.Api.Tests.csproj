@@ -35,6 +35,16 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>CultivationArea.feature.cs</LastGenOutput>
     </None>
+
+    <None Update="Acceptance\Features\US22.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>CultivationArea.feature.cs</LastGenOutput>
+    </None>
+
+    <None Update="Acceptance\Features\US23.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>CultivationArea.feature.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>
