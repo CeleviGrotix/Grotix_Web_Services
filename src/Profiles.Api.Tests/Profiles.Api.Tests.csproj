@@ -36,6 +36,11 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>Profiles.feature.cs</LastGenOutput>
     </None>
+
+    <None Update="Acceptance\Features\US26.feature">
+    <Generator>SpecFlowSingleFileGenerator</Generator>
+    <LastGenOutput>US26.feature.cs</LastGenOutput>
+  </None>
   </ItemGroup>
 
 </Project>
