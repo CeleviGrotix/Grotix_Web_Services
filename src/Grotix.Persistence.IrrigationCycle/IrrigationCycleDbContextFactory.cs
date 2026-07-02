@@ -10,6 +10,7 @@ public sealed class IrrigationCycleDbContextFactory : IDesignTimeDbContextFactor
 {
     public IrrigationCycleDbContext CreateDbContext(string[] args)
     {
+        // Load environment variables before creating the design-time DbContext.
         DotEnvBootstrap.LoadFromCurrentDirectory();
 
         var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
