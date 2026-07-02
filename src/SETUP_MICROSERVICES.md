@@ -1,4 +1,6 @@
-# Microservices local setup (Profiles + CultivationArea + Gateway)
+# Microservices Local Setup (Profiles + CultivationArea + Gateway)
+
+---
 
 ## Environment configuration
 
