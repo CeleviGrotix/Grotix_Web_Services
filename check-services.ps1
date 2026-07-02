@@ -19,11 +19,18 @@ function Test-GrotixEndpoint {
         [string]$Url
     )
 
-    $code = curl.exe -s -o NUL -w "%{http_code}" --max-time $TimeoutSec $Url 2>$null
-    $time = curl.exe -s -o NUL -w "%{time_total}" --max-time $TimeoutSec $Url 2>$null
+    $metrics = curl.exe -s -o NUL -w "%{http_code} %{time_total}" --max-time $TimeoutSec $Url 2>$null
+    $parts = $metrics -split " ", 2
+    $code = if ($parts.Count -ge 1) { $parts[0].Trim() } else { "" }
+    $time = if ($parts.Count -ge 2) { $parts[1].Trim() } else { "?" }
 
     if ($code -match "^\d{3}$") {
-        $ok = [int]$code -lt 500 -and [int]$code -ne 0
+        if ($code -eq "000") {
+            Write-Host ("{0,-22} HTTP {1,-4} {2,6}s  NO CONN (nada escuchando en ese host/puerto)" -f $Label, $code, $time) -ForegroundColor Red
+            return $false
+        }
+
+        $ok = [int]$code -lt 500
         $color = if ($ok) { "Green" } else { "Red" }
         $status = if ($ok) { "OK" } else { "FAIL" }
         Write-Host ("{0,-22} HTTP {1,-4} {2,6}s  {3}" -f $Label, $code, $time, $status) -ForegroundColor $color
@@ -72,5 +79,11 @@ if ($up -eq $total) {
 }
 
 Write-Host "Caidos o lentos: $($total - $up) de $total." -ForegroundColor Yellow
-Write-Host "HTTP 200/404 = vivo. 000/503/504 = caido o arrancando." -ForegroundColor DarkGray
+Write-Host "HTTP 200/404 = vivo. 503/504 = arrancando o BD caida." -ForegroundColor DarkGray
+if (-not $Azure -and $up -eq 0) {
+    Write-Host ""
+    Write-Host "HTTP 000 en local = no hay dotnet run en localhost:5100-5105." -ForegroundColor Yellow
+    Write-Host "Si Swagger lo probaste en Azure, usa:" -ForegroundColor Yellow
+    Write-Host "  .\check-services.ps1 -Azure" -ForegroundColor Cyan
+}
 exit 1

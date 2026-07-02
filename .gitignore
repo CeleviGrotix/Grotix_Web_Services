@@ -104,6 +104,11 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+# Azure zip deploy output (deploy-service.ps1)
+**/.publish/
+**/.publish-test/
+**/deploy.zip
+
 # Chutzpah Test files
 _Chutzpah*
 
