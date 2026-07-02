@@ -1,7 +1,5 @@
 # Microservices Local Setup (Profiles + CultivationArea + Gateway)
 
----
-
 ## Environment configuration
 
 - El repo ahora soporta un archivo raíz `.env` cargado automáticamente por `Profiles.Api`, `CultivationArea.Api` y `Gateway.Api` antes de construir la configuración.
@@ -50,7 +48,7 @@ dotnet run --project src/CultivationArea.Api/CultivationArea.Api.csproj --urls h
 dotnet run --project src/Gateway.Api/Gateway.Api.csproj --urls http://localhost:5100
 ```
 
-## Roles y permisos (resumen)
+## Roles y permisos
 
 | `role.Name` (JWT) | Uso |
 |-------------------|-----|
@@ -102,7 +100,7 @@ En el **gateway** (`5100`), mismo path que en Profiles (proxied a `5101`):
 
 Directo en APIs: `5101` / `5102` también exponen `/live`, `/ready/core`, `/ready/telemetry`.
 
-## RabbitMQ (opcional)
+## RabbitMQ (opcional para local)
 
 - Broker AMQP: `localhost:5672`. UI: `http://localhost:15672` (usuario/contraseña por defecto `guest`/`guest`).
 - Arranque con Docker (raíz del repo): `docker compose -f docker-compose.rabbitmq.yml up -d`
