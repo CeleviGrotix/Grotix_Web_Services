@@ -11,7 +11,8 @@ public sealed class IrrigationCommandService(
     IZoneAccessService zoneAccessService,
     IIrrigationContextService irrigationContextService,
     IActuatorControlService actuatorControlService,
-    IIrrigationCompletedPublisher completedPublisher) : IIrrigationCommandService
+    IIrrigationCompletedPublisher completedPublisher,
+    IIrrigationStartedPublisher startedPublisher) : IIrrigationCommandService
 {
     public async Task<IrrigationCycleRecord> StartManualAsync(
         int zoneId,
@@ -49,6 +50,7 @@ public sealed class IrrigationCommandService(
         await unitOfWork.CompleteAsync(cancellationToken);
 
         await actuatorControlService.TryActivateIrrigationAsync(zoneId, cancellationToken);
+        startedPublisher.Publish(cycle);
         return cycle;
     }
 

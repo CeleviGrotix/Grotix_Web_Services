@@ -32,10 +32,37 @@ public sealed class ProfilesRabbitMqTopologyInitializer(
                 _options.ExchangeName,
                 _options.AlertTriggeredRoutingKey);
 
-            logger.LogInformation(
-                "Profiles RabbitMQ topology OK: alertNotificationQueue={Queue} -> {RoutingKey}",
-                _options.AlertNotificationQueueName,
-                _options.AlertTriggeredRoutingKey);
+            channel.QueueDeclare(
+                _options.ProfilesIrrigationStartedQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+            channel.QueueBind(
+                _options.ProfilesIrrigationStartedQueueName,
+                _options.ExchangeName,
+                _options.IrrigationStartedRoutingKey);
+
+            channel.QueueDeclare(
+                _options.ProfilesIrrigationCompletedQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+            channel.QueueBind(
+                _options.ProfilesIrrigationCompletedQueueName,
+                _options.ExchangeName,
+                _options.IrrigationCompletedRoutingKey);
+
+            channel.QueueDeclare(
+                _options.ProfilesDeviceOfflineQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false);
+            channel.QueueBind(
+                _options.ProfilesDeviceOfflineQueueName,
+                _options.ExchangeName,
+                _options.DeviceOfflineRoutingKey);
+
+            logger.LogInformation("Profiles RabbitMQ topology OK.");
         }
         catch (Exception ex)
         {

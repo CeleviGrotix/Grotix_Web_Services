@@ -19,6 +19,9 @@ public static class ProfilesRabbitMqServiceCollectionExtensions
         services.AddSingleton<RabbitMqConnectionHolder>();
         services.AddHostedService<ProfilesRabbitMqTopologyInitializer>();
         services.AddHostedService<RabbitMqAlertNotificationConsumerHostedService>();
+        services.AddHostedService<RabbitMqIrrigationStartedNotificationConsumerHostedService>();
+        services.AddHostedService<RabbitMqIrrigationCompletedNotificationConsumerHostedService>();
+        services.AddHostedService<RabbitMqDeviceOfflineNotificationConsumerHostedService>();
         return services;
     }
 }

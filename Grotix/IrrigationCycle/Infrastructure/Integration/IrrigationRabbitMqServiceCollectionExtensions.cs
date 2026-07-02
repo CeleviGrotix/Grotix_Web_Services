@@ -18,12 +18,14 @@ public static class IrrigationRabbitMqServiceCollectionExtensions
         {
             services.AddSingleton<IRabbitMqPublisher, NoOpRabbitMqPublisher>();
             services.AddSingleton<IIrrigationCompletedPublisher, NoOpIrrigationCompletedPublisher>();
+            services.AddSingleton<IIrrigationStartedPublisher, NoOpIrrigationStartedPublisher>();
             return services;
         }
 
         services.AddSingleton<RabbitMqConnectionHolder>();
         services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
         services.AddScoped<IIrrigationCompletedPublisher, RabbitMqIrrigationCompletedPublisher>();
+        services.AddScoped<IIrrigationStartedPublisher, RabbitMqIrrigationStartedPublisher>();
         services.AddHostedService<IrrigationRabbitMqTopologyInitializer>();
         services.AddHostedService<RabbitMqAlertTriggeredConsumerHostedService>();
         services.AddHostedService<RabbitMqDeviceStatusChangedConsumerHostedService>();

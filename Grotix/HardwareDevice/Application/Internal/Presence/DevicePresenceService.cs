@@ -9,6 +9,7 @@ public sealed class DevicePresenceService(
     IMicrocontrollerRepository deviceRepository,
     IHardwareDeviceUnitOfWork unitOfWork,
     IDeviceStatusChangedPublisher deviceStatusChangedPublisher,
+    IDeviceOfflinePublisher deviceOfflinePublisher,
     IOptions<DevicePresenceOptions> options,
     ILogger<DevicePresenceService> logger) : IDevicePresenceService
 {
@@ -52,7 +53,10 @@ public sealed class DevicePresenceService(
             var oldStatus = device.Status;
             device.UpdateStatus(DeviceStatuses.Offline, device.LastSeen);
             if (!string.Equals(oldStatus, device.Status, StringComparison.OrdinalIgnoreCase))
+            {
                 deviceStatusChangedPublisher.Publish(device, oldStatus, device.Status);
+                deviceOfflinePublisher.Publish(device);
+            }
         }
 
         await unitOfWork.CompleteAsync(cancellationToken);

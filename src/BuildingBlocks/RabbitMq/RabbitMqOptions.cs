@@ -58,4 +58,19 @@ public sealed class RabbitMqOptions
 
     /// <summary>Cola consumida por Hardware para marcar dispositivos ONLINE.</summary>
     public string DeviceHeartbeatQueueName { get; set; } = "hardware.device.heartbeat";
+
+    /// <summary>Routing key publicada al iniciar un ciclo de riego.</summary>
+    public string IrrigationStartedRoutingKey { get; set; } = "irrigation.started";
+
+    /// <summary>Cola consumida por Profiles cuando un ciclo de riego inicia.</summary>
+    public string ProfilesIrrigationStartedQueueName { get; set; } = "profiles.irrigation.started";
+
+    /// <summary>Cola consumida por Profiles cuando un ciclo de riego termina.</summary>
+    public string ProfilesIrrigationCompletedQueueName { get; set; } = "profiles.irrigation.completed";
+
+    /// <summary>Routing key publicada cuando un dispositivo se pone OFFLINE.</summary>
+    public string DeviceOfflineRoutingKey { get; set; } = "hardware.device.offline";
+
+    /// <summary>Cola consumida por Profiles cuando un dispositivo se pone OFFLINE.</summary>
+    public string ProfilesDeviceOfflineQueueName { get; set; } = "profiles.device.offline";
 }

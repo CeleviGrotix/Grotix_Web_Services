@@ -21,12 +21,14 @@ public static class HardwareRabbitMqServiceCollectionExtensions
         {
             services.AddSingleton<IRabbitMqPublisher, NoOpRabbitMqPublisher>();
             services.AddSingleton<IDeviceStatusChangedPublisher, NoOpDeviceStatusChangedPublisher>();
+            services.AddSingleton<IDeviceOfflinePublisher, NoOpDeviceOfflinePublisher>();
             return services;
         }
 
         services.AddSingleton<RabbitMqConnectionHolder>();
         services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
         services.AddSingleton<IDeviceStatusChangedPublisher, RabbitMqDeviceStatusChangedPublisher>();
+        services.AddSingleton<IDeviceOfflinePublisher, RabbitMqDeviceOfflinePublisher>();
         services.AddHostedService<HardwareRabbitMqTopologyInitializer>();
         services.AddScoped<IActuatorCommandOrchestrator, ActuatorCommandOrchestrator>();
         services.AddHostedService<RabbitMqActuatorCommandConsumerHostedService>();
