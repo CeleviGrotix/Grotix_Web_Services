@@ -5,6 +5,7 @@ using Xunit;
 
 namespace HardwareDevice.Api.Tests.Unit;
 
+// Following the AAA Pattern Testing
 public class IrrigationUnitTests
 {
     [Fact]
