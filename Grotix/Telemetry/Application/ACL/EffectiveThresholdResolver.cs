@@ -9,7 +9,8 @@ namespace GrotixBackend.Telemetry.Application.ACL;
 public sealed class EffectiveThresholdResolver(
     IZoneQueryService zoneQueryService,
     ICropQueryService cropQueryService,
-    IActiveThresholdRepository activeThresholdRepository) : IEffectiveThresholdResolver
+    IActiveThresholdRepository activeThresholdRepository,
+    ISensorRepository sensorRepository) : IEffectiveThresholdResolver
 {
     public async Task<IReadOnlyList<EffectiveThreshold>> ResolveForZoneAsync(
         int zoneId,
@@ -26,6 +27,11 @@ public sealed class EffectiveThresholdResolver(
         var overrides = (await activeThresholdRepository.ListByZoneAsync(zoneId, cancellationToken))
             .ToDictionary(t => SensorTypes.Normalize(t.SensorType), StringComparer.OrdinalIgnoreCase);
 
+        var zoneSensors = await sensorRepository.ListByZoneAsync(zoneId, cancellationToken);
+        var unitByType = zoneSensors
+            .GroupBy(s => SensorTypes.Normalize(s.Type), StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().Unit, StringComparer.OrdinalIgnoreCase);
+
         var result = new List<EffectiveThreshold>();
         foreach (var sensorType in SensorTypes.All)
         {
@@ -37,7 +43,8 @@ public sealed class EffectiveThresholdResolver(
                 continue;
             }
 
-            var defaults = CropThresholdDefaults.ForSensorType(crop, sensorType);
+            unitByType.TryGetValue(sensorType, out var unit);
+            var defaults = CropThresholdDefaults.ForSensorType(crop, sensorType, unit);
             if (defaults.HasValue)
                 result.Add(new EffectiveThreshold(sensorType, defaults.Value.Min, defaults.Value.Max, "crop"));
         }

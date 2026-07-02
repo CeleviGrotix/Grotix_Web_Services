@@ -26,7 +26,7 @@ public sealed class RabbitMqDeviceStatusChangedPublisher(
             DateTime.UtcNow);
 
         var json = JsonSerializer.Serialize(evt);
-        publisher.Publish(_options.DeviceStatusChangedRoutingKey, Encoding.UTF8.GetBytes(json));
+        publisher.TryPublish(_options.DeviceStatusChangedRoutingKey, Encoding.UTF8.GetBytes(json));
     }
 }
 

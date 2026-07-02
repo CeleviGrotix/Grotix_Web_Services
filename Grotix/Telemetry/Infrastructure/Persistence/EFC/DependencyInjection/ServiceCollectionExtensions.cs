@@ -13,7 +13,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGrotixTelemetryPersistence(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        bool applyMigrationsOnStartup = true)
     {
         var connectionString = configuration.GetConnectionString("TelemetryTimescale");
         services.AddDbContext<TelemetryDbContext>(options =>
@@ -33,7 +34,8 @@ public static class ServiceCollectionExtensions
         services.AddHealthChecks()
             .AddCheck<TimescaleTelemetryHealthCheck>("timescale", tags: ["timescale"]);
 
-        services.AddHostedService<TelemetryDatabaseInitializer>();
+        if (applyMigrationsOnStartup)
+            services.AddHostedService<TelemetryDatabaseInitializer>();
 
         return services;
     }

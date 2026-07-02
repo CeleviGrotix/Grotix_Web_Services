@@ -26,11 +26,23 @@ public sealed class IrrigationCommandService(
         if (active != null)
             throw new InvalidOperationException($"Ya hay un ciclo activo en la zona {zoneId}.");
 
-        var context = await irrigationContextService.GetZoneContextAsync(zoneId, cancellationToken);
-        var volume = volumeLiters ?? IrrigationCalculator.CalculateVolumeLiters(
-            context?.CurrentHumiditySoilPercent,
-            context?.OptimalHumiditySoil);
-        var duration = IrrigationCalculator.ResolveDurationMinutes(volume, durationMinutes);
+        double volume;
+        int duration;
+
+        // Riego manual desde app: si ya viene duración, evitamos consulta a Timescale en el camino crítico.
+        if (durationMinutes is > 0)
+        {
+            volume = volumeLiters ?? IrrigationCalculator.DefaultVolumeLiters;
+            duration = durationMinutes.Value;
+        }
+        else
+        {
+            var context = await irrigationContextService.GetZoneContextAsync(zoneId, cancellationToken);
+            volume = volumeLiters ?? IrrigationCalculator.CalculateVolumeLiters(
+                context?.CurrentHumiditySoilPercent,
+                context?.OptimalHumiditySoil);
+            duration = IrrigationCalculator.ResolveDurationMinutes(volume, durationMinutes);
+        }
 
         var cycle = new IrrigationCycleRecord(zoneId, volume, duration);
         await cycleRepository.AddAsync(cycle);

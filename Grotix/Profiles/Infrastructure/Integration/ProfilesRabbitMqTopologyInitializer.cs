@@ -18,7 +18,7 @@ public sealed class ProfilesRabbitMqTopologyInitializer(
         if (!_options.Enabled)
             return Task.CompletedTask;
 
-        var connection = connectionHolder.TryGetConnection();
+        var connection = connectionHolder.EnsureConnected();
         if (connection == null)
             return Task.CompletedTask;
 

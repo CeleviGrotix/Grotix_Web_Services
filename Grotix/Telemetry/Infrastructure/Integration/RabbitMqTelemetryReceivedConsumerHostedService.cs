@@ -27,7 +27,7 @@ public sealed class RabbitMqTelemetryReceivedConsumerHostedService(
 
         await Task.Yield();
 
-        var connection = connectionHolder.TryGetConnection();
+        var connection = connectionHolder.EnsureConnected();
         if (connection == null)
         {
             logger.LogWarning("RabbitMQ telemetry consumer not started (broker unavailable).");

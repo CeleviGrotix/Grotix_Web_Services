@@ -46,7 +46,7 @@ public static class ServiceCollectionExtensions
                     mysql.MigrationsAssembly("Grotix.Persistence.HardwareDevice");
                 }));
 
-        services.AddGrotixTelemetryPersistence(configuration);
+        services.AddGrotixTelemetryPersistence(configuration, applyMigrationsOnStartup: false);
 
         services.AddScoped<IIrrigationUnitOfWork, IrrigationUnitOfWork>();
         services.AddScoped<IIrrigationCycleRepository, IrrigationCycleRepository>();

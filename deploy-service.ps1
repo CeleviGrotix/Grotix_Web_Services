@@ -32,9 +32,10 @@ function New-LinuxZip {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
 
     $sourceFull = (Resolve-Path $SourceDir).Path.TrimEnd('\')
-    if (Test-Path $DestinationPath) { Remove-Item $DestinationPath -Force }
+    $destFull = [System.IO.Path]::GetFullPath($DestinationPath)
+    if (Test-Path $destFull) { Remove-Item $destFull -Force }
 
-    $zip = [System.IO.Compression.ZipFile]::Open($DestinationPath, [System.IO.Compression.ZipArchiveMode]::Create)
+    $zip = [System.IO.Compression.ZipFile]::Open($destFull, [System.IO.Compression.ZipArchiveMode]::Create)
     try {
         Get-ChildItem $sourceFull -Recurse -File | ForEach-Object {
             $entryName = $_.FullName.Substring($sourceFull.Length + 1).Replace('\', '/')
@@ -57,6 +58,7 @@ $az = Resolve-ToolPath -Name "az" -Candidates @(
     "${env:ProgramFiles(x86)}\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
 )
 
+$ProjectPath = (Resolve-Path $ProjectPath).Path
 $publishDir = Join-Path $ProjectPath ".publish"
 $zipPath    = Join-Path $ProjectPath "deploy.zip"
 
@@ -72,13 +74,15 @@ if (Test-Path $browserPath) { Remove-Item $browserPath -Recurse -Force }
 Write-Host "[$AppName] Compressing (unix paths)..." -ForegroundColor Cyan
 New-LinuxZip -SourceDir $publishDir -DestinationPath $zipPath
 
-Write-Host "[$AppName] Deploying to Azure (clean)..." -ForegroundColor Cyan
+Write-Host "[$AppName] Deploying to Azure (async, no espera arranque del sitio)..." -ForegroundColor Cyan
 & $az webapp deploy `
     --resource-group $ResourceGroup `
     --name $AppName `
     --src-path $zipPath `
     --type zip `
-    --clean true
+    --clean true `
+    --async true `
+    --timeout 600000
 
 if ($LASTEXITCODE -ne 0) { Write-Host "Deploy failed." -ForegroundColor Red; exit 1 }
 

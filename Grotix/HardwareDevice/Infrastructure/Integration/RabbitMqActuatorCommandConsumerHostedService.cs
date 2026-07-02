@@ -36,7 +36,7 @@ public sealed class RabbitMqActuatorCommandConsumerHostedService(
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            var connection = connectionHolder.TryGetConnection();
+            var connection = connectionHolder.EnsureConnected();
             if (connection == null)
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);

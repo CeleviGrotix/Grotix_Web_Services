@@ -39,12 +39,19 @@ public sealed class ActuatorCommandOrchestrator(
             return;
         }
 
-        PublishActuatorCommand(zoneId, actuator, command);
+        if (!TryPublishActuatorCommand(zoneId, actuator, command))
+        {
+            logger.LogWarning(
+                "RabbitMQ not connected; action_queue item {ActionId} stays PENDING (edge can poll DB).",
+                queueItem.Id);
+            return;
+        }
+
         queueItem.MarkSent();
         await hardwareDb.SaveChangesAsync(cancellationToken);
     }
 
-    private void PublishActuatorCommand(int zoneId, DeviceActuator actuator, string command)
+    private bool TryPublishActuatorCommand(int zoneId, DeviceActuator actuator, string command)
     {
         var evt = new ActuatorCommandIntegrationEvent(
             zoneId,
@@ -56,12 +63,17 @@ public sealed class ActuatorCommandOrchestrator(
             DateTime.UtcNow);
 
         var json = JsonSerializer.Serialize(evt);
-        publisher.Publish(_options.ActuatorCommandRoutingKey, Encoding.UTF8.GetBytes(json));
+        var published = publisher.TryPublish(_options.ActuatorCommandRoutingKey, Encoding.UTF8.GetBytes(json));
 
-        logger.LogInformation(
-            "Actuator command published: zone={ZoneId}, actuator={ActuatorId}, command={Command}",
-            zoneId,
-            actuator.Id,
-            command);
+        if (published)
+        {
+            logger.LogInformation(
+                "Actuator command published: zone={ZoneId}, actuator={ActuatorId}, command={Command}",
+                zoneId,
+                actuator.Id,
+                command);
+        }
+
+        return published;
     }
 }

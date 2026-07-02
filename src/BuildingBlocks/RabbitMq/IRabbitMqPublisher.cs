@@ -2,5 +2,6 @@ namespace GrotixBackend.BuildingBlocks.RabbitMq;
 
 public interface IRabbitMqPublisher
 {
-    void Publish(string routingKey, ReadOnlyMemory<byte> body, string contentType = "application/json");
+    /// <summary>Publica si hay conexión activa. Devuelve false sin bloquear si RabbitMQ no está listo.</summary>
+    bool TryPublish(string routingKey, ReadOnlyMemory<byte> body, string contentType = "application/json");
 }

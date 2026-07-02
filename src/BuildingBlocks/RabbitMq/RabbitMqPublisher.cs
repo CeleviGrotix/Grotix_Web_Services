@@ -11,11 +11,11 @@ public sealed class RabbitMqPublisher(
 {
     private readonly RabbitMqOptions _options = options.Value;
 
-    public void Publish(string routingKey, ReadOnlyMemory<byte> body, string contentType = "application/json")
+    public bool TryPublish(string routingKey, ReadOnlyMemory<byte> body, string contentType = "application/json")
     {
         var connection = connectionHolder.TryGetConnection();
         if (connection == null)
-            return;
+            return false;
 
         try
         {
@@ -35,10 +35,12 @@ public sealed class RabbitMqPublisher(
                 _options.ExchangeName,
                 routingKey,
                 body.Length);
+            return true;
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "RabbitMQ publish failed for routing key {RoutingKey}", routingKey);
+            return false;
         }
     }
 }

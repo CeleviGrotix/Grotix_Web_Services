@@ -4,7 +4,11 @@ using RabbitMQ.Client;
 
 namespace GrotixBackend.BuildingBlocks.RabbitMq;
 
-/// <summary>Mantiene una conexión lazy a RabbitMQ; si el broker no está disponible, devuelve null sin tumbar la API.</summary>
+/// <summary>
+/// Mantiene una conexión lazy a RabbitMQ.
+/// <see cref="TryGetConnection"/> nunca conecta (seguro en peticiones HTTP).
+/// <see cref="EnsureConnected"/> conecta en arranque de workers / topology.
+/// </summary>
 public sealed class RabbitMqConnectionHolder(IOptions<RabbitMqOptions> options, ILogger<RabbitMqConnectionHolder> logger)
     : IDisposable
 {
@@ -12,7 +16,18 @@ public sealed class RabbitMqConnectionHolder(IOptions<RabbitMqOptions> options, 
     private IConnection? _connection;
     private bool _loggedUnavailable;
 
+    /// <summary>Devuelve la conexión abierta o null sin intentar conectar.</summary>
     public IConnection? TryGetConnection()
+    {
+        if (!options.Value.Enabled)
+            return null;
+
+        lock (_gate)
+            return _connection is { IsOpen: true } ? _connection : null;
+    }
+
+    /// <summary>Conecta si hace falta. Usar solo en arranque (hosted services), no en requests.</summary>
+    public IConnection? EnsureConnected()
     {
         if (!options.Value.Enabled)
             return null;
@@ -53,7 +68,9 @@ public sealed class RabbitMqConnectionHolder(IOptions<RabbitMqOptions> options, 
                         AutomaticRecoveryEnabled = true
                     };
                 }
+
                 _connection = factory.CreateConnection();
+                _loggedUnavailable = false;
                 logger.LogInformation(
                     "RabbitMQ connected ({Host}:{Port}, vhost={VHost}).",
                     opt.HostName,

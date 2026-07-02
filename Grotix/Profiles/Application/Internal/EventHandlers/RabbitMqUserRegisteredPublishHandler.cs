@@ -20,7 +20,7 @@ public sealed class RabbitMqUserRegisteredPublishHandler(
 
         var payload = new UserRegisteredIntegrationEvent(notification.IdentityId, notification.Email);
         var json = JsonSerializer.Serialize(payload);
-        publisher.Publish(options.Value.UserRegisteredRoutingKey, Encoding.UTF8.GetBytes(json));
+        publisher.TryPublish(options.Value.UserRegisteredRoutingKey, Encoding.UTF8.GetBytes(json));
         return Task.CompletedTask;
     }
 }

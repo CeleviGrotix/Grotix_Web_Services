@@ -17,7 +17,7 @@ public sealed class RabbitMqAlertPublisher(
     public void Publish(AlertTriggeredIntegrationEvent alert)
     {
         var json = JsonSerializer.Serialize(alert);
-        publisher.Publish(_options.AlertTriggeredRoutingKey, System.Text.Encoding.UTF8.GetBytes(json));
+        publisher.TryPublish(_options.AlertTriggeredRoutingKey, System.Text.Encoding.UTF8.GetBytes(json));
 
         logger.LogInformation(
             "Alert published: zone={ZoneId}, sensor={SensorId}, type={SensorType}, value={Value}, direction={Direction}, routingKey={RoutingKey}",

@@ -1,0 +1,65 @@
+# MySQL + PostgreSQL (Timescale) para desarrollo local.
+# Credenciales alineadas con .env y migrate.ps1
+#
+# Levantar:
+#   docker compose -f docker-compose.databases.yml up -d
+#
+# Migraciones:
+#   .\migrate.ps1
+#
+# Parar (conserva datos en volúmenes):
+#   docker compose -f docker-compose.databases.yml down
+#
+# Parar y borrar datos:
+#   docker compose -f docker-compose.databases.yml down -v
+
+# Si ya tienes grotix-mysql (3306) y grotix-telemetry (5432) corriendo con las
+# mismas credenciales, no hace falta levantar esto de nuevo — usa .\migrate.ps1.
+
+name: grotix-databases
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: grotix-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: grotix_core
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=caching_sha2_password
+    volumes:
+      - grotix_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    restart: unless-stopped
+
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: grotix-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Grotix2026!
+      POSTGRES_DB: grotix_telemetry
+    volumes:
+      - grotix_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d grotix_telemetry"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  grotix_mysql_data:
+  grotix_postgres_data:

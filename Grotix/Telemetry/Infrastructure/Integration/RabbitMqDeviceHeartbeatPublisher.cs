@@ -19,6 +19,6 @@ public sealed class RabbitMqDeviceHeartbeatPublisher(
             return;
 
         var json = JsonSerializer.Serialize(heartbeat);
-        publisher.Publish(_options.DeviceHeartbeatRoutingKey, Encoding.UTF8.GetBytes(json));
+        publisher.TryPublish(_options.DeviceHeartbeatRoutingKey, Encoding.UTF8.GetBytes(json));
     }
 }

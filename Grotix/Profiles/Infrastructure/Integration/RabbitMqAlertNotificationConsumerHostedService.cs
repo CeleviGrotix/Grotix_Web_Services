@@ -29,7 +29,7 @@ public sealed class RabbitMqAlertNotificationConsumerHostedService(
 
         await Task.Yield();
 
-        var connection = connectionHolder.TryGetConnection();
+        var connection = connectionHolder.EnsureConnected();
         if (connection == null)
         {
             logger.LogWarning("RabbitMQ profiles alert consumer not started.");

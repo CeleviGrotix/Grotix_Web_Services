@@ -2,7 +2,7 @@ namespace GrotixBackend.IrrigationCycle.Domain.Services;
 
 public static class IrrigationCalculator
 {
-    private const double DefaultVolumeLiters = 25;
+    public const double DefaultVolumeLiters = 25;
     private const double LitersPerHumidityPoint = 2.5;
     private const int DefaultDurationMinutes = 15;
     private const double FlowLitersPerMinute = 5;

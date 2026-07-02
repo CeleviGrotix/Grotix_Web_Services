@@ -28,6 +28,6 @@ public sealed class RabbitMqIrrigationCompletedPublisher(
             cycle.EndTime ?? DateTime.UtcNow);
 
         var json = JsonSerializer.Serialize(evt);
-        publisher.Publish(_options.IrrigationCompletedRoutingKey, Encoding.UTF8.GetBytes(json));
+        publisher.TryPublish(_options.IrrigationCompletedRoutingKey, Encoding.UTF8.GetBytes(json));
     }
 }

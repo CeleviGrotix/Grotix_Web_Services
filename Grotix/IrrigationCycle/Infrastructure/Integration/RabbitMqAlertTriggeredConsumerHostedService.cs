@@ -32,7 +32,7 @@ public sealed class RabbitMqAlertTriggeredConsumerHostedService(
 
         await Task.Yield();
 
-        var connection = connectionHolder.TryGetConnection();
+        var connection = connectionHolder.EnsureConnected();
         if (connection == null)
         {
             logger.LogWarning("RabbitMQ irrigation alert consumer not started.");
