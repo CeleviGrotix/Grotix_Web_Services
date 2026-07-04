@@ -4,6 +4,9 @@ param(
     [string]$ResourceGroup = "GrotixServices"
 )
 
+
+
+
 $ErrorActionPreference = "Stop"
 
 function Resolve-ToolPath {
