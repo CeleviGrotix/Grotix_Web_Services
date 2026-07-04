@@ -1,5 +1,7 @@
 namespace GrotixBackend.BuildingBlocks.RabbitMq;
 
+
+
 public interface IRabbitMqPublisher
 {
     /// <summary>Publica si hay conexión activa. Devuelve false sin bloquear si RabbitMQ no está listo.</summary>
